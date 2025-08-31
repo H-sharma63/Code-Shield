@@ -1,7 +1,6 @@
 import { google } from 'googleapis';
 import { NextRequest, NextResponse } from 'next/server';
 
-// Ensure your GOOGLE_SERVICE_ACCOUNT_CREDENTIALS are set in .env.local
 const credentials = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS;
 
 if (!credentials) {
@@ -16,37 +15,34 @@ const serviceAccountAuth = new google.auth.JWT({
 
 const sheets = google.sheets({ version: 'v4', auth: serviceAccountAuth });
 
-const SPREADSHEET_ID = '1zqcXiQsIGJGXdGJedJVMlE7YipvAuZzSbg-MD29pyJM'; // Your Google Sheet ID
-const SHEET_NAME = 'Sheet1'; // The name of the sheet where you want to log users
+const SPREADSHEET_ID = '1zqcXiQsIGJGXdGJedJVMlE7YipvAuZzSbg-MD29pyJM'; 
+const SHEET_NAME = 'Sheet1'; 
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, provider } = await req.json(); // Destructure provider
-    console.log(''); // Debug log
+    const { name, email, provider } = await req.json(); 
+    console.log(''); 
 
-    if (!name || !email || !provider) { // Provider is now also required
+    if (!name || !email || !provider) { 
       return NextResponse.json({ message: 'Name, email, and provider are required.' }, { status: 400 });
     }
 
-    // 1. Read existing data to check for duplicates
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:C`, // Read columns A, B, and C
+      range: `${SHEET_NAME}!A:C`, 
     });
 
     const existingRows = response.data.values || [];
-    // Check for duplicate based on name, email, AND provider
     const isDuplicate = existingRows.some(row => row[0] === name && row[1] === email && row[2] === provider);
 
     if (isDuplicate) {
       return NextResponse.json({ message: 'User already logged.' }, { status: 200 });
     }
 
-    // 2. Append new data if not a duplicate
-    const values = [[name, email, provider]]; // Include provider in values
+    const values = [[name, email, provider]]; 
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:C`, // Append to columns A, B, and C
+      range: `${SHEET_NAME}!A:C`, 
       valueInputOption: 'RAW',
       requestBody: {
         values: values,
