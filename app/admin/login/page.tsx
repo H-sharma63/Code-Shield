@@ -22,18 +22,18 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
+    <div className="min-h-screen flex flex-col justify-center sm:py-12">
       <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
-        <h1 className="font-bold text-center text-2xl mb-5">Admin Login</h1>
-        <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
+        <h1 className="font-bold text-center text-2xl mb-5 text-textPrimary">Admin Login</h1>
           <div className="px-5 py-7">
-            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+            {error && <p className="text-logoutButton text-center mb-4">{error}</p>}
             <div className="flex flex-col gap-4">
               {/* For admin login, we use providers with the '-admin' suffix */}
-              <GoogleLoginButton style={{ borderRadius: '30px' }} onClick={() => signIn("google-admin", { callbackUrl: '/admin/dashboard' })} />
+              <div className="w-[70%] mx-auto">
+                <GoogleLoginButton style={{ borderRadius: '30px' }} onClick={() => signIn("google-admin", { callbackUrl: '/admin/dashboard' })} />
+              </div>
             </div>
           </div>
-        </div>
       </div>
     </div>
   )

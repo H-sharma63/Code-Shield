@@ -46,22 +46,27 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
+    <div className="min-h-screen bg-base">
+      <header className="bg-cardPanel shadow">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-4xl font-bold text-textPrimary">
               Admin Dashboard
             </h1>
           </div>
           <div className="flex justify-between items-center mt-2">
-            <p className="text-x font-bold text-gray-600">Welcome, {session.user?.name} ({session.user?.email})</p>
-            <button
-              onClick={() => signOut({ callbackUrl: '/admin/login' })}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-[20px]"
-            >
-              Sign Out
-            </button>
+            <p className="text-l font-bold text-textSecondary">Welcome, {session.user?.name} ({session.user?.email})</p>
+            <div className="flex items-center">
+              <Link href="/" className="bg-primaryAccent hover:opacity-80 text-white font-bold py-2 px-4 rounded-[20px] mr-4">
+                Home
+              </Link>
+              <button
+                onClick={() => signOut({ callbackUrl: '/admin/login' })}
+                className="bg-logoutButton hover:opacity-80 text-white font-bold py-2 px-4 rounded-[20px]"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -70,29 +75,29 @@ export default function AdminDashboard() {
           <div className="px-4 py-6 sm:px-0">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
               <Link href="/admin/user-monitoring">
-                <div className="bg-white rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center cursor-pointer hover:shadow-lg transition-shadow duration-200">
-                  <p className="text-lg font-semibold mb-2">User Monitoring</p>
-                  <button className="w-[250px] bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-[20px]">
+                <div className="bg-cardPanel rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center cursor-pointer hover:shadow-lg transition-shadow duration-200">
+                  <p className="text-lg font-semibold text-textPrimary mb-2">User Monitoring</p>
+                  <button className="w-[250px] bg-primaryAccent hover:opacity-80 text-cardPanel font-bold py-2 px-4 rounded-[20px]">
                     Go to User Monitoring
                   </button>
                 </div>
               </Link>
-              <div className="bg-white rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center">
-                <p className="text-lg font-semibold mb-2">Content</p>
-                <button className="w-[250px] bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-[20px]">
-                  Go to Content
-                </button>
-              </div>
-              <div className="bg-white rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center">
-                <p className="text-lg font-semibold mb-2">Error Monitoring</p>
-                <button className="w-[250px] bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-[20px]">
+              <div className="bg-cardPanel rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center">
+                <p className="text-lg font-semibold text-textPrimary mb-2">Error Monitoring</p>
+                <button className="w-[250px] bg-primaryAccent hover:opacity-80 text-cardPanel font-bold py-2 px-4 rounded-[20px]">
                   Go to Error Monitoring
                 </button>
               </div>
-              <div className="bg-white rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center">
-                <p className="text-lg font-semibold mb-2">API Usage</p>
-                <button className="w-[250px] bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-[20px]">
+              <div className="bg-cardPanel rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center">
+                <p className="text-lg font-semibold text-textPrimary mb-2">API Usage</p>
+                <button className="w-[250px] bg-primaryAccent hover:opacity-80 text-cardPanel font-bold py-2 px-4 rounded-[20px]">
                   Go to API Usage
+                </button>
+              </div>
+              <div className="bg-cardPanel rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center">
+                <p className="text-lg font-semibold text-textPrimary mb-2">Site Admin Hub</p>
+                <button className="w-[250px] bg-primaryAccent hover:opacity-80 text-cardPanel font-bold py-2 px-4 rounded-[20px]">
+                  Go to Site Admin Hub
                 </button>
               </div>
             </div>

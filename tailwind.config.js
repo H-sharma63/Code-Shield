@@ -6,8 +6,22 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        exo: ['Exo', 'sans-serif'],
+      },
+      colors: {
+        base: '#2b2b2b',
+        primaryAccent: '#12c2e9',
+        secondaryAccent: '#c471f5',
+        cardPanel: '#37373b',
+        highlight: '#ffde59',
+        textPrimary: '#f3f3f3',
+        textSecondary: '#b0b2ba',
+        borderLine: '#41414a',
+        logoutButton: '#E84242',
+      },
+    },
   },
   plugins: [],
 }
-
