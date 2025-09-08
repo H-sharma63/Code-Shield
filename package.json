@@ -1,15 +1,23 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "ai_based_code_reviewer",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@monaco-editor/react": "^4.7.0",
+    "@mui/icons-material": "^7.3.2",
+    "@mui/lab": "^7.0.0-beta.17",
+    "@mui/material": "^7.3.2",
+    "@mui/x-tree-view": "^8.11.1",
+    "@sentry/nextjs": "^10.10.0",
     "eslint-linter-browserify": "^9.34.0",
     "googleapis": "^157.0.0",
     "lucide-react": "^0.542.0",
@@ -18,8 +26,8 @@
     "prettier": "^3.6.2",
     "pusher": "^5.2.0",
     "pusher-js": "^8.4.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-social-login-buttons": "^4.1.1"
   },
   "devDependencies": {

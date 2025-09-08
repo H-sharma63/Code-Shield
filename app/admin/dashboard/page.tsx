@@ -82,12 +82,14 @@ export default function AdminDashboard() {
                   </button>
                 </div>
               </Link>
-              <div className="bg-cardPanel rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center">
-                <p className="text-lg font-semibold text-textPrimary mb-2">Error Monitoring</p>
-                <button className="w-[250px] bg-primaryAccent hover:opacity-80 text-cardPanel font-bold py-2 px-4 rounded-[20px]">
-                  Go to Error Monitoring
-                </button>
-              </div>
+              <Link href="https://student-brn.sentry.io/projects/ai-code-reviewer/" target="_blank" rel="noopener noreferrer">
+                <div className="bg-cardPanel rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center cursor-pointer hover:shadow-lg transition-shadow duration-200">
+                  <p className="text-lg font-semibold text-textPrimary mb-2">Error Monitoring</p>
+                  <button className="w-[250px] bg-primaryAccent hover:opacity-80 text-cardPanel font-bold py-2 px-4 rounded-[20px]">
+                    Go to Sentry Dashboard
+                  </button>
+                </div>
+              </Link>
               <div className="bg-cardPanel rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center">
                 <p className="text-lg font-semibold text-textPrimary mb-2">API Usage</p>
                 <button className="w-[250px] bg-primaryAccent hover:opacity-80 text-cardPanel font-bold py-2 px-4 rounded-[20px]">

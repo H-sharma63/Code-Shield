@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./providers";
 import PusherProvider from "./components/PusherProvider";
+import ConditionalNavbar from "./components/ConditionalNavbar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,9 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-exo antialiased bg-base">
+      <body className="font-exo antialiased bg-base overflow-x-hidden">
         <Providers>
-          <PusherProvider>{children}</PusherProvider>
+          <PusherProvider>
+            <ConditionalNavbar />
+            {children}
+          </PusherProvider>
         </Providers>
       </body>
     </html>

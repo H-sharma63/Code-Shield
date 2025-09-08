@@ -23,8 +23,8 @@ export async function POST(req: NextRequest) {
     const { name, email, provider } = await req.json(); 
     console.log(''); 
 
-    if (!name || !email || !provider) { 
-      return NextResponse.json({ message: 'Name, email, and provider are required.' }, { status: 400 });
+    if (!name || !provider) { 
+      return NextResponse.json({ message: 'Name and provider are required.' }, { status: 400 });
     }
 
     const response = await sheets.spreadsheets.values.get({
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     });
 
     const existingRows = response.data.values || [];
-    const isDuplicate = existingRows.some(row => row[0] === name && row[1] === email && row[2] === provider);
+    const isDuplicate = existingRows.some(row => (row[1] === email || (email === null && !row[1])) && row[2] === provider);
 
     if (isDuplicate) {
       return NextResponse.json({ message: 'User already logged.' }, { status: 200 });

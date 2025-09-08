@@ -1,3 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* *{
+  border: 1px solid red !important;
+} */
+
 @font-face {
   font-family: 'Exo';
   src: url('/fonts/Exo-Thin.ttf') format('truetype');
@@ -61,6 +69,68 @@
   font-style: normal;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@font-face {
+  font-family: 'Exo';
+  src: url('/fonts/Exo-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('/fonts/Exo-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('/fonts/Exo-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('/fonts/Exo-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('/fonts/Exo-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('/fonts/Exo-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('/fonts/Exo-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('/fonts/Exo-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Exo';
+  src: url('/fonts/Exo-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+.my-search-match {
+  background-color: rgba(255, 255, 0, 0.3); /* Yellow with some transparency */
+}
