@@ -20,6 +20,14 @@ module.exports = {
         textSecondary: '#b0b2ba',
         borderLine: '#41414a',
         logoutButton: '#E84242',
+
+        // Added Deep Mauve colors
+        'deep-mauve-start': '#824d69',
+        'deep-mauve-end': '#1c3239',
+      },
+      backgroundImage: {
+        // Added Deep Mauve gradient
+        'basegradient': 'linear-gradient(180deg, #824d69 0%, #1c3239 100%)',
       },
     },
   },

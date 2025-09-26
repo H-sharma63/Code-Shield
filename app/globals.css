@@ -134,3 +134,22 @@
 .my-search-match {
   background-color: rgba(255, 255, 0, 0.3); /* Yellow with some transparency */
 }
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #37373b;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #b0b2ba;
+  border-radius: 4px;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #b0b2ba #37373b;
+}

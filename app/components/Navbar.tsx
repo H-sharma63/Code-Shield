@@ -11,7 +11,7 @@ const Navbar = () => {
   const { data: session } = useSession();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // New state for mobile menu
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,21 +29,19 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="w-full bg-cardPanel text-textPrimary p-4 flex justify-between items-center relative"> {/* Added relative */}
+      <nav className="w-full bg-cardPanel text-textPrimary p-4 flex justify-between items-center relative"> 
         <div className="flex items-center">
           <Link href="/" className="flex items-center space-x-2">
             <Image src="/file.svg" alt="Logo" width={32} height={32} />
             <span className="text-xl font-bold">AI Code Reviewer</span>
           </Link>
         </div>
-        {/* Hamburger menu button for mobile */}
         <div className="md:hidden">
           <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-textPrimary focus:outline-none">
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
-        {/* Desktop navigation links */}
-        <div className="hidden md:flex items-center space-x-4"> {/* Hidden on mobile, flex on medium and up */}
+        <div className="hidden md:flex items-center space-x-4"> 
           {session ? (
             <>
               <Link href="/" className="hover:text-highlight">
@@ -90,7 +88,6 @@ const Navbar = () => {
           )}
         </div>
       </nav>
-      {/* Mobile menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-cardPanel text-textPrimary p-4 flex flex-col items-center space-y-4">
           {session ? (
@@ -101,11 +98,9 @@ const Navbar = () => {
               <Link href="/editor" className="hover:text-highlight" onClick={() => setIsMobileMenuOpen(false)}>
                 Projects
               </Link>
-              {/* User dropdown in mobile menu - simplified for now */}
               <button onClick={() => { setDropdownOpen(!dropdownOpen); setIsMobileMenuOpen(false); }} className="hover:text-highlight">
                 {session.user?.name || 'Profile'}
               </button>
-              {/* Settings and Logout can be added here if needed for mobile */}
               <button onClick={() => { signOut(); setIsMobileMenuOpen(false); }} className="hover:text-highlight">
                 Logout
               </button>

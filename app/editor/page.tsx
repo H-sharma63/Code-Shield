@@ -7,7 +7,7 @@ import { Play, Files, Search as SearchIcon, CheckSquare, Plus, Minus, SquareTerm
 import FileExplorer from '../components/editor/FileExplorer';
 import Search from '../components/editor/Search';
 import Analysis from '../components/editor/Analysis';
-import Output from '../components/editor/Output';
+import Terminal from '../components/editor/Terminal';
 
 const MOCK_FILE_SYSTEM: { [key: string]: { entries: { name: string; type: string; }[] } } = {
   ".": {
@@ -17,20 +17,8 @@ const MOCK_FILE_SYSTEM: { [key: string]: { entries: { name: string; type: string
       { name: "app", type: "directory" },
       { name: "public", type: "directory" },
       { name: "types", type: "directory" },
-      { name: ".gitignore", type: "file" },
-      { name: "eslint.config.mjs", type: "file" },
-      { name: "instrumentation-client.ts", type: "file" },
-      { name: "instrumentation.ts", type: "file" },
-      { name: "next.config.ts", type: "file" },
-      { name: "package-lock.json", type: "file" },
-      { name: "package.json", type: "file" },
-      { name: "postcss.config.js", type: "file" },
       { name: "README.md", type: "file" },
-      { name: "sentry.client.config.ts", type: "file" },
-      { name: "sentry.edge.config.ts", type: "file" },
-      { name: "sentry.server.config.ts", type: "file" },
-      { name: "tailwind.config.js", type: "file" },
-      { name: "tsconfig.json", type: "file" },
+      { name: "package.json", type: "file" },
     ]
   },
   "app": {
@@ -40,17 +28,6 @@ const MOCK_FILE_SYSTEM: { [key: string]: { entries: { name: string; type: string
       { name: "editor", type: "directory" },
       { name: "sentry-example-page", type: "directory" },
       { name: "admin", type: "directory" },
-      { name: "favicon.ico", type: "file" },
-      { name: "global-error.tsx", type: "file" },
-      { name: "globals.css", type: "file" },
-      { name: "layout.tsx", type: "file" },
-      { name: "page.tsx", type: "file" },
-      { name: "providers.tsx", type: "file" },
-    ]
-  },
-  "app/editor": {
-    entries: [
-      { name: "page.tsx", type: "file" },
     ]
   },
   "app/api": {
@@ -62,44 +39,31 @@ const MOCK_FILE_SYSTEM: { [key: string]: { entries: { name: string; type: string
       { name: "sentry-example-api", type: "directory" },
     ]
   },
-  "app/components": {
+  "app/api/auth": {
     entries: [
-      { name: "ConditionalNavbar.tsx", type: "file" },
-      { name: "LoginCard.tsx", type: "file" },
-      { name: "Navbar.tsx", type: "file" },
-      { name: "PusherContext.tsx", type: "file" },
-      { name: "PusherProvider.tsx", type: "file" },
+        { name: "[...nextauth]", type: "directory" },
+    ]
+  },
+  "app/admin": {
+    entries: [
+        { name: "dashboard", type: "directory" },
+        { name: "login", type: "directory" },
+        { name: "user-monitoring", type: "directory" },
     ]
   },
   "public": {
     entries: [
-      { name: "file.svg", type: "file" },
-      { name: "globe.svg", type: "file" },
-      { name: "next.svg", type: "file" },
-      { name: "vercel.svg", type: "file" },
-      { name: "window.svg", type: "file" },
-      { name: "fonts", type: "directory" },
-      { name: "workers", type: "directory" },
+        { name: "fonts", type: "directory" },
+        { name: "workers", type: "directory" },
     ]
-  },
-  "types": {
-    entries: [
-      { name: "next-auth.d.ts", type: "file" },
-    ]
-  },
-  // Add more mock data for other directories as needed
+  }
 };
 
 const MOCK_FILE_CONTENTS: { [key: string]: string } = {
   "README.md": "This is a mock README file content.\n\nThis content is loaded from MOCK_FILE_CONTENTS in app/editor/page.tsx.",
   "package.json": "{\n  \"name\": \"mock-project\",\n  \"version\": \"1.0.0\",\n  \"description\": \"A mock project for demonstration\",\n  \"main\": \"index.js\",\n  \"scripts\": {\n    \"test\": \"echo \\\"Error: no test specified\\\" && exit 1\"\n  },\n  \"author\": \"Gemini Agent\",\n  \"license\": \"MIT\"\n}",
-  "app/editor/page.tsx": "// Mock content for app/editor/page.tsx\n\nconsole.log('This is a mock file loaded into the editor.');\n\n// You can edit this content, but changes will not be saved to disk.\n",
-  "app/layout.tsx": "// Mock content for app/layout.tsx\n\nimport './globals.css';\n\nexport default function RootLayout({ children }) {\n  return (\n    <html>\n      <body>{children}</body>\n    </html>\n  );\n}\n",
-  "app/page.tsx": "// Mock content for app/page.tsx\n\nexport default function HomePage() {\n  return (\n    <div>\n      <h1>Welcome to the Mock Home Page!</h1>\n      <p>This content is from a mock file.</p>\n    </div>\n  );\n}\n",
-  "app/globals.css": "/* Mock content for app/globals.css */\n\nbody {\n  font-family: sans-serif;\n}\n",
-  "types/next-auth.d.ts": "// Mock content for types/next-auth.d.ts\n\ndeclare module \"next-auth\" {\n  interface Session {\n    user: {\n      id: string;\n      name: string;\n      email: string;\n    };\n  }\n}\n",
-  // Add more mock file contents as needed
 };
+
 
 const mockListDirectory = async (path: string) => {
   const data = MOCK_FILE_SYSTEM[path];
@@ -125,10 +89,13 @@ const EditorPage = () => {
   const [activeView, setActiveView] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<monaco.editor.FindMatch[]>([]);
-  const [currentExplorerPath, setCurrentExplorerPath] = useState<string>('.'); // Start at project root
-  const [explorerItems, setExplorerItems] = useState<any[]>([]); // Use any[] for treeData
-  const [expanded, setExpanded] = useState<string[]>([]); // New state for expanded items
-  const [fontSize, setFontSize] = useState(16); // Initial font size
+  const [currentExplorerPath, setCurrentExplorerPath] = useState<string>('.'); 
+  const [explorerItems, setExplorerItems] = useState<any[]>([]); 
+  const [expanded, setExpanded] = useState<string[]>([]); 
+  const [fontSize, setFontSize] = useState(16);
+  const [output, setOutput] = useState<string | null>(null);
+  const [languageId, setLanguageId] = useState(71);
+  const [stdin, setStdin] = useState("");
 
   useEffect(() => {
     workerRef.current = new Worker('/workers/eslint.worker.js');
@@ -146,13 +113,11 @@ const EditorPage = () => {
     };
   }, []);
 
-  // Effect for search functionality
   useEffect(() => {
     const editor = editorRef.current;
-    const monacoInstance = monacoRef.current; // Get the monaco instance
-    if (!editor || !monacoInstance) return; // Ensure both are available
+    const monacoInstance = monacoRef.current; 
+    if (!editor || !monacoInstance) return; 
 
-    // Clear previous decorations
     decorations.current = editor.deltaDecorations(
       decorations.current,
       []
@@ -160,17 +125,17 @@ const EditorPage = () => {
 
     if (searchQuery) {
       const model = editor.getModel();
-      if (!model) return; // Ensure model exists
+      if (!model) return; 
 
       const matches = model.findMatches(
         searchQuery,
-        false, // searchOnlyEditableRange
-        false, // isRegex
-        false, // matchCase
-        null,  // wordSeparators
-        true  // captureMatches
+        false, 
+        false, 
+        false, 
+        null, 
+        true  
       );
-      setSearchResults(matches); // Store matches in state
+      setSearchResults(matches); 
 
       const newDecorations = matches.map((match: monaco.editor.FindMatch) => ({
         range: match.range,
@@ -185,10 +150,9 @@ const EditorPage = () => {
         newDecorations
       );
     } else {
-      // If searchQuery is empty, clear search results
       setSearchResults([]);
     }
-  }, [searchQuery, editorRef.current, monacoRef.current]); // Add monacoRef.current to dependencies
+  }, [searchQuery, editorRef.current, monacoRef.current]); 
 
   const fetchDirectoryContents = async (path: string) => {
     try {
@@ -200,7 +164,7 @@ const EditorPage = () => {
             id: fullPath,
             name: entry.name,
             isDir: entry.type === 'directory',
-            children: entry.type === 'directory' ? [] : null,
+            children: entry.type === 'directory' ? [] : undefined,
           };
         });
         setExplorerItems(items);
@@ -213,7 +177,6 @@ const EditorPage = () => {
     }
   };
 
-  // Helper to find node by ID in tree data
   const findNodeById = (tree: any[], id: string): any | undefined => {
     for (const node of tree) {
       if (node.id === id) {
@@ -242,8 +205,7 @@ const EditorPage = () => {
   const onItemExpansionToggle = async (event: React.SyntheticEvent | null, itemId: string, isExpanded: boolean) => {
     const node = findNodeById(explorerItems, itemId);
 
-    // Only load children if the node is a directory AND it's being expanded AND it doesn't have children loaded yet
-    if (node && node.isDir && isExpanded && (!node.children || node.children.length === 0)) {
+    if (node && node.isDir && isExpanded && node.children.length === 0) {
       try {
         const result = await mockListDirectory(node.id);
         if (result.list_directory_response && result.list_directory_response.entries) {
@@ -253,7 +215,7 @@ const EditorPage = () => {
               id: fullPath,
               name: entry.name,
               isDir: entry.type === 'directory',
-              children: entry.type === 'directory' ? [] : null,
+              children: entry.type === 'directory' ? [] : undefined,
             };
           });
 
@@ -272,7 +234,6 @@ const EditorPage = () => {
     }
   };
 
-  // Effect for file explorer functionality
   useEffect(() => {
     if (activeView === 'explorer') {
       fetchDirectoryContents(currentExplorerPath);
@@ -286,7 +247,6 @@ const EditorPage = () => {
     editorRef.current = editor;
     monacoRef.current = monacoInstance;
 
-    // Set initial font size
     editor.updateOptions({ fontSize: fontSize });
 
     const model = editor.getModel();
@@ -307,10 +267,38 @@ const EditorPage = () => {
     }
   };
 
-  const handleRunCode = () => {
-    // We'll implement the code execution logic here later.
-    console.log('Running code...');
-    setActiveView('analysis'); // Switch to analysis view on run
+  const handleRunCode = async () => {
+    if (!editorRef.current) return;
+    const code = editorRef.current.getValue();
+    setOutput("Running code...");
+    setActiveView('output');
+
+    try {
+      const response = await fetch('/api/run-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code, language_id: languageId, stdin: stdin }),
+      });
+      const result = await response.json();
+
+      let outputString = "";
+      if (result.stdout) {
+        outputString += `${result.stdout}`;
+      } else if (result.stderr) {
+        outputString += `${result.stderr}`;
+      } else if (result.compile_output) {
+        outputString += `${result.compile_output}`;
+      } else {
+        outputString = "No output.";
+      }
+
+      setOutput(outputString);
+      setStdin("");
+    } catch (error) {
+      setOutput('Failed to run code.');
+    }
   };
 
   const handleIncreaseFontSize = () => {
@@ -320,7 +308,7 @@ const EditorPage = () => {
   };
 
   const handleDecreaseFontSize = () => {
-    const newSize = Math.max(8, fontSize - 2); // Prevent font size from going too small
+    const newSize = Math.max(8, fontSize - 2); 
     setFontSize(newSize);
     editorRef.current?.updateOptions({ fontSize: newSize });
   };
@@ -376,7 +364,7 @@ const EditorPage = () => {
           />
         )}
         {activeView === 'analysis' && <Analysis />}
-        {activeView === 'output' && <Output />}
+        {activeView === 'output' && <Terminal output={output} stdin={stdin} setStdin={setStdin} />}
       </div>
     );
   };
@@ -397,6 +385,16 @@ const EditorPage = () => {
           >
             <Minus size={18} />
           </button>
+          <select 
+            value={languageId}
+            onChange={(e) => setLanguageId(parseInt(e.target.value))}
+            className="bg-base text-textPrimary rounded p-1 ml-2"
+          >
+            <option value={71}>Python</option>
+            <option value={54}>C++</option>
+            <option value={50}>C</option>
+            <option value={62}>Java</option>
+          </select>
           <button 
             onClick={handleRunCode}
             className="text-textSecondary hover:text-borderLine z-5 ml-2" 
@@ -405,7 +403,7 @@ const EditorPage = () => {
           </button>
         </div>
         <Editor
-          height="100%" // Adjust height to account for the 30px bar
+          height="100%" 
           width="100%"
           defaultLanguage="javascript"
           onMount={handleEditorDidMount}
@@ -416,16 +414,16 @@ const EditorPage = () => {
         {renderActiveView()}
       </div>
       <div className="bg-base mt-[30px] p-2 flex flex-col items-center space-y-4 flex-grow h-full">
-        <button onClick={() => setActiveView(activeView === 'explorer' ? null : 'explorer')} className={`text-textSecondary hover:text-textPrimary ${activeView === 'explorer' ? 'border-b-2 border-highlight' : ''}`}>
+        <button title="File Explorer" onClick={() => setActiveView(activeView === 'explorer' ? null : 'explorer')} className={`text-textSecondary hover:text-textPrimary pb-1 ${activeView === 'explorer' ? 'border-b-2 border-highlight' : ''}`}>
           <Files size={24} />
         </button>
-        <button onClick={() => setActiveView(activeView === 'search' ? null : 'search')} className={`text-textSecondary hover:text-textPrimary ${activeView === 'search' ? 'border-b-2 border-highlight' : ''}`}>
+        <button title="Search" onClick={() => setActiveView(activeView === 'search' ? null : 'search')} className={`text-textSecondary hover:text-textPrimary pb-1 ${activeView === 'search' ? 'border-b-2 border-highlight' : ''}`}>
           <SearchIcon size={24} />
         </button>
-        <button onClick={() => setActiveView(activeView === 'analysis' ? null : 'analysis')} className={`text-textSecondary hover:text-textPrimary ${activeView === 'analysis' ? 'border-b-2 border-highlight' : ''}`}>
+        <button title="Analysis" onClick={() => setActiveView(activeView === 'analysis' ? null : 'analysis')} className={`text-textSecondary hover:text-textPrimary pb-1 ${activeView === 'analysis' ? 'border-b-2 border-highlight' : ''}`}>
           <CheckSquare size={24} />
         </button>
-        <button onClick={() => setActiveView(activeView === 'output' ? null : 'output')} className={`text-textSecondary hover:text-textPrimary ${activeView === 'output' ? 'border-b-2 border-highlight' : ''}`}>
+        <button title="Terminal" onClick={() => setActiveView(activeView === 'output' ? null : 'output')} className={`text-textSecondary hover:text-textPrimary pb-1 ${activeView === 'output' ? 'border-b-2 border-highlight' : ''}`}>
           <SquareTerminal size={24} />
         </button>
       </div>

@@ -13,6 +13,7 @@ interface SearchProps {
 const Search = ({ searchQuery, setSearchQuery, searchResults, goToMatch }: SearchProps) => {
     return (
         <div className="h-full bg-cardPanel mt-[14px] rounded-lg p-4 flex flex-col">
+            <h2 className="text-lg font-bold mb-2 text-textPrimary">Search</h2>
             <input
                 type="text"
                 placeholder="Search..."
@@ -35,7 +36,6 @@ const Search = ({ searchQuery, setSearchQuery, searchResults, goToMatch }: Searc
                 ) : (
                     searchQuery && <p className="text-textSecondary">No results found.</p>
                 )}
-                {!searchQuery && <p className="text-textSecondary">Start typing to search.</p>}
             </div>
         </div>
     );
