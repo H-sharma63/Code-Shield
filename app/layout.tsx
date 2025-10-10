@@ -3,6 +3,7 @@ import "./globals.css";
 import Providers from "./providers";
 import PusherProvider from "./components/PusherProvider";
 import ConditionalNavbar from "./components/ConditionalNavbar";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,6 +17,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+      </head>
       <body className="font-exo antialiased bg-base overflow-x-hidden">
         <Providers>
           <PusherProvider>

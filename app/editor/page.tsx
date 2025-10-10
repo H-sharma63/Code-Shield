@@ -3,11 +3,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Editor, { Monaco } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
-import { Play, Files, Search as SearchIcon, CheckSquare, Plus, Minus, SquareTerminal } from 'lucide-react';
+import { Play, Files, Search as SearchIcon, CheckSquare, Plus, Minus, SquareTerminal, Bug } from 'lucide-react';
 import FileExplorer from '../components/editor/FileExplorer';
 import Search from '../components/editor/Search';
 import Analysis from '../components/editor/Analysis';
 import Terminal from '../components/editor/Terminal';
+import Debug from '../components/editor/Debug';
+import { useLanguageDetector } from '../components/editor/useLanguageDetector';
 
 const MOCK_FILE_SYSTEM: { [key: string]: { entries: { name: string; type: string; }[] } } = {
   ".": {
@@ -81,6 +83,14 @@ const mockReadFile = async (absolute_path: string) => {
   return { read_file_response: { output: `Mock content for ${absolute_path}` } };
 };
 
+const LANGUAGE_MAP: { [key: number]: string } = {
+  71: 'python',
+  54: 'cpp',
+  50: 'c',
+  62: 'java',
+  63: 'javascript',
+};
+
 const EditorPage = () => {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const workerRef = useRef<Worker | null>(null);
@@ -94,8 +104,17 @@ const EditorPage = () => {
   const [expanded, setExpanded] = useState<string[]>([]); 
   const [fontSize, setFontSize] = useState(16);
   const [output, setOutput] = useState<string | null>(null);
+  const [terminalKey, setTerminalKey] = useState(0);
   const [languageId, setLanguageId] = useState(71);
   const [stdin, setStdin] = useState("");
+  const [analysis, setAnalysis] = useState<{ explanation: string; suggestions: string[]; model: string } | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [debugAnalysis, setDebugAnalysis] = useState<{ explanation: string; suggestions: string[] } | null>(null);
+  const [isDebugging, setIsDebugging] = useState(false);
+  const [activeFileName, setActiveFileName] = useState('untitled');
+  const [code, setCode] = useState<string>('');
+
+  useLanguageDetector(code, setLanguageId, languageId);
 
   useEffect(() => {
     workerRef.current = new Worker('/workers/eslint.worker.js');
@@ -256,20 +275,67 @@ const EditorPage = () => {
         model.setValue(savedCode);
       }
 
-      const code = model.getValue();
-      workerRef.current?.postMessage({ code, version: model.getVersionId() });
+      const initialCode = model.getValue();
+      setCode(initialCode);
+      workerRef.current?.postMessage({ code: initialCode, version: model.getVersionId() });
 
       model.onDidChangeContent(() => {
-        const code = model.getValue();
-        localStorage.setItem('editor-content', code);
-        workerRef.current?.postMessage({ code, version: model.getVersionId() });
+        const currentCode = model.getValue();
+        setCode(currentCode);
+        localStorage.setItem('editor-content', currentCode);
+        workerRef.current?.postMessage({ code: currentCode, version: model.getVersionId() });
       });
+    }
+  };
+
+  const handleAnalyzeCode = async (output?: string) => {
+    if (!editorRef.current) return;
+    setIsAnalyzing(true);
+    const codeToAnalyze = editorRef.current.getValue();
+
+    try {
+      const response = await fetch('/api/analyze-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code: codeToAnalyze, output }),
+      });
+      const data = await response.json();
+      setAnalysis(data);
+    } catch (error) {
+      setAnalysis({ explanation: 'Failed to analyze code.', suggestions: [], model: '' });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleDebugCode = async () => {
+    if (!editorRef.current) return;
+    setIsDebugging(true);
+    const codeToAnalyze = editorRef.current.getValue();
+
+    try {
+      const response = await fetch('/api/analyze-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code: codeToAnalyze, analysisType: 'debug' }),
+      });
+      const data = await response.json();
+      setDebugAnalysis(data);
+    } catch (error) {
+      setDebugAnalysis({ explanation: 'Failed to debug code.', suggestions: [] });
+    } finally {
+      setIsDebugging(false);
     }
   };
 
   const handleRunCode = async () => {
     if (!editorRef.current) return;
-    const code = editorRef.current.getValue();
+    setTerminalKey(prevKey => prevKey + 1);
+    const codeToRun = editorRef.current.getValue();
     setOutput("Running code...");
     setActiveView('output');
 
@@ -279,7 +345,7 @@ const EditorPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ code, language_id: languageId, stdin: stdin }),
+        body: JSON.stringify({ code: codeToRun, language_id: languageId, stdin: stdin }),
       });
       const result = await response.json();
 
@@ -296,8 +362,10 @@ const EditorPage = () => {
 
       setOutput(outputString);
       setStdin("");
+      await handleAnalyzeCode();
     } catch (error) {
       setOutput('Failed to run code.');
+      await handleAnalyzeCode();
     }
   };
 
@@ -317,7 +385,10 @@ const EditorPage = () => {
     try {
       const result = await mockReadFile(filePath);
       if (result.read_file_response && result.read_file_response.output) {
-        editorRef.current?.setValue(result.read_file_response.output);
+        const fileContent = result.read_file_response.output;
+        editorRef.current?.setValue(fileContent);
+        setCode(fileContent); // Also update the code state here
+        setActiveFileName(filePath.split('/').pop() || 'untitled');
       }
     } catch (error) {
       console.error('Failed to read file:', error);
@@ -363,8 +434,9 @@ const EditorPage = () => {
             goToMatch={goToMatch}
           />
         )}
-        {activeView === 'analysis' && <Analysis />}
-        {activeView === 'output' && <Terminal output={output} stdin={stdin} setStdin={setStdin} />}
+        {activeView === 'analysis' && <Analysis analysis={analysis} isAnalyzing={isAnalyzing} />}
+        {activeView === 'debug' && <Debug analysis={debugAnalysis} isAnalyzing={isDebugging} onDebug={handleDebugCode} />}
+        {activeView === 'output' && <Terminal key={terminalKey} output={output} stdin={stdin} setStdin={setStdin} />}
       </div>
     );
   };
@@ -372,7 +444,9 @@ const EditorPage = () => {
   return (
     <div className="flex h-screen">
       <div className={activeView ? "w-3/5 h-full" : "w-full h-full"}>
-        <div className="h-[30px] bg-base flex items-center justify-end pr-4">
+        <div className="h-[30px] bg-base flex items-center justify-between pr-4">
+          <span className="text-textPrimary ml-4 font-semibold">{activeFileName}</span>
+          <div className="flex items-center">
           <button 
             onClick={handleIncreaseFontSize}
             className="text-textPrimary hover:text-highlight z-5"
@@ -394,6 +468,7 @@ const EditorPage = () => {
             <option value={54}>C++</option>
             <option value={50}>C</option>
             <option value={62}>Java</option>
+            <option value={63}>JavaScript</option>
           </select>
           <button 
             onClick={handleRunCode}
@@ -401,11 +476,12 @@ const EditorPage = () => {
           >
             <Play size={22} />
           </button>
+          </div>
         </div>
         <Editor
           height="100%" 
           width="100%"
-          defaultLanguage="javascript"
+          language={LANGUAGE_MAP[languageId] || 'python'}
           onMount={handleEditorDidMount}
           theme="vs-dark"
         />
@@ -422,6 +498,9 @@ const EditorPage = () => {
         </button>
         <button title="Analysis" onClick={() => setActiveView(activeView === 'analysis' ? null : 'analysis')} className={`text-textSecondary hover:text-textPrimary pb-1 ${activeView === 'analysis' ? 'border-b-2 border-highlight' : ''}`}>
           <CheckSquare size={24} />
+        </button>
+        <button title="Debug" onClick={() => setActiveView(activeView === 'debug' ? null : 'debug')} className={`text-textSecondary hover:text-textPrimary pb-1 ${activeView === 'debug' ? 'border-b-2 border-highlight' : ''}`}>
+          <Bug size={24} />
         </button>
         <button title="Terminal" onClick={() => setActiveView(activeView === 'output' ? null : 'output')} className={`text-textSecondary hover:text-textPrimary pb-1 ${activeView === 'output' ? 'border-b-2 border-highlight' : ''}`}>
           <SquareTerminal size={24} />

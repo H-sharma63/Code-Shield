@@ -7,7 +7,7 @@ import LoginCard from './components/LoginCard';
 export default function Home() {
   const { data: session } = useSession();
   const user = session?.user;
-  const [isLoginCardVisible, setIsLoginCardVisible] = useState(false); 
+  const [isLoginCardVisible, setIsLoginCardVisible] = useState(false);
 
   useEffect(() => {
     if (user?.name && user?.email && session?.provider) {
