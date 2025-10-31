@@ -1,57 +1,30 @@
-import { google } from 'googleapis';
 import { NextRequest, NextResponse } from 'next/server';
-
-const credentials = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS;
-
-if (!credentials) {
-  throw new Error('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS environment variable is not set.');
-}
-
-const serviceAccountAuth = new google.auth.JWT({
-  email: JSON.parse(credentials).client_email,
-  key: JSON.parse(credentials).private_key,
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-});
-
-const sheets = google.sheets({ version: 'v4', auth: serviceAccountAuth });
-
-const SPREADSHEET_ID = '1zqcXiQsIGJGXdGJedJVMlE7YipvAuZzSbg-MD29pyJM'; 
-const SHEET_NAME = 'Sheet1'; 
+// import { db } from '@/app/lib/db';
+// import { users } from '@/app/lib/schema';
+// import { eq } from 'drizzle-orm';
 
 export async function POST(req: NextRequest) {
   try {
     const { name, email, provider } = await req.json(); 
-    console.log(''); 
 
     if (!name || !provider) { 
       return NextResponse.json({ message: 'Name and provider are required.' }, { status: 400 });
     }
 
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:C`, 
-    });
+    // User logging to DB is disabled as per user's request.
+    // const existingUsers = await db.select().from(users).where(eq(users.email, email));
+    // const isDuplicate = existingUsers.some(user => user.provider === provider);
 
-    const existingRows = response.data.values || [];
-    const isDuplicate = existingRows.some(row => (row[1] === email || (email === null && !row[1])) && row[2] === provider);
+    // if (isDuplicate) {
+    //   return NextResponse.json({ message: 'User already logged.' }, { status: 200 });
+    // }
 
-    if (isDuplicate) {
-      return NextResponse.json({ message: 'User already logged.' }, { status: 200 });
-    }
+    // await db.insert(users).values({ name, email, provider });
 
-    const values = [[name, email, provider]]; 
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:C`, 
-      valueInputOption: 'RAW',
-      requestBody: {
-        values: values,
-      },
-    });
-
-    return NextResponse.json({ message: 'User logged successfully.' }, { status: 200 });
+    return NextResponse.json({ message: 'User logging to DB is disabled. Data not stored.' }, { status: 200 });
 
   } catch (error) {
-    return NextResponse.json({ message: 'Internal Server Error.' }, { status: 500 });
+    console.error('Error in log-user route (functionality disabled):', error);
+    return NextResponse.json({ message: 'Internal Server Error (logging disabled).' }, { status: 500 });
   }
 }

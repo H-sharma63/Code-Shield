@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Editor, { Monaco } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
-import { Play, Files, Search as SearchIcon, CheckSquare, Plus, Minus, SquareTerminal, Bug } from 'lucide-react';
+import { Play, Files, Search as SearchIcon, CheckSquare, Plus, Minus, SquareTerminal, Bug, Save } from 'lucide-react';
 import FileExplorer from '../components/editor/FileExplorer';
 import Search from '../components/editor/Search';
 import Analysis from '../components/editor/Analysis';
@@ -369,6 +369,29 @@ const EditorPage = () => {
     }
   };
 
+  const handleSaveProject = async () => {
+    if (!editorRef.current) return;
+    const codeToSave = editorRef.current.getValue();
+
+    try {
+      const response = await fetch('/api/save-project', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fileName: activeFileName, fileData: codeToSave }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log('Project saved successfully:', data.message);
+      } else {
+        console.error('Failed to save project:', data.message);
+      }
+    } catch (error) {
+      console.error('Error saving project:', error);
+    }
+  };
+
   const handleIncreaseFontSize = () => {
     const newSize = fontSize + 2;
     setFontSize(newSize);
@@ -475,6 +498,12 @@ const EditorPage = () => {
             className="text-textSecondary hover:text-borderLine z-5 ml-2" 
           >
             <Play size={22} />
+          </button>
+          <button 
+            onClick={handleSaveProject}
+            className="text-textSecondary hover:text-borderLine z-5 ml-2" 
+          >
+            <Save size={22} />
           </button>
           </div>
         </div>
