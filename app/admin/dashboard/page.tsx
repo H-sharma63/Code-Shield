@@ -90,7 +90,7 @@ export default function AdminDashboard() {
                   </button>
                 </div>
               </Link>
-              <div className="bg-cardPanel rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center">
+              {/* <div className="bg-cardPanel rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center">
                 <p className="text-lg font-semibold text-textPrimary mb-2">API Usage</p>
                 <button className="w-[250px] bg-primaryAccent hover:opacity-80 text-cardPanel font-bold py-2 px-4 rounded-[20px]">
                   Go to API Usage
@@ -101,7 +101,7 @@ export default function AdminDashboard() {
                 <button className="w-[250px] bg-primaryAccent hover:opacity-80 text-cardPanel font-bold py-2 px-4 rounded-[20px]">
                   Go to Site Admin Hub
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

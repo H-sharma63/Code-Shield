@@ -18,10 +18,10 @@ export default function LoginCard({ onClose }: LoginCardProps) {
         <h1 className="font-bold text-center text-2xl mb-5 text-textPrimary">User Login</h1>
         <div className="flex flex-col gap-4">
           <div className="w-[70&] mx-auto">
-            <GoogleLoginButton style={{ borderRadius: '30px' }} onClick={() => signIn("google")} />
+            <GoogleLoginButton style={{ borderRadius: '30px' }} onClick={() => signIn("google", { callbackUrl: '/dashboard' })} />
           </div>
           <div className="w-[60%] mx-auto">
-            <GithubLoginButton style={{ borderRadius: '30px' }} onClick={() => signIn("github")} />
+            <GithubLoginButton style={{ borderRadius: '30px' }} onClick={() => signIn("github", { callbackUrl: '/dashboard' })} />
           </div>
         </div>
       </div>

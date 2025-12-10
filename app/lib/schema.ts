@@ -1,7 +1,19 @@
-import { pgTable, serial, text, varchar, integer } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, varchar, integer, timestamp } from 'drizzle-orm/pg-core';
 
 export const projects = pgTable('projects', {
   id: serial('id').primaryKey(),
+  projectName: varchar('project_name', { length: 256 }),
   fileName: varchar('file_name', { length: 256 }).notNull(),
-  fileData: text('file_data').notNull(),
+  blobUrl: varchar('blob_url', { length: 256 }).notNull(),
+  userEmail: varchar('user_email', { length: 256 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull(),
 });
+
+// export const apiUsage = pgTable('api_usage', {
+//     id: serial('id').primaryKey(),
+//     model: varchar('model', { length: 256 }),
+//     tokens: integer('tokens'),
+//     createdAt: timestamp('created_at').defaultNow(),
+//     userEmail: varchar('user_email', { length: 256 }),
+// });

@@ -1,0 +1,513 @@
+### **SDLC Life Cycle for Code Shield: AI-based Code Reviewer**
+
+Given the nature of "Code Shield" as an AI-powered code review and execution platform with distinct user roles and continuous feature development, an **Agile Software Development Life Cycle (SDLC)** methodology is highly suitable. Agile promotes iterative development, flexibility, collaboration, and rapid response to change, which are crucial for a project involving evolving AI models and user feedback.
+
+The key phases within this Agile framework would typically include:
+
+1.  **Requirements Gathering & Analysis:**
+    *   **Objective:** To understand and define the functional and non-functional requirements for the AI Code Reviewer.
+    *   **Activities:**
+        *   Identify user stories for different personas (e.g., Developer, Admin).
+        *   Define core features: code analysis, code execution, file management, user authentication, admin monitoring.
+        *   Specify AI model integration requirements (OpenAI/OpenRouter, Judge0).
+        *   Outline performance, security (encryption, authentication), and scalability needs.
+        *   Gather feedback on desired programming languages, analysis types (review, debug), and output formats.
+    *   **Output:** User Stories, Feature Backlog, Initial Wireframes/Mockups.
+
+2.  **Sprint Planning:**
+    *   **Objective:** To plan the work for an upcoming iteration (sprint), typically 1-4 weeks long.
+    *   **Activities:**
+        *   Select a subset of high-priority user stories from the backlog to be completed in the sprint.
+        *   Break down user stories into smaller, actionable tasks.
+        *   Estimate effort for each task.
+        *   Define the sprint goal and deliverables.
+    *   **Output:** Sprint Backlog, Sprint Goal.
+
+3.  **Design:**
+    *   **Objective:** To design the architecture, components, and user interfaces for the features planned in the current sprint.
+    *   **Activities:**
+        *   **System Architecture Design:** Define how the frontend, backend APIs, database, and external AI/execution services will interact.
+        *   **UI/UX Design:** Create wireframes and mockups for new features (e.g., editor enhancements, admin dashboard views).
+        *   **API Design:** Define endpoints and data structures for communication between frontend and backend, and with external services.
+        *   **Database Schema Design:** Update or create new database schemas as needed for new features (e.g., storing project metadata, user data).
+        *   **Component Design:** Plan the structure and responsibilities of individual React components.
+    *   **Output:** System Design Document (updated iteratively), API Specifications, Database Schema updates, UI/UX designs.
+
+4.  **Development & Implementation:**
+    *   **Objective:** To build and implement the features defined in the sprint.
+    *   **Activities:**
+        *   Write code for frontend components (React, Next.js).
+        *   Develop backend API routes (Next.js API routes).
+        *   Integrate with AI services (OpenAI/OpenRouter) and code execution platforms (Judge0).
+        *   Implement database interactions using Drizzle ORM.
+        *   Write unit and integration tests for new functionalities.
+        *   Continuous integration of code changes.
+    *   **Output:** Working software features, tested code.
+
+5.  **Testing & Quality Assurance:**
+    *   **Objective:** To ensure the developed features meet requirements and are free of defects.
+    *   **Activities:**
+        *   **Unit Testing:** Verify individual functions and components.
+        *   **Integration Testing:** Test interactions between different modules and services.
+        *   **System Testing:** Validate the end-to-end functionality of the application.
+        *   **User Acceptance Testing (UAT):** Stakeholders test the features to ensure they meet business needs.
+        *   **Performance Testing:** Assess system responsiveness and scalability.
+        *   **Security Testing:** Identify vulnerabilities.
+        *   **Error Monitoring:** Utilize Sentry for real-time error tracking.
+    *   **Output:** Test Reports, Bug Reports.
+
+6.  **Deployment & Feedback:**
+    *   **Objective:** To release the developed features to users and gather feedback for future iterations.
+    *   **Activities:**
+        *   Deploy new features to staging or production environments (e.g., Vercel).
+        *   Monitor application performance and stability post-deployment.
+        *   Collect user feedback through various channels.
+        *   Review sprint outcomes and identify areas for improvement in the next sprint.
+        *   **Output:** Deployed Application, User Feedback, Lessons Learned.
+
+This iterative cycle allows for continuous improvement and adaptation to changing requirements, ensuring that "Code Shield" remains a relevant and effective tool.
+
+---
+
+### **System Design for Code Shield: AI-based Code Reviewer**
+
+The "Code Shield: AI-based Code Reviewer" is a full-stack web application designed to provide AI-powered code analysis, debugging suggestions, and code execution capabilities. It supports user authentication, project management, and administrative monitoring.
+
+**1. Architecture Overview:**
+
+The system follows a client-server architecture, leveraging Next.js for both frontend and backend API routes. It integrates with several external services for core functionalities like AI analysis and code execution.
+
+*   **Frontend (Client-side):** Built with React and Next.js, providing the user interface for code editing, file management, analysis display, and terminal output.
+*   **Backend (Server-side/API Routes):** Next.js API routes handle requests for AI analysis, code execution, project saving/retrieval, user authentication, and admin functionalities.
+*   **Database:** PostgreSQL (via Neon) managed by Drizzle ORM for persistent storage of project metadata and potentially user-related data.
+*   **External Services:**
+    *   **OpenAI/OpenRouter:** For AI-powered code analysis and debugging suggestions.
+    *   **Judge0:** For executing user-submitted code in various programming languages.
+    *   **NextAuth.js:** For secure user authentication (Google, GitHub, and admin-specific Google).
+    *   **Pusher:** For real-time features, such as live user count.
+    *   **Vercel Blob:** For storing actual code file content.
+    *   **Sentry:** For error monitoring and reporting.
+
+**2. Key Components and Modules:**
+
+*   **User Interface (Frontend):**
+    *   **Editor Page (`app/editor/page.tsx`):** The central hub for users to write, edit, analyze, and run code. It integrates:
+        *   **Monaco Editor:** For a rich code editing experience.
+        *   **File Explorer (`app/components/editor/FileExplorer.tsx`):** To manage and select projects/files.
+        *   **Analysis Panel (`app/components/editor/Analysis.tsx`):** Displays AI-generated code explanations and suggestions.
+        *   **Debug Panel (`app/components/editor/Debug.tsx`):** Provides AI-generated debugging suggestions.
+        *   **Output/Terminal Panel (`app/components/editor/Output.tsx`, `app/components/editor/Terminal.tsx`):** Shows results of code execution and allows for standard input.
+        *   **Search Panel (`app/components/editor/Search.tsx`):** For searching within the active code file.
+    *   **Authentication Components (`app/components/LoginCard.tsx`, `app/components/Navbar.tsx`):** Handles user login/logout and displays user session information.
+    *   **Admin Dashboard (`app/admin/dashboard/page.tsx`):** Provides an overview for administrators, with links to user monitoring and error monitoring.
+    *   **User Monitoring Page (`app/admin/user-monitoring/page.tsx`):** Displays a list of users and live user count.
+    *   **Conditional Navbar (`app/components/ConditionalNavbar.tsx`):** Dynamically renders the navigation bar based on the current route.
+    *   **Project Context (`app/components/ProjectContext.tsx`):** Manages the active project's name and renaming state across components.
+    *   **Pusher Provider (`app/components/PusherProvider.tsx`):** Manages real-time user presence.
+
+*   **API Routes (Backend):**
+    *   **`/api/analyze-code` (`app/api/analyze-code/route.ts`):** Receives code and analysis type, forwards it to OpenAI/OpenRouter, and returns AI-generated explanations and suggestions.
+    *   **`/api/run-code` (`app/api/run-code/route.ts`):** Receives code, language ID, and stdin, sends it to Judge0 for execution, and returns the execution results (stdout, stderr, compile output).
+    *   **`/api/save-project` (`app/api/save-project/route.ts`):** Handles saving new projects or updating existing ones. Stores file content in Vercel Blob and metadata in the database.
+    *   **`/api/get-projects` (`app/api/get-projects/route.ts`):** Retrieves a list of unique projects from the database.
+    *   **`/api/get-project-details` (`app/api/get-project-details/route.ts`):** Fetches details for a specific project, including its `blobUrl` to retrieve file content.
+    *   **`/api/auth/[...nextauth]` (`app/api/auth/[...nextauth]/route.ts`):** NextAuth.js endpoint for handling authentication with Google and GitHub, including admin-specific login logic.
+    *   **`/api/get-users` (`app/api/get-users/route.ts`):** Fetches user data, likely from a Google Sheet based on the `googleapis` usage.
+    *   **`/api/log-user` (`app/api/log-user/route.ts`):** (Currently disabled) Intended for logging user activity, but explicitly commented out in the code.
+    *   **`/api/pusher/presence` (`app/api/pusher/presence/route.ts`):** Pusher authentication endpoint for presence channels.
+    *   **`/api/sentry-example-api` (`app/api/sentry-example-api/route.ts`):** A faulty API route for testing Sentry integration.
+
+**3. Data Flow (High-Level):**
+
+1.  **User Interaction:** A user interacts with the Monaco Editor to write or upload code.
+2.  **File Management:**
+    *   **Upload:** User uploads a file via `FileUpload` component -> `handleFileUpload` -> `api/save-project` -> Vercel Blob (file content) + PostgreSQL (metadata).
+    *   **Load:** User selects a project from `FileExplorer` -> `handleFileClick` -> `api/get-project-details` (metadata) -> Vercel Blob (file content) -> Monaco Editor.
+3.  **Code Analysis:** User triggers analysis -> `handleAnalyzeCode` -> `api/analyze-code` -> OpenAI/OpenRouter -> Analysis Panel.
+4.  **Code Execution:** User triggers execution -> `handleRunCode` -> `api/run-code` -> Judge0 -> Output/Terminal Panel.
+5.  **Authentication:** User attempts login -> `LoginCard` -> NextAuth.js (`api/auth`) -> Google/GitHub -> Session management.
+6.  **Admin Monitoring:** Admin accesses dashboard -> `api/get-users` -> Google Sheets (user list) -> User Monitoring Page.
+7.  **Real-time Presence:** Users connect -> `PusherProvider` -> `api/pusher/presence` -> Pusher -> Live User Count.
+
+**4. Site Map**
+
+This diagram provides a high-level overview of the application's structure and user flow.
+
+```mermaid
+graph TD
+    subgraph "Code Shield Site Map"
+        A["/ (Home Page)"] --> B("/editor")
+        A --> C{"Login (via Providers)"}
+
+        B -- "Authenticated" --> BA("Editor UI")
+        
+        subgraph "Admin Section"
+            D["/admin/login"] --> E("/admin/dashboard")
+            E --> F("/admin/user-monitoring")
+        end
+    end
+```
+
+**5. User Roles:**
+
+*   **User:** Can write, edit, upload, save, analyze, and execute code. Can manage their projects.
+*   **Admin:** Can access an administrative dashboard, monitor users, and potentially view error logs (via Sentry). Authenticated via a specific admin Google provider.
+
+**6. Non-Functional Considerations:**
+
+*   **Security:** NextAuth.js for authentication, environment variables for API keys, encryption for sensitive data (though not explicitly detailed in the provided code snippets for data at rest beyond blob storage).
+*   **Scalability:** Next.js serverless functions, Vercel Blob, Neon (serverless PostgreSQL), and external cloud-based AI/execution services contribute to scalability.
+*   **Performance:** Optimized API calls, client-side rendering for editor, and efficient data fetching.
+*   **Reliability:** Sentry for error monitoring, robust error handling in API routes.
+*   **Maintainability:** Modular component structure, clear API routes, use of ORM.
+
+---
+
+### **Physical Diagrams (Mermaid.js Code Snippets)**
+
+#### **1. Use Case Diagram (Mermaid.js)**
+
+```mermaid
+graph TD
+    actor_dev[Developer]
+    actor_admin[Administrator]
+    actor_ai[AI Code Analysis Service]
+    actor_exec[Code Execution Service]
+    actor_auth[Auth Provider]
+
+    subgraph "Code Shield: AI-based Code Reviewer System"
+        uc_login(Login to System)
+        uc_logout(Logout from System)
+        uc_session(Manage Session)
+
+        uc_upload(Upload Code File)
+        uc_save(Save Project/Code)
+        uc_retrieve(Retrieve Project/Code)
+        uc_edit(Edit Code)
+        uc_analyze(Analyze Code)
+        uc_debug(Debug Code)
+        uc_execute(Execute Code)
+        uc_view_output(View Code Output)
+        uc_search(Search Code)
+        uc_rename_project(Manage Project Name)
+        uc_font_size(Adjust Editor Font Size)
+        uc_select_lang(Select Code Language)
+
+        uc_admin_dashboard(Access Admin Dashboard)
+        uc_monitor_users(Monitor Users)
+        uc_monitor_live(Monitor Live User Count)
+        uc_monitor_errors(Monitor Errors)
+    end
+
+    actor_dev -- (uc_login)
+    actor_dev -- (uc_logout)
+    actor_dev -- (uc_session)
+    actor_dev -- (uc_upload)
+    actor_dev -- (uc_save)
+    actor_dev -- (uc_retrieve)
+    actor_dev -- (uc_edit)
+    actor_dev -- (uc_analyze)
+    actor_dev -- (uc_debug)
+    actor_dev -- (uc_execute)
+    actor_dev -- (uc_view_output)
+    actor_dev -- (uc_search)
+    actor_dev -- (uc_rename_project)
+    actor_dev -- (uc_font_size)
+    actor_dev -- (uc_select_lang)
+
+    actor_admin -- (uc_login)
+    actor_admin -- (uc_logout)
+    actor_admin -- (uc_session)
+    actor_admin -- (uc_admin_dashboard)
+    actor_admin -- (uc_monitor_users)
+    actor_admin -- (uc_monitor_live)
+    actor_admin -- (uc_monitor_errors)
+
+    uc_analyze ..> actor_ai : <<uses>>
+    uc_debug ..> actor_ai : <<uses>>
+    uc_execute ..> actor_exec : <<uses>>
+    uc_login ..> actor_auth : <<uses>>
+    uc_monitor_users ..> actor_auth : <<uses>> (for user data)
+```
+
+#### **2. Component Diagram (Mermaid.js)**
+
+```mermaid
+graph TD
+    subgraph "Client Application (Next.js/React)"
+        C1[Frontend UI]
+        C2[Editor Module]
+        C3[Authentication Module]
+        C4[Project Management Module]
+        C5[Pusher Client]
+    end
+
+    subgraph "Next.js Backend API"
+        B1[Auth API]
+        B2[Code Analysis API]
+        B3[Code Execution API]
+        B4[Project API]
+        B5[User API]
+        B6[Pusher Auth API]
+        B7[Error Reporting API]
+    end
+
+    subgraph "External Services"
+        E1[OpenAI/OpenRouter]
+        E2[Judge0]
+        E3[Pusher Service]
+        E4[Google Sheets API]
+        E5[Sentry]
+        E6[Google/GitHub Auth]
+    end
+
+    DB[Neon PostgreSQL Database]
+    BLOB[Vercel Blob Storage]
+
+    C1 --> B1
+    C1 --> B2
+    C1 --> B3
+    C1 --> B4
+    C1 --> B5
+    C1 --> B6
+    C1 --> B7
+    C1 --> C2
+    C1 --> C3
+    C1 --> C4
+    C1 --> C5
+
+    C2 --> B2
+    C2 --> B3
+    C2 --> B4
+
+    C3 --> B1
+
+    C4 --> B4
+
+    C5 --> B6
+
+    B1 --> E6
+    B2 --> E1
+    B3 --> E2
+    B4 --> DB
+    B4 --> BLOB
+    B5 --> E4
+    B6 --> E3
+    B7 --> E5
+```
+
+#### **3. Data Flow Diagram (DFD) - Level 0 (Mermaid.js)**
+
+```mermaid
+graph TD
+    A[Developer]
+    B[Administrator]
+    C[AI Code Service]
+    D[Code Execution Service]
+    E[Auth Provider]
+    F[User Data Source]
+
+    subgraph "AI-BASED CODE REVIEWER SYSTEM"
+        P1(Process System)
+    end
+
+    A -- "Code, Command" --> P1
+    P1 -- "Analysis Request" --> C
+    C -- "Analysis Results" --> P1
+    P1 -- "Execution Request" --> D
+    D -- "Execution Results" --> P1
+    P1 -- "Code Output, Analysis, UI" --> A
+
+    A -- "Login Credentials" --> P1
+    P1 -- "Auth Request" --> E
+    E -- "Auth Response" --> P1
+
+    B -- "Monitoring Request" --> P1
+    P1 -- "User List Request" --> F
+    F -- "User List" --> P1
+    P1 -- "Monitoring Data, User Stats" --> B
+```
+
+### **Data Flow Diagram (DFD) - Level 1: Code Analysis (Mermaid.js)**
+
+This diagram details the internal data flows and processes involved when a user requests code analysis.
+
+```mermaid
+graph TD
+    A[Developer] -->|Code to Analyze| P1(Request AI Analysis)
+    P1 -->|Code| D1[Code Editor (Temporary Storage)]
+    D1 -->|Code| P2(Send Code to AI Service)
+    P2 -->|Code, Analysis Type| E1[AI Code Service]
+    E1 -->|Raw Analysis Results| P3(Receive AI Response)
+    P3 -->|Raw Analysis Results| D2[Analysis Results (Temporary Storage)]
+    D2 -->|Raw Analysis Results| P4(Format Analysis for Display)
+    P4 -->|Formatted Analysis| A
+```
+
+#### **4. Deployment Diagram (Mermaid.js)**
+
+```mermaid
+graph TD
+    subgraph "Client Devices"
+        CD1[Browser]
+    end
+
+    subgraph "Vercel Platform"
+        V1[Next.js Application]
+        V2[Vercel Blob Storage]
+    end
+
+    subgraph "Neon Database Service"
+        ND1[PostgreSQL Database]
+    end
+
+    subgraph "External Cloud Provider"
+        EC1[OpenAI/OpenRouter Infrastructure]
+        EC2[Judge0 Server]
+        EC3[Pusher Server]
+        EC4[Sentry Server]
+        EC5[Google/GitHub Auth Servers]
+        EC6[Google Sheets Service]
+    end
+
+    CD1 -- "HTTP/S" --> V1
+    V1 -- "HTTP/S" --> ND1
+    V1 -- "HTTP/S" --> V2
+    V1 -- "HTTP/S" --> EC1
+    V1 -- "HTTP/S" --> EC2
+    V1 -- "HTTP/S" --> EC3
+    V1 -- "HTTP/S" --> EC4
+    V1 -- "HTTP/S" --> EC5
+    V1 -- "HTTP/S" --> EC6
+
+    CD1 -- "WebSocket" --> EC3
+```
+
+#### **5. Other Relevant Software Engineering Diagrams**
+
+While Use Case, Component, DFD, and Deployment diagrams cover a broad spectrum, other diagrams could provide more granular detail if needed for specific aspects:
+
+*   **Sequence Diagram:** To illustrate the interaction flow between objects/components over time for specific scenarios (e.g., "User performs code analysis," "User logs in"). This would be helpful for understanding real-time interactions.
+*   **Class Diagram (Conceptual):** To show the main conceptual entities in the system (e.g., User, Project, CodeFile, AnalysisResult) and their relationships, similar to the database schema but at a higher abstraction.
+*   **State Machine Diagram:** For components with complex state logic (e.g., the editor's various states like `isAnalyzing`, `isDebugging`, `isUploadingFile`).
+
+---
+
+### **Database Design and Schema for Code Shield: AI-based Code Reviewer**
+
+Your project utilizes a PostgreSQL database, specifically through the Neon serverless platform, and interacts with it using the Drizzle ORM. This setup provides a robust, relational database solution suitable for structured data storage.
+
+**1. Database Technology:**
+*   **Database System:** PostgreSQL
+*   **Hosting:** Neon (serverless PostgreSQL)
+*   **ORM (Object-Relational Mapper):** Drizzle ORM
+
+**2. Database Design Principles:**
+*   **Relational Model:** Data is organized into tables with predefined schemas, supporting relationships between entities.
+*   **Normalization:** Data is structured to reduce redundancy and improve data integrity.
+*   **Scalability:** Neon's serverless nature allows for automatic scaling based on demand.
+
+**3. Identified Entities and Relationships:**
+
+Based on the `app/lib/schema.ts` and the API routes, the primary entity identified is `projects`. Other entities like `users` are mentioned in commented-out code or inferred from authentication, but `projects` is the only one with an active schema definition.
+
+#### **4. Database Schema (Drizzle ORM Definition)**
+
+The `app/lib/schema.ts` file defines the `projects` table:
+
+```typescript
+import { pgTable, serial, text, varchar, integer } from 'drizzle-orm/pg-core';
+
+export const projects = pgTable('projects', {
+  id: serial('id').primaryKey(),
+  projectName: varchar('project_name', { length: 256 }),
+  fileName: varchar('file_name', { length: 256 }).notNull(),
+  blobUrl: varchar('blob_url', { length: 256 }).notNull(),
+});
+```
+
+**Explanation of the `projects` table:**
+
+*   **Table Name:** `projects`
+*   **Columns:**
+    *   `id`:
+        *   **Type:** `serial` (auto-incrementing integer, typically used for primary keys in PostgreSQL).
+        *   **Constraint:** `primaryKey()` - Uniquely identifies each project entry.
+    *   `projectName`:
+        *   **Type:** `varchar` (variable-length string) with a maximum length of 256 characters.
+        *   **Purpose:** Stores the user-defined name for the project.
+    *   `fileName`:
+        *   **Type:** `varchar` (variable-length string) with a maximum length of 256 characters.
+        *   **Constraint:** `notNull()` - Ensures every project has an associated file name.
+        *   **Purpose:** Stores the name of the file associated with the project (e.g., `my_code.py`). This is likely used to retrieve the actual code content from blob storage.
+    *   `blobUrl`:
+        *   **Type:** `varchar` (variable-length string) with a maximum length of 256 characters.
+        *   **Constraint:** `notNull()` - Ensures every project has a URL pointing to its stored content.
+        *   **Purpose:** Stores the URL where the actual code content is saved (e.g., in Vercel Blob Storage).
+
+**Inferred/Potential Future Entities:**
+
+While not actively defined in `app/lib/schema.ts`, the application's functionality suggests other entities that might be stored in the database or managed externally:
+
+*   **Users:**
+    *   **Attributes:** `id`, `name`, `email`, `provider`, `role` (e.g., 'user', 'admin').
+    *   **Relationship:** A `User` can own multiple `Projects`.
+    *   **Current Status:** User data is currently managed externally (Google Sheets for admin monitoring) and through NextAuth.js sessions. A commented-out `users` schema in `app/api/log-user/route.ts` suggests a potential future database integration.
+
+*   **Analysis Results / Debugging Sessions:**
+    *   **Attributes:** `id`, `projectId` (FK to `projects`), `analysisType` (e.g., 'review', 'debug'), `timestamp`, `explanation`, `suggestions`, `modelUsed`.
+    *   **Relationship:** A `Project` can have multiple `Analysis Results`.
+    *   **Current Status:** Analysis results are generated on-the-fly and displayed, not persistently stored in the database based on the current code.
+
+*   **Code Execution Logs:**
+    *   **Attributes:** `id`, `projectId` (FK to `projects`), `timestamp`, `languageId`, `stdin`, `stdout`, `stderr`, `exitCode`.
+    *   **Relationship:** A `Project` can have multiple `Code Execution Logs`.
+    *   **Current Status:** Execution results are displayed in the terminal, not persistently stored.
+
+**5. Entity-Relationship (ER) Diagram**
+
+This diagram illustrates the relationships between the main entities in the system, including current and inferred future tables.
+
+```mermaid
+erDiagram
+    USERS ||--o{ PROJECTS : "has"
+    PROJECTS ||--o{ ANALYSIS_RESULTS : "has"
+    PROJECTS ||--o{ EXECUTION_LOGS : "has"
+
+    USERS {
+        int id PK
+        varchar name
+        varchar email
+        varchar provider
+        varchar role
+    }
+
+    PROJECTS {
+        int id PK
+        int user_id FK
+        varchar projectName
+        varchar fileName
+        varchar blobUrl
+    }
+
+    ANALYSIS_RESULTS {
+        int id PK
+        int project_id FK
+        varchar analysisType
+        datetime timestamp
+        text explanation
+        text suggestions
+        varchar modelUsed
+    }
+
+    EXECUTION_LOGS {
+        int id PK
+        int project_id FK
+        datetime timestamp
+        int languageId
+        text stdin
+        text stdout
+        text stderr
+        varchar exitCode
+    }
+```

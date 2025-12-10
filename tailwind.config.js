@@ -9,6 +9,7 @@ module.exports = {
     extend: {
       fontFamily: {
         exo: ['Exo', 'sans-serif'],
+        'rush-funky': ['Rush Funky', 'cursive'],
       },
       colors: {
         base: '#2b2b2b',
@@ -27,7 +28,7 @@ module.exports = {
       },
       backgroundImage: {
         // Added Deep Mauve gradient
-        'basegradient': 'linear-gradient(180deg, #824d69 0%, #1c3239 100%)',
+        'basegradient': 'linear-gradient(180deg, #020024 0%, #090979 100%)',
       },
     },
   },

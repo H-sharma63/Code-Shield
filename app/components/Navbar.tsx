@@ -29,11 +29,11 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="w-full bg-cardPanel text-textPrimary p-4 flex justify-between items-center relative"> 
+      <nav className="w-full bg-cardPanel text-textPrimary p-4 flex justify-between items-center sticky top-0 z-50"> 
         <div className="flex items-center">
           <Link href="/" className="flex items-center space-x-2">
-            <Image src="/file.svg" alt="Logo" width={32} height={32} />
-            <span className="text-xl font-bold">AI Code Reviewer</span>
+            <Image src="/logo.svg" alt="Logo" width={32} height={32} />
+            <span className="text-2xl font-bold font-rush-funky tracking-widest relative top-[3px]">CodeShield</span>
           </Link>
         </div>
         <div className="md:hidden">
@@ -44,12 +44,15 @@ const Navbar = () => {
         <div className="hidden md:flex items-center space-x-4"> 
           {session ? (
             <>
-              <Link href="/" className="hover:text-highlight">
-                Home
+              <Link href="/dashboard" className="hover:text-highlight">
+                Dashboard
               </Link>
-              <Link href="/editor" className="hover:text-highlight">
+              <Link href="/projects" className="hover:text-highlight">
                 Projects
               </Link>
+              {/* <Link href="/editor" className="hover:text-highlight">
+                Editor
+              </Link> */}
               <div className="relative" ref={dropdownRef}>
                 <button onClick={() => setDropdownOpen(!dropdownOpen)} className="rounded-full">
                   {session.user?.image ? (
@@ -68,9 +71,9 @@ const Navbar = () => {
                 </button>
                 {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-cardPanel rounded-md shadow-lg py-1 z-10">
-                    <Link href="/settings" className="block px-4 py-2 text-sm text-textPrimary hover:bg-gray-700">
+                    {/* <Link href="/settings" className="block px-4 py-2 text-sm text-textPrimary hover:bg-gray-700">
                       Settings
-                    </Link>
+                    </Link> */}
                     <button
                       onClick={() => signOut()}
                       className="block w-full text-left px-4 py-2 text-sm text-textPrimary hover:bg-logoutButton"
@@ -92,11 +95,14 @@ const Navbar = () => {
         <div className="md:hidden bg-cardPanel text-textPrimary p-4 flex flex-col items-center space-y-4">
           {session ? (
             <>
-              <Link href="/" className="hover:text-highlight" onClick={() => setIsMobileMenuOpen(false)}>
-                Home
+              <Link href="/dashboard" className="hover:text-highlight" onClick={() => setIsMobileMenuOpen(false)}>
+                Dashboard
+              </Link>
+              <Link href="/projects" className="hover:text-highlight" onClick={() => setIsMobileMenuOpen(false)}>
+                Projects
               </Link>
               <Link href="/editor" className="hover:text-highlight" onClick={() => setIsMobileMenuOpen(false)}>
-                Projects
+                Editor
               </Link>
               <button onClick={() => { setDropdownOpen(!dropdownOpen); setIsMobileMenuOpen(false); }} className="hover:text-highlight">
                 {session.user?.name || 'Profile'}

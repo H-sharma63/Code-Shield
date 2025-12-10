@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
   try {
     const submissionResponse = await fetch('https://judge0-ce.p.rapidapi.com/submissions', submissionOptions);
     const submissionResult = await submissionResponse.json();
+    console.log('Submission Result:', submissionResult);
     const { token } = submissionResult;
 
     if (!token) {
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest) {
       await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
       resultResponse = await fetch(`https://judge0-ce.p.rapidapi.com/submissions/${token}`, getOptions);
       resultData = await resultResponse.json();
+      console.log('Result Data:', resultData);
       statusId = resultData.status.id;
     }
 

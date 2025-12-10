@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import OpenAI from 'openai'; // OpenRouter is compatible with OpenAI SDK
 
 // Initialize the OpenAI client to connect to OpenRouter
 const openrouter = new OpenAI({
@@ -21,9 +21,10 @@ export async function POST(req: NextRequest) {
       systemPrompt = `You are an expert AI code debugger. Analyze the user's code and provide suggestions on how to debug it. The user is looking for help in finding and fixing potential bugs. Provide a list of actionable suggestions for debugging. Return your response as a valid JSON object with two keys: "explanation" (a string explaining the potential issues) and "suggestions" (an array of strings with debugging steps). Do not include any other text or markdown formatting in your response.`;
     }
 
-    const model = 'openai/gpt-5-codex';
+    // Use the Claude Sonnet 4.5 model via OpenRouter
+    const modelName = 'anthropic/claude-3-5-sonnet'; 
     const completion = await openrouter.chat.completions.create({
-      model, // Using the specialized code model
+      model: modelName,
       messages: [
         {
           role: 'system',
@@ -34,6 +35,7 @@ export async function POST(req: NextRequest) {
           content: code,
         },
       ],
+      max_tokens: 2666, // Set a default max_tokens, user can adjust if 402 errors persist
       response_format: { type: 'json_object' }, // Ensure the response is JSON
     });
 
@@ -46,7 +48,7 @@ export async function POST(req: NextRequest) {
     // The model should return a valid JSON string, so we parse it.
     const analysis = JSON.parse(responseContent);
 
-    return NextResponse.json({ ...analysis, model }, { status: 200 });
+    return NextResponse.json({ ...analysis, model: modelName }, { status: 200 });
 
   } catch (error: any) {
     console.error('Error analyzing code:', error);
