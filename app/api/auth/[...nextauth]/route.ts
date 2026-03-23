@@ -13,6 +13,11 @@ const googleProvider = GoogleProvider({
 const githubProvider = GitHubProvider({
   clientId: process.env.GITHUB_ID!,
   clientSecret: process.env.GITHUB_SECRET!,
+  authorization: {
+    params: {
+      scope: 'read:user user:email repo',
+    },
+  },
 });
 
 // Create admin-specific provider configurations by copying and modifying the id
@@ -44,15 +49,19 @@ export const authOptions = {
       // Allow sign-in for regular user providers
       return true;
     },
-    async jwt({ token, account }: { token: JWT, account: Account | null }) { // Add types here
+    async jwt({ token, account }: { token: JWT, account: Account | null }) {
       if (account) {
-        token.provider = account.provider; // Add provider to the token
+        token.provider = account.provider;
+        token.accessToken = account.access_token; // Store the GitHub access token
       }
       return token;
     },
-    async session({ session, token }: { session: Session, token: JWT }) { // Add types here
+    async session({ session, token }: { session: Session, token: JWT }) {
       if (token.provider) {
-        session.provider = token.provider; // Add provider from token to session
+        session.provider = token.provider;
+      }
+      if (token.accessToken) {
+        session.accessToken = token.accessToken; // Pass the token to the session
       }
       return session;
     }

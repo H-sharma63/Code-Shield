@@ -17,10 +17,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
       </head>
-      <body className="font-exo antialiased bg-base overflow-x-hidden">
+      <body className="font-exo antialiased bg-base overflow-x-hidden" suppressHydrationWarning>
         <Providers>
           <PusherProvider>
             <ProjectProvider>

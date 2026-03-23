@@ -71,9 +71,9 @@ const Navbar = () => {
                 </button>
                 {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-cardPanel rounded-md shadow-lg py-1 z-10">
-                    {/* <Link href="/settings" className="block px-4 py-2 text-sm text-textPrimary hover:bg-gray-700">
+                    <Link href="/settings" className="block px-4 py-2 text-sm text-textPrimary hover:bg-gray-700">
                       Settings
-                    </Link> */}
+                    </Link>
                     <button
                       onClick={() => signOut()}
                       className="block w-full text-left px-4 py-2 text-sm text-textPrimary hover:bg-logoutButton"

@@ -18,7 +18,7 @@ const ConditionalNavbar = () => {
 
   if (pathname === '/editor') {
     return (
-      <div className="h-16 bg-cardPanel flex items-center justify-between px-4">
+      <div className="h-16 bg-cardPanel flex items-center justify-between px-4 border-b border-base">
         <Link href="/projects" className="text-textSecondary hover:text-textPrimary">
           <ArrowLeft size={24} />
         </Link>

@@ -3,9 +3,35 @@
 @tailwind components;
 @tailwind utilities;
 
-/* *{
+/* Custom Professional Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #41414a;
+  border-radius: 5px;
+  border: 2px solid #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #50505a;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #41414a #1e1e1e;
+}
+
+/* :root {
   border: 1px solid red !important;
-  } */
+  }  */
   
 @font-face {
   font-family: 'Rush Funky';
