@@ -219,11 +219,11 @@ const FileExplorer = ({
     };
 
     return (
-        <div className="h-full bg-cardPanel rounded-lg mt-[14px] p-4 flex flex-col border border-borderLine overflow-hidden" onClick={() => setSelectedPath(null)}>
-            <div className="flex items-center justify-between mb-4 shrink-0">
-                <h2 className="text-[11px] font-bold text-textSecondary uppercase tracking-widest flex items-center">
-                    {repoFullName ? <Github size={14} className="mr-2 text-highlight" /> : null}
-                    {repoFullName ? 'Repo Explorer' : 'File Explorer'}
+        <div className="h-full bg-transparent p-5 flex flex-col overflow-hidden" onClick={() => setSelectedPath(null)}>
+            <div className="flex items-center justify-between mb-6 shrink-0">
+                <h2 className="text-[12px] font-black text-textSecondary uppercase tracking-[0.2em] flex items-center">
+                    {repoFullName ? <Github size={14} className="mr-3 text-highlight" /> : null}
+                    {repoFullName ? 'Repository' : 'Workspace'}
                 </h2>
                 <div className="flex items-center space-x-1">
                     <button onClick={(e) => { e.stopPropagation(); setIsCreating('file'); }} title="New File" className="p-1 hover:bg-white/10 rounded text-textSecondary hover:text-textPrimary transition-colors"><FilePlus size={14} /></button>

@@ -9,21 +9,14 @@ interface TerminalProps {
 }
 
 const Terminal = ({ output, stdin, setStdin }: TerminalProps) => {
-    const [history, setHistory] = useState<string[]>([]);
     const [currentInput, setCurrentInput] = useState("");
-    const inputRef = useRef<HTMLInputElement>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (output) {
-            setHistory(prev => [...prev, output]);
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
     }, [output]);
-
-    useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.focus();
-        }
-    }, [history]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCurrentInput(e.target.value);
@@ -31,29 +24,30 @@ const Terminal = ({ output, stdin, setStdin }: TerminalProps) => {
 
     const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            const newHistory = [...history, `> ${currentInput}`];
-            setHistory(newHistory);
-            setStdin(`${stdin}${currentInput}\n`);
+            setStdin(stdin + currentInput + '\n');
             setCurrentInput("");
         }
     };
 
     return (
-        <div className="h-full bg-cardPanel mt-[14px] rounded-lg p-4 flex flex-col">
-            <h2 className="text-lg font-bold mb-2 text-textPrimary">Terminal</h2>
-            <div className="flex-1 overflow-y-auto custom-scrollbar" onClick={() => inputRef.current?.focus()}>
-                {history.map((line, index) => (
-                    <div key={index} className="text-textSecondary whitespace-pre-wrap">{line}</div>
-                ))}
-                <div className="flex">
-                    <span className="text-textSecondary">{`> `}</span>
+        <div className="h-full bg-cardPanel rounded-none border-t border-borderLine flex flex-col font-mono text-sm">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-borderLine bg-[#121214]">
+                <h2 className="text-[10px] font-black uppercase tracking-widest text-textSecondary">System Terminal</h2>
+            </div>
+            <div 
+                ref={scrollRef}
+                className="flex-1 p-4 overflow-y-auto custom-scrollbar"
+            >
+                <pre className="text-textSecondary whitespace-pre-wrap">{output || 'Execution output will appear here...'}</pre>
+                <div className="flex items-center mt-2">
+                    <span className="text-green-500 font-bold mr-2">➜</span>
                     <input 
-                        ref={inputRef}
                         type="text"
-                        className="bg-transparent text-textPrimary outline-none flex-1"
+                        className="bg-transparent text-textPrimary outline-none flex-1 border-none focus:ring-0 p-0 text-sm"
                         value={currentInput}
                         onChange={handleInputChange}
                         onKeyDown={handleInputKeyDown}
+                        placeholder="Enter stdin..."
                     />
                 </div>
             </div>

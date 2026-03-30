@@ -7,11 +7,18 @@ export async function GET(req: NextRequest) {
   try {
     const session: any = await getServerSession(authOptions);
 
-    if (!session || !session.accessToken || session.provider !== 'github') {
+    if (!session || !session.accessToken) {
       return NextResponse.json({ 
-        message: 'GitHub connection required.',
-        error: 'NOT_CONNECTED' 
+        message: 'GitHub access token missing. Please sign in with GitHub.',
+        error: 'AUTH_REQUIRED' 
       }, { status: 401 });
+    }
+
+    if (session.provider !== 'github') {
+        return NextResponse.json({ 
+          message: 'This session is not authenticated with GitHub. Please reconnect via GitHub.',
+          error: 'PROVIDER_MISMATCH' 
+        }, { status: 401 });
     }
 
     const octokit = new Octokit({

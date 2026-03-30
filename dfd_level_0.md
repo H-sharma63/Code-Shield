@@ -1,29 +1,39 @@
+# Data Flow Diagram (DFD) - Level 0 (Context Diagram)
+
+This diagram shows the high-level data flow between the CodeShield AI system and its external entities.
+
 ```mermaid
 graph TD
-    subgraph External Entities
-        Developer
-        Admin
-        AI_Service[AI Code Analyzer]
-        Execution_Engine[Code Execution Engine]
-    end
+    User([User / Developer])
+    GitHub([GitHub API])
+    AI_Service([Vertex AI / Gemini])
+    Judge0([Judge0 Execution Engine])
+    DB[(PostgreSQL Database)]
 
-    subgraph System
-        A[AI Code Reviewer System]
-    end
+    %% User Interactions
+    User -- "GitHub OAuth Login" --> CodeShield{{"CodeShield AI Platform"}}
+    User -- "File Selection / Code Edit" --> CodeShield
+    User -- "Run Analysis / Test Mission" --> CodeShield
+    
+    %% System Outputs to User
+    CodeShield -- "AI Insights & Debug Reports" --> User
+    CodeShield -- "Execution Output (Stdout/Stderr)" --> User
+    CodeShield -- "Mission Results (Pass/Fail)" --> User
 
-    Developer -- User Credentials & Code --> A
-    Developer -- Project Info --> A
-    A -- Analysis & Execution Results --> Developer
-    A -- Project Data --> Developer
+    %% GitHub Interactions
+    CodeShield -- "Fetch Repo List & Contents" --> GitHub
+    CodeShield -- "Commit Changes / Push Patches" --> GitHub
+    GitHub -- "Repository Meta & Source Code" --> CodeShield
 
-    Admin -- Admin Credentials --> A
-    Admin -- Management Requests --> A
-    A -- User & Project Data --> Admin
-    A -- System Logs --> Admin
+    %% AI Interactions
+    CodeShield -- "Code Snippets & Workspace Context" --> AI_Service
+    AI_Service -- "Structured Analysis & Fixes" --> CodeShield
 
-    A -- Code for Analysis --> AI_Service
-    AI_Service -- Analysis Report --> A
+    %% Code Execution
+    CodeShield -- "Code Payload + Stdin" --> Judge0
+    Judge0 -- "Execution Logs & Status" --> CodeShield
 
-    A -- Code for Execution --> Execution_Engine
-    Execution_Engine -- Execution Output --> A
+    %% Database Storage
+    CodeShield -- "Save Project Meta & Logs" --> DB
+    DB -- "Historical Projects & Activities" --> CodeShield
 ```

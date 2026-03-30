@@ -3,9 +3,9 @@ import AnthropicVertex from '@anthropic-ai/vertex-sdk';
 import { GoogleAuth } from 'google-auth-library';
 
 const credentialsVar = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS;
-const projectNumber = '1086019342831';
+const projectID = 'proud-breaker-381513';
 const defaultLocation = 'us-central1';
-const approvedLocation = 'us-east5';
+const approvedLocation = 'us-east5'; // Optimized based on user quota list
 
 let vertexAI: VertexAI | null = null;
 let anthropic: AnthropicVertex | null = null;
@@ -17,7 +17,7 @@ if (credentialsVar) {
     const privateKey = creds.private_key.replace(/\\n/g, '\n');
 
     vertexAI = new VertexAI({
-      project: projectNumber,
+      project: projectID,
       location: defaultLocation,
       googleAuthOptions: {
         credentials: { client_email: creds.client_email, private_key: privateKey },
@@ -25,7 +25,7 @@ if (credentialsVar) {
     });
 
     anthropic = new AnthropicVertex({
-      projectId: projectNumber,
+      projectId: projectID,
       region: approvedLocation,
       // Cast to any to bypass strict type mismatch between different versions of GoogleAuth
       googleAuth: new GoogleAuth({
@@ -42,7 +42,7 @@ if (credentialsVar) {
   }
 }
 
-export async function callVertexAI(type: string, apiModel: string, code: string, systemPrompt: string) {
+export async function callVertexAI(type: string, apiModel: string, code: string, systemPrompt: string, responseType: 'text' | 'json' = 'text') {
   try {
     if (type === 'anthropic') {
       if (!anthropic) throw new Error('Anthropic Vertex SDK not initialized.');
@@ -66,7 +66,7 @@ export async function callVertexAI(type: string, apiModel: string, code: string,
       });
       const client = await auth.getClient();
       const token = await client.getAccessToken();
-      const url = `https://${defaultLocation}-aiplatform.googleapis.com/v1/projects/${projectNumber}/locations/${defaultLocation}/publishers/mistralai/models/${apiModel}:rawPredict`;
+      const url = `https://${defaultLocation}-aiplatform.googleapis.com/v1/projects/${projectID}/locations/${defaultLocation}/publishers/mistralai/models/${apiModel}:rawPredict`;
 
       const response = await fetch(url, {
         method: 'POST',
@@ -88,14 +88,16 @@ export async function callVertexAI(type: string, apiModel: string, code: string,
         const generativeModel = vertexAI.getGenerativeModel({ model: apiModel });
         const result = await generativeModel.generateContent({
           contents: [{ role: 'user', parts: [{ text: `${systemPrompt}\n\nCode:\n${code}` }] }],
-          generationConfig: { responseMimeType: 'application/json' }
+          generationConfig: { 
+            responseMimeType: responseType === 'json' ? 'application/json' : 'text/plain' 
+          }
         });
         const response = await result.response;
         return response.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
       } catch (geminiError: any) {
         if (apiModel !== 'gemini-2.0-flash-001') {
           console.warn(`[SERVICE_RETRY] Gemini ${apiModel} failed. Trying 2.0 Flash...`);
-          return await callGeminiFallback(code, systemPrompt);
+          return await callGeminiFallback(code, systemPrompt, responseType);
         }
         throw geminiError;
       }
@@ -107,12 +109,14 @@ export async function callVertexAI(type: string, apiModel: string, code: string,
   }
 }
 
-export async function callGeminiFallback(code: string, systemPrompt: string) {
+export async function callGeminiFallback(code: string, systemPrompt: string, responseType: 'text' | 'json' = 'text') {
     if (!vertexAI) throw new Error('Vertex AI SDK not initialized.');
     const fallbackModel = vertexAI.getGenerativeModel({ model: 'gemini-2.0-flash-001' });
     const fallbackResult = await fallbackModel.generateContent({
       contents: [{ role: 'user', parts: [{ text: `${systemPrompt}\n\nCode:\n${code}` }] }],
-      generationConfig: { responseMimeType: 'application/json' }
+      generationConfig: { 
+        responseMimeType: responseType === 'json' ? 'application/json' : 'text/plain' 
+      }
     });
     return fallbackResult.response.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
 }

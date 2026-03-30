@@ -4,23 +4,24 @@ import { callOpenRouter } from '@/app/lib/ai/openrouter-service';
 
 // --- REGISTERED VERTEX MODELS ONLY ---
 const VERTEX_MODELS: Record<string, { type: 'google' | 'anthropic' | 'mistral'; apiModel: string }> = {
-  'claude-3.7-sonnet': { type: 'anthropic', apiModel: 'claude-3-7-sonnet@20250219' },
-  'claude-3.5-sonnet': { type: 'anthropic', apiModel: 'claude-3-5-sonnet@20240620' },
-  'claude-4.0-opus': { type: 'anthropic', apiModel: 'claude-opus-4' },
-  'claude-4.1-opus': { type: 'anthropic', apiModel: 'claude-opus-4-1' },
-  'mistral-codestral2': { type: 'mistral', apiModel: 'codestral-2' },
-  'gemini-2.5-pro': { type: 'google', apiModel: 'gemini-2.5-pro' },
-  'gemini-3-pro-preview': { type: 'google', apiModel: 'gemini-3-pro-preview' },
   'gemini-3.1-pro-preview': { type: 'google', apiModel: 'gemini-3.1-pro-preview' },
-  'gemini-test': { type: 'google', apiModel: 'gemini-2.0-flash' },
+  'mistral-codestral2': { type: 'mistral', apiModel: 'codestral-2' },
+  'gemini-test': { type: 'google', apiModel: 'gemini-3.1-pro-preview' },
 };
+
 
 export async function POST(req: NextRequest) {
   try {
-    const { code, analysisType, modelId = 'gemini-test' } = await req.json();
+    const { code, analysisType, modelId = 'gemini-test', context = '' } = await req.json();
     if (!code) return NextResponse.json({ message: 'Code is required.' }, { status: 400 });
 
-    const systemPromptText = systemPrompt(analysisType);
+    const systemPromptText = systemPrompt(analysisType, !!context);
+
+    // Combine context with code for analysis
+    const fullPrompt = context
+      ? `--- START OF PROJECT WORKSPACE CONTEXT ---\n${context}\n--- END OF PROJECT WORKSPACE CONTEXT ---\n\n--- FILE FOR SPECIFIC ATTENTION (OPTIONAL) ---\n${code}\n\nINSTRUCTION: Using the Project Workspace Context provided above, perform a project-wide architectural analysis. Focus on cross-file dependencies, system-wide patterns, and overall project health. Use the 'FILE FOR SPECIFIC ATTENTION' as a starting point or a specific example within the project.`
+      : code;
+
     let responseContent: string;
     let finalModelName = modelId;
 
@@ -28,18 +29,19 @@ export async function POST(req: NextRequest) {
 
     if (vertexConfig) {
       try {
-        responseContent = await callVertexAI(vertexConfig.type, vertexConfig.apiModel, code, systemPromptText);
+        responseContent = await callVertexAI(vertexConfig.type, vertexConfig.apiModel, fullPrompt, systemPromptText, 'json');
         finalModelName = vertexConfig.apiModel;
       } catch (error: any) {
-        responseContent = await callGeminiFallback(code, systemPromptText);
+        responseContent = await callGeminiFallback(fullPrompt, systemPromptText, 'json');
         finalModelName = 'gemini-2.0-flash (Fallback)';
       }
     } else {
-      responseContent = await callOpenRouter(modelId, code, systemPromptText);
+      responseContent = await callOpenRouter(modelId, fullPrompt, systemPromptText);
     }
 
     // --- "UNBREAKABLE" PARSER ---
-    let content = responseContent.replace(/```json|```/g, '').trim();
+    let strResponse = typeof responseContent === 'string' ? responseContent : JSON.stringify(responseContent);
+    let content = strResponse.replace(/```json|```/g, '').trim();
     const start = content.indexOf('{');
     const end = content.lastIndexOf('}');
 
@@ -47,18 +49,17 @@ export async function POST(req: NextRequest) {
     let jsonStr = content.substring(start, end + 1);
 
     try {
-        const parsed = JSON.parse(jsonStr);
-        // --- AUTOMATIC INJECTION FOR AUDIT ---
-        if (analysisType === 'audit' && parsed.auditCode) {
-            const codeB64 = Buffer.from(code).toString('base64');
-            const injection = `import base64\nwith open("subject.src", "wb") as f: f.write(base64.b64decode("${codeB64}"))\n\n`;
-            parsed.auditCode = injection + parsed.auditCode;
-        }
-        return NextResponse.json({ ...parsed, model: finalModelName });
+      const parsed = JSON.parse(jsonStr);
+      // --- AUTOMATIC INJECTION FOR AUDIT ---
+      if (analysisType === 'audit' && parsed.testSuite) {
+        const codeB64 = Buffer.from(code).toString('base64');
+        const injection = `import base64\nwith open("subject_code.py", "wb") as f: f.write(base64.b64decode("${codeB64}"))\n\n`;
+        parsed.testSuite = injection + parsed.testSuite;
+      }
+      return NextResponse.json({ ...parsed, model: finalModelName });
     } catch (e: any) {
-        console.error("[SIMPLE_PARSER_FAILED] Error:", e.message);
-        console.error("Failed on:", jsonStr.substring(0, 200));
-        return NextResponse.json({ message: 'AI response parsing failed.' }, { status: 500 });
+      console.error("[SIMPLE_PARSER_FAILED] Error:", e.message);
+      return NextResponse.json({ message: 'AI response parsing failed.' }, { status: 500 });
     }
 
   } catch (error: any) {
@@ -67,23 +68,34 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function systemPrompt(type: string) {
-    if (type === 'debug') {
-        return `You are an expert AI code debugger. Analyze the code and provide suggestions on how to debug it. Return a valid JSON object with keys: "explanation" (string) and "suggestions" (array of strings). Do not include markdown formatting.`;
-    }
-    if (type === 'audit') {
-        return `You are an expert software quality auditor. Your goal is to generate a comprehensive 4-tier testing audit script in Python.
+function systemPrompt(type: string, hasContext: boolean) {
+  const contextInstruction = hasContext
+    ? " You have been provided with the COMPLETE PROJECT WORKSPACE CONTEXT (File Tree + Source Code of multiple files). Your primary goal is to perform a PROJECT-WIDE analysis. Do not just focus on a single file; instead, look at how different components, services, and configurations interact across the entire repository."
+    : " Analyze the provided code snippet.";
+
+  if (type === 'debug') {
+    return `You are an expert AI code debugger.${contextInstruction} Analyze the code and provide suggestions on how to debug it, considering its role in the project. Return a valid JSON object with keys: "explanation" (string) and "suggestions" (array of strings). Do not include markdown formatting.`;
+  }
+  if (type === 'audit') {
+    return `You are an autonomous AI Testing Agent called 'The Sprite'.${contextInstruction} Your mission is to explore the provided code, identify critical risks, and generate a VEIRFIABLE test suite as proof.
         
-        CRITICAL INSTRUCTIONS:
-        1. The user's code is in a file named "subject.src".
-        2. You MUST first determine if the code is Python. If it contains non-Python keywords like "import React", "const", or "function", you MUST ONLY perform static analysis by reading "subject.src" as a string.
-        3. Do NOT attempt to run or import "subject.src" if it is not Python. This will cause a SyntaxError.
-        4. If it IS Python, you may rename it to "subject.py" and import it for dynamic tests.
-        5. VERBOSE OUTPUT: You MUST use print() statements to report results for all 4 tiers.
+        CRITICAL AGENT INSTRUCTIONS:
+        1. "Explore" the code as an agent would. Describe your process in "Discoveries".
+        2. You must generate 5-10 specific "Mission Discoveries" for the requested tier.
+        3. For each Discovery, determine if the mission "Passed" or "Failed".
+        4. MANDATORY: Generate a "testSuite" (Python string) using 'unittest' or 'pytest'.
+        5. This "testSuite" MUST import the provided code (named "subject_code.py") using 'import subject_code'.
+        6. The test must fail if the discovered vulnerabilities exist.
         
-        Tiers: Unit (Logic), Integration (Interactions), Security (Vulnerabilities), Performance (Efficiency).
+        Return a valid JSON object with: 
+        "explanation" (short mission summary), 
+        "report": { "unit": [], "integration": [], "security": [], "performance": [] },
+        "testSuite": "PYTHON_CODE_STRING",
+        "stats": { "passed": number, "failed": number, "total": number },
+        "score": number,
+        "grade": string
         
-        Return a valid JSON object with keys: "explanation", "auditCode", "report". Do not include markdown formatting.`;
-    }
-    return `You are an expert AI code reviewer. Analyze the code and provide a brief, high-level explanation, followed by actionable suggestions. Return a valid JSON object with keys: "explanation" (string) and "suggestions" (array of strings). Do not include markdown formatting.`;
+        Return ONLY JSON. Do not include markdown formatting. Keep the tone agentic (explorer style).`;
+  }
+  return `You are an expert AI code reviewer.${contextInstruction} Provide a high-level architectural overview of the project (if context provided) or the file, followed by cross-file actionable suggestions. Return a valid JSON object with keys: "explanation" (string) and "suggestions" (array of strings). Do not include markdown formatting.`;
 }

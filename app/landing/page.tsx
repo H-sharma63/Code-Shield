@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { 
   ShieldCheck, 
   Zap, 
@@ -18,47 +18,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 
 export default function LandingPage() {
-  const { data: session } = useSession();
-  const user = session?.user;
-  const router = useRouter();
-
-  useEffect(() => {
-    if (session) {
-      router.push('/dashboard');
-    }
-  }, [session, router]);
-
-  useEffect(() => {
-    if (user?.name && user?.email && session?.provider) {
-      const logUserToSheet = async () => {
-        try {
-          const response = await fetch('/api/log-user', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ name: user.name, email: user.email, provider: session.provider }),
-          });
-          const data = await response.json();
-          if (response.ok) {
-            console.log('User logging successful:', data.message);
-            // Save last login time
-            localStorage.setItem('codeshield_last_login', new Date().toISOString());
-          } else {
-            console.error('Failed to log user:', data.message);
-          }
-        } catch (error) {
-          console.error('Network or unexpected error logging user:', error);
-        }
-      };
-      logUserToSheet();
-    }
-  }, [session, user]);
-
   return (
     <div className="min-h-screen bg-[#060608] text-textPrimary selection:bg-white/10 selection:text-white overflow-hidden">
       {/* Refined Background Layers with Visible but Subtle Gradients */}
@@ -69,7 +30,7 @@ export default function LandingPage() {
         {/* Primary Accent Glow (Top Right) */}
         <div className="absolute top-[-20%] right-[-10%] w-[80%] h-[80%] bg-primaryAccent/15 rounded-full blur-[120px]"></div>
         
-        {/* Secondary Accent Wash (Bottom Left) */}
+        {/* Secondary Accent Wash (Bottom Left) - more towards the center-left */}
         <div className="absolute bottom-[-10%] left-[-10%] w-[80%] h-[80%] bg-secondaryAccent/10 rounded-full blur-[150px]"></div>
 
         {/* Extra highlight behind hero */}

@@ -25,13 +25,26 @@ export async function GET(req: NextRequest) {
     });
 
     if (path) {
-        // Fetch specific file content
+        // Fetch specific file content or directory children
         const response = await octokit.rest.repos.getContent({
             owner,
             repo,
             path,
         });
         const data: any = response.data;
+
+        // If it's a directory, return its children
+        if (Array.isArray(data)) {
+            const items = data.map((item: any) => ({
+                name: item.name,
+                path: item.path,
+                type: item.type === 'dir' ? 'dir' : 'file',
+                sha: item.sha,
+            }));
+            return NextResponse.json({ items }, { status: 200 });
+        }
+
+        // If it's a single file
         return NextResponse.json({ 
             item: {
                 name: data.name,

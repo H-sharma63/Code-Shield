@@ -10,9 +10,10 @@ interface DiffViewProps {
     language: string;
     fileName: string;
     onClose: () => void;
+    onAccept?: (newContent: string) => void;
 }
 
-const DiffView = ({ original, modified, language, fileName, onClose }: DiffViewProps) => {
+const DiffView = ({ original, modified, language, fileName, onClose, onAccept }: DiffViewProps) => {
     const editorRef = useRef<any>(null);
 
     // CRITICAL: Manually reset models before unmount to prevent disposal error
@@ -76,14 +77,33 @@ const DiffView = ({ original, modified, language, fileName, onClose }: DiffViewP
             </div>
             
             {/* Legend Footer */}
-            <div className="px-4 py-2 bg-cardPanel border-t border-borderLine flex space-x-6 shrink-0 justify-end shadow-inner">
-                <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-red-500/20 border border-red-500/50 rounded-sm" />
-                    <span className="text-[10px] text-textSecondary font-bold uppercase tracking-tighter">Deletions</span>
+            <div className="px-4 py-3 bg-[#121214] border-t border-borderLine flex items-center justify-between shrink-0 shadow-inner">
+                <div className="flex space-x-6">
+                    <div className="flex items-center space-x-2">
+                        <div className="w-3 h-3 bg-red-500/20 border border-red-500/50 rounded-sm" />
+                        <span className="text-[10px] text-textSecondary font-bold uppercase tracking-tighter">Deletions</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <div className="w-3 h-3 bg-green-500/20 border border-green-500/50 rounded-sm" />
+                        <span className="text-[10px] text-textSecondary font-bold uppercase tracking-tighter">Additions</span>
+                    </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-green-500/20 border border-green-500/50 rounded-sm" />
-                    <span className="text-[10px] text-textSecondary font-bold uppercase tracking-tighter">Additions</span>
+
+                <div className="flex items-center space-x-3">
+                    <button 
+                        onClick={onClose}
+                        className="px-4 py-1.5 text-[10px] font-bold text-textSecondary hover:text-white transition-all uppercase tracking-widest"
+                    >
+                        Discard
+                    </button>
+                    {onAccept && (
+                        <button 
+                            onClick={() => onAccept(modified)}
+                            className="bg-highlight hover:bg-highlight/80 text-black px-6 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-highlight/20 transition-all active:scale-95"
+                        >
+                            Accept & Apply
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
