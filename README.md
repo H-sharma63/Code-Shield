@@ -128,7 +128,7 @@ export const projects = pgTable('projects', {
 
 ```bash
 # Clone the repository
-git clone https://github.com/H-sharma63/Minor-Project.git
+git clone https://github.com/H-sharma63/Code-Shield.git
 cd Minor-Project
 
 # Install dependencies
