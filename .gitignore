@@ -45,3 +45,24 @@ next-env.d.ts
 
 .gemini/
 gha-creds-*.json
+/workspaces/
+
+# GSD - AI Agent Infrastructure
+.agent/
+.agents/
+.gsd/
+.gemini/
+.assets/
+adapters/
+PROJECT_RULES.md
+GSD-STYLE.md
+model_capabilities.yaml
+SPEC.md
+ROADMAP.md
+STATE.md
+CHANGELOG.md
+
+# GCP Server Management Scripts
+start-server.bat
+stop-server.bat
+update-server.bat

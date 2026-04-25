@@ -100,9 +100,13 @@ export async function getDeepProjectContext(repoFullName: string): Promise<strin
                     const res = await fetch(`/api/github/contents?repo=${encodeURIComponent(repoFullName)}&path=${encodeURIComponent(file.path)}`);
                     const data = await res.json();
                     if (res.ok && data.item?.content) {
+                        const encoded = data.item.content.replace(/[\n\r\s]+/g, '');
+                        const binString = atob(encoded);
+                        const bytes = new Uint8Array(binString.length);
+                        for (let i = 0; i < binString.length; i++) bytes[i] = binString.charCodeAt(i);
                         return {
                             path: file.path,
-                            content: atob(data.item.content.replace(/\n/g, ''))
+                            content: new TextDecoder().decode(bytes)
                         };
                     }
                 } catch (e) {

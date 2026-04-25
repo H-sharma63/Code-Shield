@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     if (id) {
       // Update existing project by id, ensuring it belongs to the user
-      await db.update(projects).set({ projectName, fileName, blobUrl: blob.url, updatedAt: new Date() }).where(eq(projects.id, id)).where(eq(projects.userEmail, userEmail));
+      await db.update(projects).set({ projectName, fileName, blobUrl: blob.url, updatedAt: new Date() }).where(and(eq(projects.id, id), eq(projects.userEmail, userEmail)));
     } else {
       // Check if a project with the same projectName and fileName already exists for this user
       const existingProject = await db.select().from(projects).where(

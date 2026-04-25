@@ -1,0 +1,54 @@
+<h2>Who Runs What? (Execution Model)</h2>
+<p class="subtitle">Clarity on Client vs. Server responsibilities</p>
+
+<div class="mockup">
+  <div class="mockup-header">The Architecture Map</div>
+  <div class="mockup-body">
+    <div style="display: flex; gap: 1.5rem; padding: 1rem; align-items: stretch;">
+      
+      <!-- User Side -->
+      <div style="flex: 1; border: 2px solid #3b82f6; border-radius: 8px; padding: 1rem; background: #eef6ff; color: #1e3a8a;">
+        <div class="label" style="background: #3b82f6; color: #fff; border-radius: 4px; padding: 2px 6px;">User Side (Browser)</div>
+        <ul style="font-size: 0.8rem; margin-top: 1rem; padding-left: 1.2rem;">
+          <li>Visual Editor UI</li>
+          <li>The "Run" Button</li>
+          <li>Sending raw keystrokes</li>
+          <li>Viewing the App Preview</li>
+        </ul>
+        <p style="font-size: 0.7rem; margin-top: 1rem; font-style: italic;">"I am just the remote control."</p>
+      </div>
+
+      <div style="display: flex; align-items: center; color: #888; font-weight: bold;">&harr;</div>
+
+      <!-- Server Side -->
+      <div style="flex: 1; border: 2px solid #00ff00; border-radius: 8px; padding: 1rem; background: #002200; color: #00ff00;">
+        <div class="label" style="background: #00ff00; color: #000; border-radius: 4px; padding: 2px 6px;">Server Side (GCP VM)</div>
+        <ul style="font-size: 0.8rem; margin-top: 1rem; padding-left: 1.2rem;">
+          <li><strong>All npm install</strong></li>
+          <li><strong>All node_modules</strong></li>
+          <li><strong>Running the Dev Server</strong></li>
+          <li><strong>Handling the Tunnel</strong></li>
+        </ul>
+        <p style="font-size: 0.7rem; margin-top: 1rem; font-style: italic;">"I am the heavy-duty engine."</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="server_side" onclick="toggleSelect(this)">
+    <div class="letter">&check;</div>
+    <div class="content">
+      <h3>100% Server-Side Execution</h3>
+      <p>Everything heavy runs on the GCP VM. The user's computer stays cool and doesn't need to install anything. This is why it works even on slow laptops.</p>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>Why this is the correct choice</h4>
+    <p>If we ran it on the user's side (Client), we would be limited by their browser resources (like WebContainers). By running on the <strong>Server (GCP)</strong>, we have zero limits and full persistence for those <code>node_modules</code> you mentioned.</p>
+  </div>
+</div>

@@ -19,6 +19,8 @@ export async function POST(req: NextRequest) {
     const systemPrompt = `You are a professional AI test automation engineer.
 Analyze the given code and generate exactly 8-10 comprehensive test cases.
 You MUST return ONLY valid JSON, no markdown, no explanation.
+IMPORTANT: The 'input' and 'expectedOutput' MUST be literal values (strings, numbers, booleans, arrays, or objects). 
+DO NOT use Python expressions like '"..." * 5000' or variables inside the JSON.
 Cover these specific types: happy_path, edge_case, boundary, negative, invalid_input.
 
 Return this EXACT JSON shape:
@@ -33,14 +35,24 @@ Return this EXACT JSON shape:
 
     let responseContent: string;
     try {
-        // Default to gemini-1.5-pro for high-fidelity test generation
-        responseContent = await callVertexAI('google', 'gemini-1.5-pro-002', userPrompt, systemPrompt, 'json');
+        // Use the newly registered Gemini 3.1 Pro Preview
+        responseContent = await callVertexAI('google', 'gemini-3.1-pro-preview', userPrompt, systemPrompt, 'json');
     } catch (error: any) {
         responseContent = await callGeminiFallback(userPrompt, systemPrompt, 'json');
     }
 
-    // Clean up any potential markdown fluff
-    const cleanedJson = responseContent.replace(/```json\n/i, '').replace(/```\n/i, '').replace(/\n```/i, '').trim();
+    // Clean up markdown and common AI expressions that break JSON.parse
+    let cleanedJson = responseContent.replace(/```json\n?|```/gi, '').trim();
+
+    // REGEX SAFETY NET: Catch Python-style string multiplication (e.g. "a" * 10) 
+    // and replace it with the actual repeated string literal.
+    cleanedJson = cleanedJson.replace(/"([^"]+)"\s*\*\s*(\d+)/g, (match, str, count) => {
+        try {
+            return JSON.stringify(str.repeat(parseInt(count)));
+        } catch (e) {
+            return match; // Fallback to original if repeat fails
+        }
+    });
     
     try {
         const parsedData = JSON.parse(cleanedJson);

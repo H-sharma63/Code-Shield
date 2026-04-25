@@ -1,0 +1,88 @@
+<h2>Architectural Brainstorming: Remote App Runner</h2>
+<p class="subtitle">Solving the "New Tab" and Persistence issues</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Approach A: GCP VM + SSH</div>
+    <div class="mockup-body">
+      <div style="padding: 1rem; font-size: 0.9rem;">
+        <div style="border: 1px solid #444; border-radius: 4px; padding: 0.5rem; margin-bottom: 0.5rem; background: #1a1a1a;">
+          <strong>Cloud Instance (GCP)</strong>
+          <ul style="margin: 0.5rem 0; padding-left: 1.2rem;">
+            <li>Persistent <code>node_modules</code></li>
+            <li>Real Shell (Bash/Zsh)</li>
+            <li>Cloudflare Tunnel / LocalTunnel</li>
+          </ul>
+        </div>
+        <div style="text-align: center; color: #888;">&uarr;&darr; (SSH over WebSocket)</div>
+        <div style="border: 1px solid #444; border-radius: 4px; padding: 0.5rem; margin-top: 0.5rem; background: #1a1a1a;">
+          <strong>CodeShield Frontend</strong>
+          <ul style="margin: 0.5rem 0; padding-left: 1.2rem;">
+            <li>Xterm.js Terminal</li>
+            <li>Real Public URL</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="mockup">
+    <div class="mockup-header">Approach B: Enhanced Native Engine</div>
+    <div class="mockup-body">
+       <div style="padding: 1rem; font-size: 0.9rem;">
+        <div style="border: 1px solid #444; border-radius: 4px; padding: 0.5rem; margin-bottom: 0.5rem; background: #1a1a1a;">
+          <strong>Docker Container (Railway)</strong>
+          <ul style="margin: 0.5rem 0; padding-left: 1.2rem;">
+            <li>Ephemeral but fast</li>
+            <li>Localtunnel auto-spawn</li>
+            <li>Automated lifecycle</li>
+          </ul>
+        </div>
+        <div style="text-align: center; color: #888;">&uarr;&darr; (Socket.io)</div>
+        <div style="border: 1px solid #444; border-radius: 4px; padding: 0.5rem; margin-top: 0.5rem; background: #1a1a1a;">
+          <strong>CodeShield Frontend</strong>
+          <ul style="margin: 0.5rem 0; padding-left: 1.2rem;">
+            <li>Existing implementation</li>
+            <li>Need fix for state persistence</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="gcp" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>GCP VM + SSH</h3>
+      <p>Best for persistence and real-world feel. Harder to scale (one VM per user?), but very steady.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="native" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Scale Native Engine</h3>
+      <p>Optimize current Railway engine with Volumes/Persistence. Easier to automate, but shares host resources.</p>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>Approach A Benefits</h4>
+    <ul>
+      <li>Dedicated IP/Resources</li>
+      <li>Persistent node_modules</li>
+      <li>Standard SSH Access</li>
+    </ul>
+  </div>
+  <div class="cons">
+    <h4>Approach A Challenges</h4>
+    <ul>
+      <li>GCP Credit Management</li>
+      <li>VM Startup Latency</li>
+      <li>SSH Key Security</li>
+    </ul>
+  </div>
+</div>

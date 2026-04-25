@@ -1,0 +1,51 @@
+<h2>Zero-Config "Run" Experience</h2>
+<p class="subtitle">One click triggers the entire background chain</p>
+
+<div class="mockup">
+  <div class="mockup-header">CodeShield UI (Your Frontend)</div>
+  <div class="mockup-body">
+    <div style="padding: 2rem; text-align: center; background: #000;">
+      <button style="background: #00ff00; color: #000; border: none; padding: 1rem 2rem; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; box-shadow: 0 0 20px rgba(0,255,0,0.3);">
+        &nbsp;▶&nbsp; RUN APPLICATION
+      </button>
+      <p style="margin-top: 1rem; color: #888; font-size: 0.8rem;">Detecting framework: <strong>Next.js</strong></p>
+    </div>
+  </div>
+</div>
+
+<div style="text-align: center; padding: 1rem; color: #888;">&darr; AUTOMATIC BACKGROUND STEPS &darr;</div>
+
+<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+  <div style="flex: 1; min-width: 150px; border: 1px solid #444; border-radius: 4px; padding: 0.8rem; background: #111; font-size: 0.75rem;">
+    <div class="label" style="color: #3b82f6;">Step 1</div>
+    <strong>Start Dev Server</strong><br>
+    <code style="color: #666;">npm run dev</code>
+  </div>
+  <div style="flex: 1; min-width: 150px; border: 1px solid #444; border-radius: 4px; padding: 0.8rem; background: #111; font-size: 0.75rem;">
+    <div class="label" style="color: #f6821f;">Step 2</div>
+    <strong>Request Tunnel</strong><br>
+    <code style="color: #666;">lt --port 3000...</code>
+  </div>
+  <div style="flex: 1; min-width: 150px; border: 1px solid #444; border-radius: 4px; padding: 0.8rem; background: #111; font-size: 0.75rem;">
+    <div class="label" style="color: #00ff00;">Step 3</div>
+    <strong>Return Public URL</strong><br>
+    <code style="color: #666;">https://app.loca.lt</code>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="auto_runner" onclick="toggleSelect(this)">
+    <div class="letter">&check;</div>
+    <div class="content">
+      <h3>Automated Lifecycle Manager</h3>
+      <p>We'll write a "Manager Service" on the VM. When you click Run, the frontend sends a single API request, and the Manager handles the rest. <strong>You never type a tunnel command.</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>The "Magic" Part</h4>
+    <p>The Manager Service will monitor the app. If the app crashes, it restarts. If the tunnel drops, it reconnects. Everything stays "steady" without you touching the terminal.</p>
+  </div>
+</div>

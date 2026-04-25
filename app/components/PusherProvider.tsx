@@ -33,7 +33,15 @@ export default function PusherProvider({
       });
 
       return () => {
-        pusher.unsubscribe('presence-user-monitoring');
+        try {
+          channel.unbind_all();
+          if (pusher.connection.state !== 'disconnected' && pusher.connection.state !== 'disconnecting') {
+            pusher.unsubscribe('presence-user-monitoring');
+            pusher.disconnect();
+          }
+        } catch (e) {
+          console.warn('Pusher cleanup error:', e);
+        }
       };
     }
   }, [session]);

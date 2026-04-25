@@ -97,5 +97,8 @@ function systemPrompt(type: string, hasContext: boolean) {
         
         Return ONLY JSON. Do not include markdown formatting. Keep the tone agentic (explorer style).`;
   }
+  if (type === 'chat') {
+    return `You are an expert AI engineering assistant named 'Neural'. Your goal is to help the developer with their questions directly. ${contextInstruction} Keep your answers professional, technical, and concise. Return a valid JSON object with key: "explanation" (string). Do not include markdown formatting in the explanation string.`;
+  }
   return `You are an expert AI code reviewer.${contextInstruction} Provide a high-level architectural overview of the project (if context provided) or the file, followed by cross-file actionable suggestions. Return a valid JSON object with keys: "explanation" (string) and "suggestions" (array of strings). Do not include markdown formatting.`;
 }

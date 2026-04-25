@@ -3,7 +3,7 @@
 import { useSession, signIn } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Github, Settings as SettingsIcon, Globe, Lock, ExternalLink, RefreshCw, AlertCircle, Edit } from 'lucide-react';
+import { Github, Settings as SettingsIcon, Globe, Lock, ExternalLink, RefreshCw, AlertCircle, Edit, Bot, Key, Eye, EyeOff, Save, Check } from 'lucide-react';
 
 interface Repo {
   id: number;
@@ -22,6 +22,26 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasFetched, setHasFetched] = useState(false);
+  const [agentKeys, setAgentKeys] = useState({
+    ANTHROPIC_API_KEY: '',
+    GEMINI_API_KEY: '',
+    OPENAI_API_KEY: '',
+    OPENROUTER_API_KEY: '',
+  });
+  const [showKeys, setShowKeys] = useState({ ANTHROPIC_API_KEY: false, GEMINI_API_KEY: false, OPENAI_API_KEY: false, OPENROUTER_API_KEY: false });
+  const [savedKeys, setSavedKeys] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    const stored = localStorage.getItem('codeshield_agent_keys');
+    if (stored) setAgentKeys(JSON.parse(stored));
+  }, []);
+
+  const handleSaveKey = (key: string) => {
+    const updated = { ...agentKeys };
+    localStorage.setItem('codeshield_agent_keys', JSON.stringify(updated));
+    setSavedKeys(prev => ({ ...prev, [key]: true }));
+    setTimeout(() => setSavedKeys(prev => ({ ...prev, [key]: false })), 2000);
+  };
 
   const fetchRepos = async () => {
     if (loading && hasFetched) return; // Prevent concurrent fetches
@@ -93,6 +113,58 @@ export default function SettingsPage() {
                 <span className="text-highlight font-bold">Tabbed</span>
               </div>
             </div>
+          </div>
+
+          {/* AI Agent Keys */}
+          <div className="bg-cardPanel p-6 rounded-lg shadow-lg border border-borderLine">
+            <div className="flex items-center space-x-2 mb-5">
+              <Bot size={20} className="text-highlight" />
+              <h2 className="text-xl font-bold text-textPrimary">AI Agent Keys</h2>
+            </div>
+            <p className="text-[11px] text-textSecondary mb-4 leading-relaxed">
+              Add your own API keys (BYOK) to power Claude Code, Gemini CLI and OpenCode agents running on the CodeShield backend.
+            </p>
+            <div className="space-y-4">
+              {([
+                { id: 'ANTHROPIC_API_KEY', label: 'Claude (Anthropic)', placeholder: 'sk-ant-...' },
+                { id: 'GEMINI_API_KEY', label: 'Gemini (Google)', placeholder: 'AIza...' },
+                { id: 'OPENAI_API_KEY', label: 'OpenAI (Codex)', placeholder: 'sk-...' },
+                { id: 'OPENROUTER_API_KEY', label: 'OpenRouter (OpenCode / Models)', placeholder: 'sk-or-...' },
+              ] as { id: keyof typeof agentKeys; label: string; placeholder: string }[]).map(({ id, label, placeholder }) => (
+                <div key={id}>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-textSecondary opacity-70 mb-1.5">{label}</label>
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <input
+                        type={showKeys[id] ? 'text' : 'password'}
+                        value={agentKeys[id]}
+                        onChange={(e) => setAgentKeys(prev => ({ ...prev, [id]: e.target.value }))}
+                        placeholder={placeholder}
+                        className="w-full bg-base border border-borderLine text-textPrimary text-xs rounded-lg p-2.5 pr-8 outline-none focus:border-highlight/50 transition-all font-mono"
+                      />
+                      <button
+                        onClick={() => setShowKeys(prev => ({ ...prev, [id]: !prev[id] }))}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-textSecondary hover:text-textPrimary transition-colors"
+                      >
+                        {showKeys[id] ? <EyeOff size={13} /> : <Eye size={13} />}
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => handleSaveKey(id)}
+                      className={`p-2 rounded-lg transition-all shrink-0 ${
+                        savedKeys[id]
+                          ? 'bg-green-500/20 text-green-400'
+                          : 'bg-highlight/10 text-highlight hover:bg-highlight/20'
+                      }`}
+                      title="Save Key"
+                    >
+                      {savedKeys[id] ? <Check size={14} /> : <Save size={14} />}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-[10px] text-textSecondary/50 mt-4 italic">Keys are stored locally in your browser.</p>
           </div>
         </div>
 

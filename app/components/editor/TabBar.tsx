@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Play, Plus, Minus, ChevronRight, Folder, File, Loader2 } from 'lucide-react';
+import { X, Play, Plus, Minus, ChevronRight, Folder, File, Loader2, ExternalLink } from 'lucide-react';
 import FileIcon from './FileIcon';
 
 export interface Tab {
@@ -20,9 +20,13 @@ interface TabBarProps {
   onRun?: () => void;
   onIncreaseFont?: () => void;
   onDecreaseFont?: () => void;
+  publicUrls?: Record<number, string>;
 }
 
-export default function TabBar({ tabs, activeTabId, repoFullName, onTabClick, onTabClose, onFileClick, onRun, onIncreaseFont, onDecreaseFont }: TabBarProps) {
+import { useWorkspace } from './WorkspaceContext';
+
+export default function TabBar({ tabs, activeTabId, repoFullName, onTabClick, onTabClose, onFileClick, onRun, onIncreaseFont, onDecreaseFont, publicUrls }: TabBarProps) {
+  const { serverUrls } = useWorkspace();
   const [pickerPath, setPickerPath] = useState<string | null>(null);
   const [pickerAnchor, setPickerAnchor] = useState<{ x: number, y: number } | null>(null);
 
@@ -68,22 +72,23 @@ export default function TabBar({ tabs, activeTabId, repoFullName, onTabClick, on
                     `}
                 >
                     <FileIcon name={tab.name} size={14} />
-                    <span className={`text-[10px] truncate flex-1 font-medium ${isModified ? 'italic' : ''}`}>
-                        {tab.name} {isModified && '•'}
+                    <span className="text-[10px] truncate flex-1 font-medium">
+                        {tab.name} 
                     </span>
                     
+                    {isModified && !isActive && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 group-hover:hidden" />
+                    )}
+
                     <button
                         onClick={(e) => { e.stopPropagation(); onTabClose(tab.id); }}
-                        className={`p-0.5 rounded hover:bg-white/10 transition-colors ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                        className={`p-0.5 rounded hover:bg-white/10 transition-all ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                     >
-                        <X size={10} />
+                        <X size={12} className={isModified && isActive ? "text-indigo-400" : ""} />
                     </button>
                 </div>
               );
           })}
-        </div>
-        <div className="flex items-center px-3 space-x-3 h-full border-l border-borderLine bg-cardPanel shrink-0">
-          <button onClick={onRun} className="flex items-center space-x-1 px-2 py-0.5 text-textSecondary hover:text-highlight transition-all" title="Run/Analyze (Ctrl+Enter)"><Play size={16} /></button>
         </div>
       </div>
 
@@ -112,20 +117,6 @@ export default function TabBar({ tabs, activeTabId, repoFullName, onTabClick, on
           </div>
       </div>
 
-      {/* 3. Breadcrumb Picker Dropdown */}
-      {pickerPath && pickerAnchor && (
-          <BreadcrumbPicker 
-            path={pickerPath} 
-            repoFullName={repoFullName} 
-            anchor={pickerAnchor} 
-            onClose={() => { setPickerPath(null); setPickerAnchor(null); }}
-            onNavigate={(newPath, isDir) => {
-                if (!isDir && onFileClick) onFileClick(newPath);
-                setPickerPath(null);
-                setPickerAnchor(null);
-            }}
-          />
-      )}
     </div>
   );
 }

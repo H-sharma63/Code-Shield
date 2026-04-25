@@ -1,0 +1,526 @@
+'use client';
+
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import { io, Socket } from 'socket.io-client';
+import type { WebContainer, WebContainerProcess } from '@webcontainer/api';
+import type { Terminal as XTermType } from 'xterm';
+import { OPFSStorage } from '@/app/lib/editor/opfs-storage';
+import { ShieldSyncEngine, ChangedFile } from '@/app/lib/editor/shield-sync';
+
+export interface TerminalSession {
+  id: string;
+  process: WebContainerProcess | null;
+  terminal: XTermType;
+  fitAddon: any;
+  name: string;
+}
+
+interface WorkspaceContextType {
+  webcontainer: WebContainer | null;
+  sessions: TerminalSession[];
+  activeSessionId: string | null;
+  bootStatus: 'idle' | 'booting' | 'ready' | 'error';
+  error: string | null;
+  serverUrl: string | null;
+  serverUrls: Record<number, string>;
+  publicUrls: Record<number, string>;
+  lastDiagnostic: { type: string; message: string; fix: string } | null;
+  setLastDiagnostic: (diag: { type: string; message: string; fix: string } | null) => void;
+  nodeModulesMissing: boolean;
+  createSession: () => Promise<void>;
+  setActiveSessionId: (id: string) => void;
+  closeSession: (id: string) => void;
+  syncProject: (projectId: string) => Promise<void>;
+  persistFile: (path: string, content: string | Uint8Array) => Promise<void>;
+  isSyncing: boolean;
+  changedFiles: ChangedFile[];
+  refreshChanges: () => Promise<void>;
+  mountTerminal: (sessionId: string, container: HTMLDivElement) => void;
+  sendCommand: (command: string) => void;
+}
+
+const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);
+
+export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [webcontainer, setWebcontainer] = useState<WebContainer | null>(null);
+  const [sessions, setSessions] = useState<TerminalSession[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [bootStatus, setBootStatus] = useState<'idle' | 'booting' | 'ready' | 'error'>('idle');
+  const [serverUrl, setServerUrl] = useState<string | null>(process.env.NEXT_PUBLIC_PREVIEW_URL || null);
+  const [serverUrls, setServerUrls] = useState<Record<number, string>>({});
+  const [publicUrls, setPublicUrls] = useState<Record<number, string>>({});
+  const [lastDiagnostic, setLastDiagnostic] = useState<{ type: string; message: string; fix: string } | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [nodeModulesMissing, setNodeModulesMissing] = useState(false);
+  const [changedFiles, setChangedFiles] = useState<ChangedFile[]>([]);
+
+  const lastSyncedProjectId = useRef<string | null>(null);
+  const sessionsRef = useRef<TerminalSession[]>([]);
+  const bootStatusRef = useRef<'idle' | 'booting' | 'ready' | 'error'>('idle');
+
+  const persistFile = useCallback(async (path: string, content: string | Uint8Array) => {
+    await OPFSStorage.writeFile(path, content);
+  }, []);
+
+  const restoreFiles = useCallback(async (instance: WebContainer) => {
+    try {
+      const files = await OPFSStorage.getAllFiles();
+      const tree: any = {};
+
+      // 🌲 ATOMIC TRANSFORM: Flat Map -> Nested Tree
+      for (const [path, content] of Object.entries(files)) {
+        const parts = path.split('/');
+        let current = tree;
+        
+        for (let i = 0; i < parts.length; i++) {
+          const part = parts[i];
+          const isFile = i === parts.length - 1;
+          
+          if (isFile) {
+            current[part] = {
+              file: {
+                contents: content
+              }
+            };
+          } else {
+            if (!current[part]) {
+              current[part] = {
+                directory: {}
+              };
+            }
+            current = current[part].directory;
+          }
+        }
+      }
+
+      // 🚀 ATOMIC MOUNT: Instant restoration of entire project
+      await instance.mount(tree);
+      
+      const terminal = sessionsRef.current[0]?.terminal;
+      if (terminal && Object.keys(files).length > 0) {
+        terminal.write(`\r\n\x1b[32m✔\x1b[0m \x1b[1mWorkspace Restored:\x1b[0m ${Object.keys(files).length} files mounted in atomic burst.\r\n`);
+      }
+    } catch (e) {
+      console.error("Atomic Restore Error:", e);
+    }
+  }, []);
+
+  const createSession = useCallback(async () => {
+    if (!webcontainer) return;
+
+    const { Terminal: XTerm } = await import('xterm');
+    const { FitAddon } = await import('xterm-addon-fit');
+    const { WebLinksAddon } = await import('xterm-addon-web-links');
+
+    const term = new XTerm({
+      theme: { background: '#0a0a0c', foreground: '#ffffff', cursor: '#818cf8' },
+      fontFamily: "'Fira Code', 'Cascadia Code', Menlo, monospace",
+      fontSize: 12,
+      lineHeight: 1.4,
+      cursorBlink: true,
+      convertEol: true,
+    });
+    const fit = new FitAddon();
+    term.loadAddon(fit);
+    term.loadAddon(new WebLinksAddon());
+
+    // 📋 Enable Copy on Selection
+    term.onSelectionChange(() => {
+      const selection = term.getSelection();
+      if (selection) {
+        navigator.clipboard.writeText(selection).catch(() => {});
+      }
+    });
+
+    const sessionId = Math.random().toString(36).substring(7);
+    const sessionCount = sessionsRef.current.length + 1;
+
+    const shell = await webcontainer.spawn('jsh', { 
+        terminal: { cols: 80, rows: 24 },
+        env: { 
+            NODE_ENV: 'development',
+            NEXT_TURBO: '0', 
+            NEXT_PRIVATE_LOCAL_SKIP_SWC_CHECK: '1',
+            NEXT_TELEMETRY_DISABLED: '1'
+        }
+    });
+
+    // 🛰️ WASM Bridge Logic
+    const inputWriter = shell.input.getWriter();
+    shell.output.pipeTo(new WritableStream({
+      write(data) {
+        let output = typeof data === 'string' ? data : new TextDecoder().decode(data);
+
+        if (output.includes('localhost:3000') || output.includes('localhost:3001')) {
+            const portMatch = output.match(/localhost:(\d+)/);
+            const port = portMatch ? parseInt(portMatch[1]) : 3000;
+            setTimeout(() => {
+                if (serverUrls[port] || process.env.NEXT_PUBLIC_PREVIEW_URL) {
+                    const u = process.env.NEXT_PUBLIC_PREVIEW_URL || serverUrls[port];
+                    term.write(`\r\n\x1b[44;37m 🚀 CODESHIELD BRIDGE \x1b[0m \x1b[1;32mView your project here:\x1b[0m \x1b[4;38;2;129;140;248m${u}\x1b[0m\r\n`);
+                }
+            }, 500);
+        }
+
+        term.write(output);
+      }
+    })).catch(() => {});
+
+    term.onData(data => inputWriter.write(data));
+
+    const newSession: TerminalSession = { 
+        id: sessionId, 
+        process: shell, 
+        terminal: term, 
+        fitAddon: fit,
+        name: `Terminal ${sessionCount}`
+    };
+
+    sessionsRef.current = [...sessionsRef.current, newSession];
+    setSessions([...sessionsRef.current]);
+    setActiveSessionId(sessionId);
+  }, [webcontainer, serverUrls]);
+
+  const closeSession = useCallback((id: string) => {
+    const session = sessionsRef.current.find(s => s.id === id);
+    if (session) {
+      if (session.process) {
+          session.process.kill();
+      }
+      session.terminal.dispose();
+    }
+    sessionsRef.current = sessionsRef.current.filter(s => s.id !== id);
+    setSessions([...sessionsRef.current]);
+    
+    if (activeSessionId === id) {
+      const nextSession = sessionsRef.current[sessionsRef.current.length - 1];
+      setActiveSessionId(nextSession ? nextSession.id : null);
+    }
+  }, [activeSessionId]);
+  
+  const ensureCompatibility = useCallback(async (instance: any) => {
+    try {
+      const pkgRaw = await instance.fs.readFile('package.json', 'utf-8').catch(() => null);
+      if (!pkgRaw) return;
+
+      const pkg = JSON.parse(pkgRaw);
+      let changed = false;
+
+      // 1. Force Webpack for Next.js (Turbo is incompatible with browser WASM)
+      if (pkg.scripts) {
+          ['dev', 'build'].forEach(script => {
+              if (pkg.scripts[script]) {
+                  // Cleanup previous incorrect patch if present
+                  if (pkg.scripts[script].includes('next --webpack dev')) {
+                      pkg.scripts[script] = pkg.scripts[script].replace('next --webpack dev', 'next dev --webpack -p 3001');
+                      changed = true;
+                  }
+
+                  // Normal case: append if missing, and force Port 3001 to avoid host conflicts (3000 is common for IDE)
+                  if (pkg.scripts[script].startsWith('next dev') && !pkg.scripts[script].includes('--webpack')) {
+                      pkg.scripts[script] = pkg.scripts[script].replace('next dev', 'next dev --webpack -p 3001');
+                      changed = true;
+                  }
+                  if (pkg.scripts[script].startsWith('next build') && !pkg.scripts[script].includes('--webpack')) {
+                      pkg.scripts[script] = pkg.scripts[script].replace('next build', 'next build --webpack');
+                      changed = true;
+                  }
+              }
+          });
+      }
+
+      if (changed) {
+          await instance.fs.writeFile('package.json', JSON.stringify(pkg, null, 2));
+          const terminal = sessionsRef.current[0]?.terminal;
+          if (terminal) {
+              terminal.write(`\r\n\x1b[45;37m [ CODESHIELD WASM-SHIM ] \x1b[0m\r\n`);
+              terminal.write(`\x1b[32m✔ Professional Turbo experience enabled via Webpack-WASM bridge for browser stability.\x1b[0m\r\n`);
+          }
+      }
+
+      // 2. Inject WASM Environment Flags via .env.local
+      let dotEnv = await instance.fs.readFile('.env.local', 'utf-8').catch(() => "");
+      if (!dotEnv.includes('NEXT_PRIVATE_LOCAL_SKIP_SWC_CHECK')) {
+          dotEnv += `\nNEXT_PRIVATE_LOCAL_SKIP_SWC_CHECK=1\nNEXT_TELEMETRY_DISABLED=1\n`;
+          await instance.fs.writeFile('.env.local', dotEnv);
+      }
+
+    } catch (e) {
+      console.error("Compatibility Shield Error:", e);
+    }
+  }, []);
+
+  const mountTerminal = useCallback((sessionId: string, container: HTMLDivElement) => {
+    const session = sessionsRef.current.find(s => s.id === sessionId);
+    if (!session) return;
+    
+    session.terminal.open(container);
+    try {
+      session.fitAddon.fit();
+    } catch (e) { }
+    session.terminal.focus();
+  }, []);
+
+  const sendCommand = useCallback((command: string) => {
+    const session = sessionsRef.current.find(s => s.id === activeSessionId) || sessionsRef.current[0];
+    if (session) {
+      if (session.process) {
+          const writer = session.process.input.getWriter();
+          writer.write(command + '\n');
+          writer.releaseLock();
+      }
+      
+      // Also ensure terminal is visible
+      session.terminal.focus();
+    }
+  }, [activeSessionId]);
+
+  const boot = useCallback(async () => {
+    if (bootStatusRef.current !== 'idle') return;
+    bootStatusRef.current = 'booting';
+    setBootStatus('booting');
+
+    try {
+      // 🛡️ SERVICE WORKER PURIFICATION: Clear legacy workers to fix 404 bridge
+      if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          let cleared = false;
+          for (const reg of registrations) {
+              if (reg.active?.scriptURL.includes('sw.js')) {
+                  await reg.unregister();
+                  cleared = true;
+              }
+          }
+          if (cleared) {
+              console.log("CodeShield: Legacy Service Worker cleared. Rebooting for clean isolation...");
+              window.location.reload();
+              return;
+          }
+      }
+
+      // 1. Isolation Check
+      if (typeof window !== 'undefined' && !window.crossOriginIsolated) {
+          console.warn("CodeShield: Cross-Origin Isolation is not active. Some features may be limited.");
+      }
+
+      // 2. Boot the V8 Engine
+      const { WebContainer } = await import('@webcontainer/api');
+      const instance = await WebContainer.boot();
+
+      // 🚀 Handle Internal Servers & Preview Injection
+      instance.on('server-ready', async (port, url) => {
+        // ALWAYS prioritize the manual .env URL if the user has provided one.
+        // This prevents the weird webcontainer-api.io URL from overtaking the preview frame.
+        const manualPreviewUrl = process.env.NEXT_PUBLIC_PREVIEW_URL;
+        const finalUrl = manualPreviewUrl || url;
+        
+        setServerUrl(finalUrl);
+        setServerUrls(prev => ({ ...prev, [port]: finalUrl }));
+        
+        const terminal = sessionsRef.current[0]?.terminal;
+        if (terminal) {
+          terminal.write(`\r\n\x1b[42;30m 🔌 PREVIEW READY \x1b[0m \x1b[1;32mYour project is ready to view at:\x1b[0m \x1b[4;38;2;129;140;248m${finalUrl}\x1b[0m\r\n\r\n`);
+        }
+      });
+      
+      // 3. Restore & Shield (Fail-Safe)
+      try {
+          await restoreFiles(instance);
+          await ensureCompatibility(instance);
+      } catch (e) {
+          console.warn("Soft boot failure during restoration:", e);
+      }
+
+      // 🔔 Detect node_modules
+      try {
+        await instance.fs.readdir('node_modules');
+        setNodeModulesMissing(false);
+      } catch {
+        setNodeModulesMissing(true);
+      }
+
+      setWebcontainer(instance);
+      bootStatusRef.current = 'ready';
+      setBootStatus('ready');
+    } catch (err: any) {
+      console.error("Fatal boot error:", err);
+      setError(err.message);
+      bootStatusRef.current = 'error';
+      setBootStatus('error');
+    }
+  }, [restoreFiles]);
+
+  useEffect(() => {
+    if (bootStatus === 'ready' && sessionsRef.current.length === 0) {
+      createSession();
+    }
+  }, [bootStatus, createSession]);
+
+  const syncProject = useCallback(async (projectId: string) => {
+    if (!webcontainer || isSyncing || lastSyncedProjectId.current === projectId) return;
+    setIsSyncing(true);
+    try {
+      const treeRes = await fetch(`/api/github/contents?repo=${encodeURIComponent(projectId)}`);
+      if (!treeRes.ok) throw new Error('Failed to fetch project tree');
+
+      const data = await treeRes.json();
+      const items = data.items || [];
+      const CONCURRENCY_LIMIT = 15;
+      const fileItems = items.filter((item: any) => item.type === 'file');
+
+      for (let i = 0; i < fileItems.length; i += CONCURRENCY_LIMIT) {
+        const batch = fileItems.slice(i, i + CONCURRENCY_LIMIT);
+        await Promise.all(batch.map(async (item: any) => {
+          try {
+            const res = await fetch(`/api/github/contents?repo=${encodeURIComponent(projectId)}&path=${encodeURIComponent(item.path)}`);
+            const data = await res.json();
+            if (data.item?.content) {
+              const content = atob(data.item.content.replace(/\n/g, ''));
+              const dir = item.path.split('/').slice(0, -1).join('/');
+              if (dir) await webcontainer.fs.mkdir(dir, { recursive: true }).catch(() => { });
+              await webcontainer.fs.writeFile(item.path, content);
+              await persistFile(item.path, content);
+            }
+          } catch (e) { }
+        }));
+      }
+      await ensureCompatibility(webcontainer);
+      
+      // 🚀 INITIAL SNAPSHOT: Mark all sync'd files as 'Base' state
+      // This prevents the Source Control from showing all files as 'Added' (A)
+      const allFiles = await OPFSStorage.getAllFiles();
+      const currentPaths = Object.keys(allFiles).filter(p => !p.startsWith('.shield/') && !p.includes('node_modules/'));
+      await ShieldSyncEngine.snapshot(currentPaths);
+      
+      lastSyncedProjectId.current = projectId;
+    } finally { setIsSyncing(false); }
+  }, [webcontainer, isSyncing, persistFile]);
+  
+  const refreshChanges = useCallback(async () => {
+    const changes = await ShieldSyncEngine.getChanges();
+    setChangedFiles(changes);
+
+    // 🔔 Periodic Dependency Check (to clear the warning after npm install)
+    if (webcontainer && nodeModulesMissing) {
+      webcontainer.fs.readdir('node_modules')
+        .then(() => setNodeModulesMissing(false))
+        .catch(() => {});
+    }
+  }, [webcontainer, nodeModulesMissing]);
+
+  useEffect(() => {
+    if (bootStatus === 'ready') {
+      const interval = setInterval(refreshChanges, 3000);
+      refreshChanges();
+      return () => clearInterval(interval);
+    }
+  }, [bootStatus, refreshChanges]);
+
+  useEffect(() => {
+    if (!webcontainer || bootStatus !== 'ready') return;
+    let stopWatching: (() => void) | null = null;
+
+    // 🚀 PERFORMANCE: Debounced batch writer.
+    // Accumulate all FS events for 500ms then flush them all in the background.
+    // This prevents every file keystroke from blocking the main event loop and freezing the terminal.
+    const pendingWrites = new Map<string, 'update' | 'delete'>();
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const flushPending = () => {
+      if (pendingWrites.size === 0) return;
+      const snapshot = new Map(pendingWrites);
+      pendingWrites.clear();
+      // Fire-and-forget — never await inside the watcher
+      (async () => {
+        for (const [path, type] of snapshot) {
+          try {
+            if (type === 'update') {
+              const content = await webcontainer.fs.readFile(path).catch(() => null);
+              if (content) await OPFSStorage.writeFile(path, content);
+            } else {
+              await OPFSStorage.deleteEntry(path, true).catch(() => {});
+            }
+          } catch {}
+        }
+      })();
+    };
+
+    const startWatching = async () => {
+      try {
+        const IGNORED = ['node_modules', '.next', 'dist', 'build', '.cache', '.npm', '.git'];
+        const watcher = await webcontainer.fs.watch('/', { recursive: true }, (event: any) => {
+          const events = Array.isArray(event) ? event : [event];
+          
+          // 🚀 PERFORMANCE: Ultra-fast early exit for ignored paths
+          const filtered = events.filter(e => {
+            const p = e.path;
+            if (!p || p === '/') return false;
+            
+            // 🔔 Special Case: node_modules directory itself
+            if (p === 'node_modules' || p === './node_modules') {
+                webcontainer.fs.readdir('node_modules')
+                    .then(() => setNodeModulesMissing(false))
+                    .catch(() => setNodeModulesMissing(true));
+                return false; 
+            }
+
+            return !IGNORED.some(seg => p.includes(seg));
+          });
+
+          if (filtered.length === 0) return;
+
+          // 🛰️ EVENT STORM PROTECTION
+          // If we see more than 1000 events at once, increase debounce to let the CPU breathe
+          const dynamicDebounce = filtered.length > 1000 ? 2000 : 500;
+
+          for (const e of filtered) {
+            pendingWrites.set(e.path, e.type);
+          }
+
+          if (debounceTimer) clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(flushPending, dynamicDebounce);
+        });
+        stopWatching = () => { watcher.close(); if (debounceTimer) clearTimeout(debounceTimer); };
+      } catch (e) {}
+    };
+    startWatching();
+    return () => stopWatching?.();
+  }, [webcontainer, bootStatus]);
+
+  useEffect(() => { if (bootStatus === 'idle') boot(); }, [bootStatus, boot]);
+
+  return (
+    <WorkspaceContext.Provider value={{
+      webcontainer,
+      sessions,
+      activeSessionId,
+      setActiveSessionId,
+      createSession,
+      closeSession,
+      bootStatus,
+      error,
+      serverUrl,
+      serverUrls,
+      lastDiagnostic,
+      setLastDiagnostic,
+      nodeModulesMissing,
+      syncProject,
+      persistFile,
+      isSyncing,
+      changedFiles,
+      refreshChanges,
+      mountTerminal,
+      publicUrls,
+      sendCommand
+    }}>
+      {children}
+    </WorkspaceContext.Provider>
+  );
+};
+
+export const useWorkspace = () => {
+  const context = useContext(WorkspaceContext);
+  if (!context) throw new Error('useWorkspace must be used within WorkspaceProvider');
+  return context;
+};

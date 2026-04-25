@@ -7,9 +7,9 @@ export async function GET(req: NextRequest) {
   try {
     const session: any = await getServerSession(authOptions);
 
-    if (!session || !session.accessToken) {
+    if (!process.env.GITHUB_TOKEN && (!session || !session.accessToken)) {
       return NextResponse.json({ 
-        message: 'GitHub access token missing. Please sign in with GitHub.',
+        message: 'GitHub access token missing. Please sign in or provide a GITHUB_TOKEN.',
         error: 'AUTH_REQUIRED' 
       }, { status: 401 });
     }
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     }
 
     const octokit = new Octokit({
-      auth: session.accessToken
+      auth: process.env.GITHUB_TOKEN || session?.accessToken
     });
 
     // Fetch all repositories for the authenticated user

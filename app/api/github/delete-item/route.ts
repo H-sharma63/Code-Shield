@@ -6,7 +6,7 @@ import { Octokit } from 'octokit';
 export async function POST(req: NextRequest) {
   try {
     const session: any = await getServerSession(authOptions);
-    const { repoFullName, path, type } = await req.json();
+    const { repoFullName, path, type, branchName } = await req.json();
 
     if (!session || !session.accessToken) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -19,12 +19,20 @@ export async function POST(req: NextRequest) {
     const [owner, repo] = repoFullName.split('/');
     const octokit = new Octokit({ auth: session.accessToken });
 
+    // Determine target branch
+    let targetBranch = branchName;
+    if (!targetBranch) {
+        const { data: repoData } = await octokit.rest.repos.get({ owner, repo });
+        targetBranch = repoData.default_branch;
+    }
+
     if (type === 'file') {
         // 1. Get the current SHA of the file
         const { data: fileData }: any = await octokit.rest.repos.getContent({
             owner,
             repo,
             path,
+            ref: targetBranch,
         });
 
         // 2. Delete the file
@@ -34,22 +42,14 @@ export async function POST(req: NextRequest) {
             path,
             message: `chore: delete file ${path}`,
             sha: fileData.sha,
+            branch: targetBranch,
         });
     } else {
         // FOLDER DELETION LOGIC
-        // GitHub API doesn't have a "Delete Directory" endpoint.
-        // We must fetch all files in that directory and delete them one by one, 
-        // OR delete the entire recursive tree (more efficient).
-        
-        // Strategy: Get the recursive tree, filter out items under this path, and create a new commit.
-        // For simplicity in a prototype, we'll delete the .gitkeep or specific files if it's a small folder.
-        // For a MAJOR project, we use the tree logic:
-        
-        const repoInfo = await octokit.rest.repos.get({ owner, repo });
         const { data: refData } = await octokit.rest.git.getRef({
             owner,
             repo,
-            ref: `heads/${repoInfo.data.default_branch}`,
+            ref: `heads/${targetBranch}`,
         });
         
         const baseTreeSha = refData.object.sha;
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
         await octokit.rest.git.updateRef({
             owner,
             repo,
-            ref: `heads/${repoInfo.data.default_branch}`,
+            ref: `heads/${targetBranch}`,
             sha: newCommit.sha,
         });
     }

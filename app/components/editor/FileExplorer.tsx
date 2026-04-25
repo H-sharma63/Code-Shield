@@ -1,17 +1,20 @@
 'use client';
 
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
-import { ChevronRight, ChevronDown, Github, FilePlus, FolderPlus, RotateCcw, X, Trash2, MoreVertical } from 'lucide-react';
+import { ChevronRight, ChevronDown, Github, FilePlus, FolderPlus, RotateCcw, X, Trash2, Network } from 'lucide-react';
 import FileUpload from './FileUpload';
 import { useState, useEffect } from 'react';
 import FileIcon from './FileIcon';
 import DeleteConfirmationModal from '../DeleteConfirmationModal';
+import EnvGuidanceModal from './EnvGuidanceModal';
+import { useWorkspace } from './WorkspaceContext';
 
 interface FileExplorerProps {
     currentExplorerPath: string;
     explorerItems: any[];
     onItemExpansionToggle: (event: React.SyntheticEvent | null, itemId: string, isExpanded: boolean) => void;
     onItemSelectionToggle: (event: React.SyntheticEvent | null, itemId: string, isSelected: boolean) => void;
+    onFileClick: (path: string) => void;
     onPathChange: (newPath: string) => void;
     expandedItems: string[];
     onExpandedItemsChange: (event: React.SyntheticEvent | null, itemIds: string[]) => void;
@@ -20,9 +23,11 @@ interface FileExplorerProps {
     refreshExplorer: boolean;
     activeFileName: string;
     repoFullName?: string | null;
+    branchName?: string;
     onItemCreated?: (path: string) => void;
     onItemDeleted?: (path: string) => void;
     onNotify?: (message: string, severity: 'success' | 'error') => void;
+    onSwitchToEnvManager?: () => void;
 }
 
 const ChevronDownIcon = ({ ownerState, ...props }: any) => <ChevronDown size={20} color="#f3f3f3" {...props} />;
@@ -30,9 +35,10 @@ const ChevronRightIcon = ({ ownerState, ...props }: any) => <ChevronRight size={
 
 const FileExplorer = ({ 
     currentExplorerPath, explorerItems, onItemExpansionToggle, onItemSelectionToggle, 
-    expandedItems, onExpandedItemsChange, onFileUpload, isUploadingFile, 
-    refreshExplorer, activeFileName, repoFullName, onItemCreated, onItemDeleted, onNotify 
+    onFileClick, expandedItems, onExpandedItemsChange, onFileUpload, isUploadingFile, 
+    refreshExplorer, activeFileName, repoFullName, branchName = 'main', onItemCreated, onItemDeleted, onNotify, onSwitchToEnvManager 
 }: FileExplorerProps) => {
+    const { changedFiles, nodeModulesMissing } = useWorkspace();
     const [fetchedItems, setFetchedItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [localExpanded, setLocalExpanded] = useState<string[]>([]);
@@ -41,6 +47,8 @@ const FileExplorer = ({
     const [selectedPath, setSelectedPath] = useState<string | null>(null);
     const [isCreating, setIsCreating] = useState<'file' | 'folder' | null>(null);
     const [newItemName, setNewItemName] = useState('');
+    const [showEnvGuidance, setShowEnvGuidance] = useState(false);
+    const [pendingFileCreation, setPendingFileCreation] = useState<string | null>(null);
 
     // DELETE LOGIC
     const [itemToDelete, setItemToDelete] = useState<{ path: string, type: 'file' | 'folder' } | null>(null);
@@ -50,31 +58,43 @@ const FileExplorer = ({
             if (!repoFullName) return;
             const prefix = selectedPath ? `${selectedPath}/` : '';
             const finalPath = `${prefix}${newItemName.trim()}`;
-            
-            try {
-                const response = await fetch('/api/github/create-item', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ repoFullName, path: finalPath, type: isCreating })
-                });
 
-                if (response.ok) {
-                    onItemCreated?.(finalPath);
-                    onNotify?.(`Successfully created ${isCreating}: ${newItemName}`, 'success');
-                    setIsCreating(null);
-                    setNewItemName('');
-                    await fetchInitialData();
-                } else {
-                    const data = await response.json();
-                    onNotify?.(data.error || 'Failed to create item', 'error');
-                }
-            } catch (error) {
-                console.error('Create error:', error);
-                onNotify?.('Error creating item on GitHub', 'error');
+            // Check for .env file creation
+            if (isCreating === 'file' && (newItemName.trim().toLowerCase().includes('.env') || newItemName.trim().toLowerCase() === '.env')) {
+                setPendingFileCreation(finalPath);
+                setShowEnvGuidance(true);
+                return;
             }
+            
+            executeCreation(finalPath);
         } else if (e.key === 'Escape') {
             setIsCreating(null);
             setNewItemName('');
+        }
+    };
+
+    const executeCreation = async (path: string) => {
+        try {
+            const response = await fetch('/api/github/create-item', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ repoFullName, path, type: isCreating, branchName })
+            });
+
+            if (response.ok) {
+                onItemCreated?.(path);
+                onNotify?.(`Successfully created ${isCreating}: ${path.split('/').pop()}`, 'success');
+                setIsCreating(null);
+                setNewItemName('');
+                setPendingFileCreation(null);
+                await fetchInitialData();
+            } else {
+                const data = await response.json();
+                onNotify?.(data.error || 'Failed to create item', 'error');
+            }
+        } catch (error) {
+            console.error('Create error:', error);
+            onNotify?.('Error creating item on GitHub', 'error');
         }
     };
 
@@ -85,7 +105,7 @@ const FileExplorer = ({
             const response = await fetch('/api/github/delete-item', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ repoFullName, path: itemToDelete.path, type: itemToDelete.type })
+                body: JSON.stringify({ repoFullName, path: itemToDelete.path, type: itemToDelete.type, branchName })
             });
 
             if (response.ok) {
@@ -102,6 +122,14 @@ const FileExplorer = ({
             console.error('Delete error:', error);
             onNotify?.('Error deleting item on GitHub', 'error');
         }
+    };
+
+    // 🏁 VS CODE STYLE SORTING: Folders First, then Files (Alphabetical)
+    const sortNodes = (nodes: any[]) => {
+        return nodes.sort((a, b) => {
+            if (a.isDir !== b.isDir) return b.isDir ? 1 : -1;
+            return a.name.localeCompare(b.name, undefined, { sensitivity: 'base', numeric: true });
+        });
     };
 
     // Helper to build a nested tree from a flat list of paths
@@ -131,6 +159,16 @@ const FileExplorer = ({
                 currentLevel = map[currentPath].children;
             });
         });
+
+        // 🚀 Deep Sort recursively
+        const deepSort = (nodes: any[]) => {
+            sortNodes(nodes);
+            nodes.forEach(node => {
+                if (node.children && node.children.length > 0) deepSort(node.children);
+            });
+        };
+        deepSort(root);
+        
         return root;
     };
 
@@ -138,12 +176,23 @@ const FileExplorer = ({
         setLoading(true);
         try {
             if (repoFullName) {
-                const response = await fetch(`/api/github/contents?repo=${encodeURIComponent(repoFullName)}`);
+                // 1. Fetch Core Files (GitHub)
+                const response = await fetch(`/api/github/contents?repo=${encodeURIComponent(repoFullName)}&ref=${branchName}`);
                 const data = await response.json();
-                if (data.items) {
-                    const nestedTree = buildTree(data.items);
-                    setFetchedItems(nestedTree);
-                }
+                let explorerItems = data.items || [];
+
+                // 2. Fetch/Inject node_modules (Only if they actually exist)
+                const hasPackageJson = explorerItems.some((i: any) => i.path === 'package.json');
+                
+                // Only show node_modules if we explicitly know it's not missing (e.g. backend reported it)
+                // For now, let's not eagerly inject it unless we have a way to verify its presence on GCP.
+                // We can add a socket event later to check for its existence.
+                // if (hasPackageJson && !nodeModulesMissing && !explorerItems.some((i: any) => i.path === 'node_modules')) {
+                //     explorerItems.push({ path: 'node_modules', type: 'dir' });
+                // }
+
+                const nestedTree = buildTree(explorerItems);
+                setFetchedItems(nestedTree);
             } else {
                 const response = await fetch('/api/get-projects');
                 const data = await response.json();
@@ -162,14 +211,25 @@ const FileExplorer = ({
         }
     };
 
+    const handleToggleExpansion = async (event: React.SyntheticEvent | null, itemId: string) => {
+        const isExpanding = !localExpanded.includes(itemId);
+        if (isExpanding) {
+            setLocalExpanded(prev => [...prev, itemId]);
+        } else {
+            setLocalExpanded(prev => prev.filter(id => id !== itemId));
+        }
+    };
+
     useEffect(() => {
         fetchInitialData();
-    }, [refreshExplorer, repoFullName]);
+    }, [refreshExplorer, repoFullName, branchName, nodeModulesMissing]);
 
     const renderTree = (items: any[]) => {
-        return items.map((item) => {
+        return items.map((item: any) => {
             const isExpanded = localExpanded.includes(item.id);
             const isSelected = selectedPath === item.id;
+            const status = changedFiles.find((f: any) => f.path === item.id)?.status;
+            const colorClass = status === 'added' ? 'text-green-400' : (status === 'modified' ? 'text-yellow-400' : 'text-textPrimary');
 
             return (
                 <TreeItem 
@@ -192,7 +252,7 @@ const FileExplorer = ({
                             }}
                         >
                             <FileIcon name={item.name} isDir={item.isDir} isOpen={isExpanded} size={16} />
-                            <span className={`text-sm flex-1 ${isSelected ? 'text-highlight font-bold' : 'text-textPrimary'} truncate font-medium`}>{item.name}</span>
+                            <span className={`text-sm flex-1 ${isSelected ? 'text-highlight font-bold' : colorClass} truncate font-medium`}>{item.name}</span>
                             
                             {/* DELETE ACTION */}
                             <button 
@@ -212,7 +272,11 @@ const FileExplorer = ({
                         expandIcon: ChevronRightIcon,
                     }}
                 >
-                    {item.isDir && item.children && item.children.length > 0 ? renderTree(item.children) : null}
+                    {item.isDir ? (
+                        item.children && item.children.length > 0 
+                            ? renderTree(item.children) 
+                            : <TreeItem itemId={`${item.id}-placeholder`} label="Empty" sx={{ display: 'none' }} />
+                    ) : null}
                 </TreeItem>
             );
         });
@@ -226,6 +290,7 @@ const FileExplorer = ({
                     {repoFullName ? 'Repository' : 'Workspace'}
                 </h2>
                 <div className="flex items-center space-x-1">
+                    <button onClick={() => onFileClick('codeshield://architecture')} title="Architecture Map" className="p-1 hover:bg-white/10 rounded text-textSecondary hover:text-textPrimary transition-colors"><Network size={14} /></button>
                     <button onClick={(e) => { e.stopPropagation(); setIsCreating('file'); }} title="New File" className="p-1 hover:bg-white/10 rounded text-textSecondary hover:text-textPrimary transition-colors"><FilePlus size={14} /></button>
                     <button onClick={(e) => { e.stopPropagation(); setIsCreating('folder'); }} title="New Folder" className="p-1 hover:bg-white/10 rounded text-textSecondary hover:text-textPrimary transition-colors"><FolderPlus size={14} /></button>
                     <button 
@@ -267,7 +332,7 @@ const FileExplorer = ({
                 ) : (
                     <SimpleTreeView
                         expandedItems={localExpanded}
-                        onExpandedItemsChange={(e, ids) => setLocalExpanded(ids)}
+                        onItemExpansionToggle={handleToggleExpansion}
                     >
                         {renderTree(fetchedItems)}
                     </SimpleTreeView>
@@ -280,6 +345,21 @@ const FileExplorer = ({
                 onConfirm={handleDeleteItem}
                 itemName={itemToDelete?.path.split('/').pop() || ''}
                 itemType={itemToDelete?.type || 'file'}
+            />
+
+            <EnvGuidanceModal 
+                isOpen={showEnvGuidance}
+                onClose={() => {
+                    if (pendingFileCreation) executeCreation(pendingFileCreation);
+                    setShowEnvGuidance(false);
+                }}
+                onSwitchToEnvManager={() => {
+                    onSwitchToEnvManager?.();
+                    setIsCreating(null);
+                    setNewItemName('');
+                    setPendingFileCreation(null);
+                    setShowEnvGuidance(false);
+                }}
             />
         </div>
     );

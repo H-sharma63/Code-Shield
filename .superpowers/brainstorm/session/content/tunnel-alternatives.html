@@ -1,0 +1,57 @@
+<h2>Tunneling Alternatives</h2>
+<p class="subtitle">Exploring other "Named URL" options</p>
+
+<div class="cards">
+  <div class="card" data-choice="ngrok" onclick="toggleSelect(this)">
+    <div class="card-body">
+      <h3>Ngrok</h3>
+      <p style="font-size: 0.8rem; color: #aaa;">The Industry Standard</p>
+      <ul style="font-size: 0.75rem; padding-left: 1.2rem; margin-top: 0.5rem;">
+        <li style="color: #ff9999;">&times; Static domain requires paid plan</li>
+        <li style="color: #99ff99;">&check; Most stable and fastest</li>
+        <li style="color: #ff9999;">&times; Free plan has strict bandwidth limits</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" data-choice="serveo" onclick="toggleSelect(this)">
+    <div class="card-body">
+      <h3>Serveo.net</h3>
+      <p style="font-size: 0.8rem; color: #aaa;">SSH-only (No binary needed)</p>
+      <ul style="font-size: 0.75rem; padding-left: 1.2rem; margin-top: 0.5rem;">
+        <li style="color: #99ff99;">&check; Request custom subdomains for free</li>
+        <li style="color: #99ff99;">&check; Zero installation on VM (uses SSH)</li>
+        <li style="color: #ff9999;">&times; Often down due to abuse</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" data-choice="bore" onclick="toggleSelect(this)">
+    <div class="card-body">
+      <h3>Bore.pub</h3>
+      <p style="font-size: 0.8rem; color: #aaa;">Modern & Fast (Rust)</p>
+      <ul style="font-size: 0.75rem; padding-left: 1.2rem; margin-top: 0.5rem;">
+        <li style="color: #99ff99;">&check; Extremely lightweight</li>
+        <li style="color: #ff9999;">&times; Usually gives you a random port, not a subdomain</li>
+        <li style="color: #99ff99;">&check; Great for raw TCP connections</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="serveo_pick" onclick="toggleSelect(this)">
+    <div class="letter">&starf;</div>
+    <div class="content">
+      <h3>My Verdict</h3>
+      <p>If <strong>Localtunnel</strong> isn't right, <strong>Serveo.net</strong> is the closest free match for custom subdomains (<code>user.serveo.net</code>). However, Localtunnel is generally the community favorite for free "named" URLs.</p>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>Why custom subdomains are tricky for free</h4>
+    <p>Most companies (like Ngrok) make "Static Domains" a paid feature because it's expensive to manage the DNS and prevent spam. For a free major project, <strong>Localtunnel</strong> or <strong>Cloudflare</strong> (even with random names) are your strongest options.</p>
+  </div>
+</div>

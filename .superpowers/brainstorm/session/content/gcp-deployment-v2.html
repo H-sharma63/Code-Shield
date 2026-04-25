@@ -1,0 +1,74 @@
+<h2>GCP Deployment & Storage Guide</h2>
+<p class="subtitle">Step-by-step to a live Workspace Node</p>
+
+<div class="mockup">
+  <div class="mockup-header">Storage Hierarchy (on GCP VM)</div>
+  <div class="mockup-body" style="background: #0d0d0d; color: #fff; font-family: monospace; padding: 1rem; font-size: 0.8rem;">
+    <div style="color: #3b82f6;">/ (Root)</div>
+    <div style="margin-left: 1rem; border-left: 1px solid #333; padding-left: 0.5rem;">
+      <div style="color: #00ff00;">workspaces/</div>
+      <div style="margin-left: 1rem; border-left: 1px solid #333; padding-left: 0.5rem;">
+        <div style="color: #f6821f;">user1/</div>
+        <div style="margin-left: 1rem; border-left: 1px solid #333; padding-left: 0.5rem;">
+          <div style="color: #eee;">portfolio-site/</div>
+          <div style="margin-left: 1rem; border-left: 1px solid #333; padding-left: 0.5rem; color: #888;">
+            ├── .git/<br>
+            ├── <strong>node_modules/</strong> <span style="color: #444;">(Persistent here)</span><br>
+            ├── package.json<br>
+            └── src/
+          </div>
+        </div>
+        <div style="color: #f6821f; margin-top: 0.5rem;">user2/</div>
+        <div style="margin-left: 1rem; border-left: 1px solid #333; padding-left: 0.5rem; color: #888;">
+          └── e-commerce-app/ ...
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cards">
+  <div class="card">
+    <div class="card-body">
+      <h3>1. Create the VM</h3>
+      <p style="font-size: 0.8rem; color: #aaa;">In GCP Console:</p>
+      <ul style="font-size: 0.75rem; padding-left: 1.2rem;">
+        <li>Instance: <strong>e2-micro</strong> (Free Tier)</li>
+        <li>OS: <strong>Ubuntu 22.04 LTS</strong></li>
+        <li>Disk: <strong>30GB Balanced Persistent Disk</strong></li>
+        <li>Firewall: Allow HTTP/HTTPS</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h3>2. Prepare the Environment</h3>
+      <p style="font-size: 0.8rem; color: #aaa;">Run these commands via SSH:</p>
+      <div style="background: #000; padding: 0.5rem; border-radius: 4px; font-family: monospace; font-size: 0.7rem; color: #00ff00;">
+        sudo apt update && sudo apt install git -y<br>
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash -<br>
+        sudo apt install nodejs -y<br>
+        sudo mkdir /workspaces && sudo chmod 777 /workspaces
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h3>3. Deploy Terminal Backend</h3>
+      <ul style="font-size: 0.75rem; padding-left: 1.2rem;">
+        <li>Copy the <code>terminal-backend</code> folder to the VM</li>
+        <li>Run <code>npm install</code> on the VM</li>
+        <li>Start with PM2: <code>pm2 start server.js</code></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>Why /workspaces?</h4>
+    <p>By creating <code>/workspaces</code> at the root level, it stays independent of your OS user folders. Even if you update the VM, the data in this folder remains "steady" as long as you don't delete the persistent disk.</p>
+  </div>
+</div>

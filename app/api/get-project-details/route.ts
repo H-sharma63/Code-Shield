@@ -3,7 +3,7 @@ import { db } from '@/app/lib/db';
 import { projects } from '@/app/lib/schema';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 export async function GET(req: NextRequest) {
   try {
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ message: 'File name is required.' }, { status: 400 });
     }
 
-    const project = await db.select().from(projects).where(eq(projects.fileName, fileName)).where(eq(projects.userEmail, userEmail)).limit(1);
+    const project = await db.select().from(projects).where(and(eq(projects.fileName, fileName), eq(projects.userEmail, userEmail))).limit(1);
 
     if (project.length === 0) {
       return NextResponse.json({ message: 'Project not found or you do not have permission to view it.' }, { status: 404 });

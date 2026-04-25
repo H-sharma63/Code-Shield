@@ -6,7 +6,7 @@ import { Octokit } from 'octokit';
 export async function POST(req: NextRequest) {
   try {
     const session: any = await getServerSession(authOptions);
-    const { repoFullName, path, type } = await req.json();
+    const { repoFullName, path, type, branchName } = await req.json();
 
     if (!session || !session.accessToken) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
       path: finalPath,
       message: `feat: create ${type} ${sanitizedPath}`,
       content: Buffer.from(content).toString('base64'),
+      branch: branchName || undefined,
     });
 
     return NextResponse.json({ 

@@ -3,7 +3,7 @@ import { db } from '@/app/lib/db';
 import { projects } from '@/app/lib/schema';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Project ID and new project name are required.' }, { status: 400 });
     }
 
-    await db.update(projects).set({ projectName: newProjectName }).where(eq(projects.id, id)).where(eq(projects.userEmail, userEmail));
+    await db.update(projects).set({ projectName: newProjectName }).where(and(eq(projects.id, id), eq(projects.userEmail, userEmail)));
 
     return NextResponse.json({ message: 'Project renamed successfully.' }, { status: 200 });
 

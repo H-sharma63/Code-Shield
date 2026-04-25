@@ -1,4 +1,4 @@
-import { pgTable, serial, text, varchar, integer, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, varchar, integer, timestamp, jsonb } from 'drizzle-orm/pg-core';
 
 export const projects = pgTable('projects', {
   id: serial('id').primaryKey(),
@@ -19,6 +19,14 @@ export const testRuns = pgTable('test_runs', {
   passed: integer('passed'),
   failed: integer('failed'),
   results: text('results'), // JSON stringified full results
+});
+
+export const repoEnvironments = pgTable('repo_environments', {
+  id: serial('id').primaryKey(),
+  repoFullName: varchar('repo_full_name', { length: 256 }).notNull(),
+  userEmail: varchar('user_email', { length: 256 }).notNull(),
+  envVars: jsonb('env_vars').default({}).notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull(),
 });
 
 // export const apiUsage = pgTable('api_usage', {

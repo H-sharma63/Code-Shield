@@ -1,0 +1,73 @@
+<h2>The "DIY Railway" on GCP</h2>
+<p class="subtitle">Providing real public URLs with persistent storage</p>
+
+<div class="mockup">
+  <div class="mockup-header">Proposed Architecture: GCP Workspace Node</div>
+  <div class="mockup-body">
+    <div style="display: flex; gap: 1rem; padding: 1rem; align-items: stretch;">
+      <!-- Client -->
+      <div style="flex: 1; border: 1px solid #444; border-radius: 8px; padding: 1rem; background: #0d0d0d;">
+        <div class="label">Browser</div>
+        <div style="margin: 1rem 0; border: 1px dashed #666; padding: 0.5rem; border-radius: 4px; font-family: monospace; font-size: 0.8rem;">
+          https://3000-user1.workspace.codeshield.dev
+        </div>
+        <p style="font-size: 0.8rem; color: #aaa;">User opens app in <strong>New Tab</strong>. Connects directly to GCP via SSL.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; justify-content: center; color: #888;">&larr; HTTPS &rarr;</div>
+
+      <!-- Server -->
+      <div style="flex: 2; border: 1px solid #444; border-radius: 8px; padding: 1rem; background: #1a1a1a;">
+        <div class="label">GCP VM (Persistent)</div>
+        
+        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+          <div style="flex: 1; border: 1px solid #00ff00; border-radius: 4px; padding: 0.5rem; background: #0d0d0d; font-size: 0.8rem;">
+            <div class="label" style="color: #00ff00;">Caddy / Reverse Proxy</div>
+            Maps subdomains to Docker ports
+          </div>
+          <div style="flex: 1; border: 1px solid #3b82f6; border-radius: 4px; padding: 0.5rem; background: #0d0d0d; font-size: 0.8rem;">
+            <div class="label" style="color: #3b82f6;">Session Manager</div>
+            Clones repos, manages Docker containers
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem; border: 1px solid #666; border-radius: 4px; padding: 1rem; background: #2a2a2a;">
+          <div class="label">User Workspace (Docker)</div>
+          <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+            <div style="background: #000; padding: 0.3rem 0.6rem; border-radius: 4px; font-family: monospace; font-size: 0.7rem; color: #eee;">Repo Files</div>
+            <div style="background: #222; padding: 0.3rem 0.6rem; border-radius: 4px; font-family: monospace; font-size: 0.7rem; color: #aaa; border: 1px solid #444;">node_modules (Volume)</div>
+          </div>
+          <p style="font-size: 0.75rem; margin-top: 0.5rem; color: #888;">Hot reload works because Monaco saves files directly to the Docker Volume.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="wildcard" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>Wildcard DNS + Caddy</h3>
+      <p>Configure <code>*.workspace.yourdomain.com</code> to point to GCP. Caddy auto-provisions SSL. Feels exactly like Codeanywhere.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="cloudflare" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>Cloudflare Tunnel</h3>
+      <p>Easier setup (no DNS config needed). One tunnel per session. Might be slightly slower for hot reload due to proxy hops.</p>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>Why this is better than WebContainers</h4>
+    <ul>
+      <li><strong>Native Linux:</strong> Runs any binary (not just WASM-compatible).</li>
+      <li><strong>Real New Tab:</strong> Browser session is a standard HTTP site.</li>
+      <li><strong>Persistent node_modules:</strong> <code>npm install</code> happens once; survives refreshes.</li>
+    </ul>
+  </div>
+</div>

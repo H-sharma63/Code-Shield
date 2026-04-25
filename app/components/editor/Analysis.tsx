@@ -100,6 +100,17 @@ const Analysis = ({
                     {/* AI ASSISTANT ACTIONS */}
                     <div className="pt-2 flex space-x-2">
                         <button 
+                            onClick={onAnalyze}
+                            disabled={isAnalyzing}
+                            className="flex-1 flex items-center justify-center space-x-2 bg-highlight hover:bg-highlight/80 text-black py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all shadow-md disabled:opacity-30 disabled:shadow-none"
+                            title="Run Analysis"
+                        >
+                            <Play size={12} />
+                            <span>Run Analysis</span>
+                        </button>
+                    </div>
+                    <div className="pt-2 flex space-x-2">
+                        <button 
                             onClick={onSmartFix}
                             disabled={isAnalyzing || !analysis}
                             className="flex-1 flex items-center justify-center space-x-2 bg-[#ffde59]/10 hover:bg-[#ffde59]/20 text-highlight py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all border border-highlight/20 disabled:opacity-30"

@@ -6,27 +6,30 @@ import { Octokit } from 'octokit';
 export async function POST(req: NextRequest) {
   try {
     const session: any = await getServerSession(authOptions);
-    const { repoFullName, path, content, message } = await req.json();
+    const { repoFullName, changes, message, branchName } = await req.json();
 
     if (!session || !session.accessToken) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!repoFullName || !path || !content || !message) {
+    if (!repoFullName || !changes || !Array.isArray(changes) || !message) {
       return NextResponse.json({ message: 'Missing required parameters' }, { status: 400 });
     }
 
     const [owner, repo] = repoFullName.split('/');
     const octokit = new Octokit({ auth: session.accessToken });
 
-    // 1. Get the current commit SHA of the default branch
-    const { data: repoData } = await octokit.rest.repos.get({ owner, repo });
-    const defaultBranch = repoData.default_branch;
+    // 1. Get the current commit SHA of the target branch
+    let targetBranch = branchName;
+    if (!targetBranch) {
+        const { data: repoData } = await octokit.rest.repos.get({ owner, repo });
+        targetBranch = repoData.default_branch;
+    }
     
     const { data: refData } = await octokit.rest.git.getRef({
       owner,
       repo,
-      ref: `heads/${defaultBranch}`,
+      ref: `heads/${targetBranch}`,
     });
     const latestCommitSha = refData.object.sha;
 
@@ -38,27 +41,45 @@ export async function POST(req: NextRequest) {
     });
     const baseTreeSha = commitData.tree.sha;
 
-    // 3. Create a new blob for the updated content
-    const { data: blobData } = await octokit.rest.git.createBlob({
-      owner,
-      repo,
-      content,
-      encoding: 'utf-8',
-    });
+    // 3. Create blobs for each file change
+    const treeItems = [];
+    for (const change of changes) {
+        if (change.status === 'deleted') {
+            // Setting sha to null in the Tree API with a base_tree removes the file
+            treeItems.push({
+                path: change.path,
+                mode: '100644',
+                type: 'blob',
+                sha: null,
+            });
+            continue;
+        }
 
-    // 4. Create a new tree with the updated file
+        const { data: blobData } = await octokit.rest.git.createBlob({
+            owner,
+            repo,
+            content: change.content,
+            encoding: 'utf-8',
+        });
+
+        treeItems.push({
+            path: change.path,
+            mode: '100644', // normal file
+            type: 'blob',
+            sha: blobData.sha,
+        });
+    }
+
+    if (treeItems.length === 0) {
+        return NextResponse.json({ message: 'No valid changes to commit.' }, { status: 400 });
+    }
+
+    // 4. Create a new tree with all changed files
     const { data: treeData } = await octokit.rest.git.createTree({
       owner,
       repo,
       base_tree: baseTreeSha,
-      tree: [
-        {
-          path,
-          mode: '100644', // normal file
-          type: 'blob',
-          sha: blobData.sha,
-        },
-      ],
+      tree: treeItems as any[],
     });
 
     // 5. Create the new commit
@@ -74,14 +95,14 @@ export async function POST(req: NextRequest) {
     await octokit.rest.git.updateRef({
       owner,
       repo,
-      ref: `heads/${defaultBranch}`,
+      ref: `heads/${targetBranch}`,
       sha: newCommitData.sha,
     });
 
     return NextResponse.json({ 
-      message: 'Committed successfully!', 
+      message: `${treeItems.length} files committed successfully!`, 
       sha: newCommitData.sha,
-      url: newCommitData.html_url 
+      url: `https://github.com/${repoFullName}/commit/${newCommitData.sha}`
     }, { status: 200 });
 
   } catch (error: any) {

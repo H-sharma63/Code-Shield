@@ -68,6 +68,12 @@ export async function GET(req: NextRequest) {
     }, { status: 200 });
 
   } catch (error: any) {
+    if (error.status === 404) {
+        return NextResponse.json({ 
+            message: 'Repository or search index not found on GitHub.', 
+            error: 'Not Found' 
+        }, { status: 404 });
+    }
     console.error('Code search error:', error);
     return NextResponse.json({ 
       message: 'Failed to search code.', 

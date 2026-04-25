@@ -1,0 +1,37 @@
+<h2>The "Real Domain" Experience (Free)</h2>
+<p class="subtitle">Using Cloudflare Quick Tunnels for vanity URLs</p>
+
+<div class="mockup">
+  <div class="mockup-header">Browser: App Preview</div>
+  <div class="mockup-body" style="background: #fff; height: 200px; display: flex; flex-direction: column;">
+    <div style="background: #f1f3f4; padding: 0.5rem; display: flex; align-items: center; border-bottom: 1px solid #ddd;">
+      <div style="background: #fff; border: 1px solid #ccc; border-radius: 12px; padding: 2px 12px; font-size: 0.75rem; color: #555; width: 300px;">
+        &lock; https://<strong>codeshield-user-99.trycloudflare.com</strong>
+      </div>
+    </div>
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center; color: #999; font-style: italic;">
+      User's running Web App (Next.js/React/Vite)
+    </div>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="cloudflare_named" onclick="toggleSelect(this)">
+    <div class="letter">&check;</div>
+    <div class="content">
+      <h3>Cloudflare Quick Tunnels</h3>
+      <p>This is exactly what you need. It looks like a real domain, has a green lock (SSL), and we can generate a unique name for every session.</p>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>Why this matches your vision</h4>
+    <ul>
+      <li><strong>Vanity URL:</strong> No ugly IP addresses.</li>
+      <li><strong>Instant Deployment:</strong> As soon as the user hits "Run", we spawn the tunnel on the GCP VM.</li>
+      <li><strong>Persistence:</strong> Since the tunnel runs on the GCP VM, <code>node_modules</code> stay installed and ready.</li>
+    </ul>
+  </div>
+</div>

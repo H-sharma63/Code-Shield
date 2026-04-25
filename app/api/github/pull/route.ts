@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const repoFullName = searchParams.get('repo');
     const path = searchParams.get('path');
+    const ref = searchParams.get('ref');
 
     if (!session || !session.accessToken) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
@@ -26,6 +27,7 @@ export async function GET(req: NextRequest) {
       owner,
       repo,
       path,
+      ref: ref || undefined,
     });
 
     const data: any = response.data;
@@ -43,6 +45,12 @@ export async function GET(req: NextRequest) {
     throw new Error('No content found for this file.');
 
   } catch (error: any) {
+    if (error.status === 404) {
+        return NextResponse.json({ 
+            message: 'File not found on GitHub. If this is a new file, you need to commit it first.', 
+            error: 'Not Found' 
+        }, { status: 404 });
+    }
     console.error('Error pulling from GitHub:', error);
     return NextResponse.json({ 
       message: 'Failed to pull changes.', 

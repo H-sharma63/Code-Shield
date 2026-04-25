@@ -50,7 +50,7 @@ const QualityAudit = ({ code, selectedModel, repoFullName, onNotify, onSmartFix 
 
     useEffect(() => {
         if (feedRef.current) feedRef.current.scrollTop = feedRef.current.scrollHeight;
-    }, [agentThoughts]);
+    }, [agentThoughts, isTraceOpen]);
 
     const logThought = (msg: string) => setAgentThoughts(prev => [...prev, `[${new Date().toLocaleTimeString()}] > ${msg}`]);
 
@@ -242,6 +242,35 @@ except Exception as e:
 
                         {/* TEST CASE LISTING - RESPONSIVE GRID */}
                         <div className="flex-1 grid grid-cols-1 @lg:grid-cols-2 @2xl:grid-cols-3 gap-4 @lg:gap-6 overflow-y-auto custom-scrollbar p-2">
+                            {/* LIVE PERFORMANCE MONITOR */}
+                            <div className="col-span-full bg-highlight/5 border border-highlight/20 rounded-2xl p-6 mb-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center space-x-3">
+                                        <Activity className="text-highlight animate-pulse" size={18} />
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-textPrimary">Mission Control Center</h3>
+                                    </div>
+                                    <div className="text-[10px] font-mono text-highlight/60 uppercase">Target: {focusedTier.toUpperCase()} Protocol</div>
+                                </div>
+                                <div className="grid grid-cols-1 @lg:grid-cols-2 gap-6">
+                                    <div className="space-y-3">
+                                        <div className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Execution Trace</div>
+                                        <div className="bg-black/60 rounded-xl p-4 h-[120px] overflow-y-auto custom-scrollbar font-mono text-[10px] text-highlight space-y-1 border border-white/5">
+                                            {agentThoughts.filter(t => t.includes(`[${focusedTier.toUpperCase()}]`)).length > 0 ? (
+                                                agentThoughts.filter(t => t.includes(`[${focusedTier.toUpperCase()}]`)).map((t, i) => <div key={i}>{t}</div>)
+                                            ) : (
+                                                <div className="opacity-40 italic">Waiting for telemetry...</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <div className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Runtime Integrity</div>
+                                        <div className="bg-black/60 rounded-xl p-4 h-[120px] overflow-y-auto custom-scrollbar font-mono text-[9px] text-green-400 space-y-1 border border-white/5 whitespace-pre-wrap">
+                                            {tierStates[focusedTier].logs || "Analyzing structural patterns..."}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {tierStates[focusedTier].testSuite?.testCases.map((tc: any) => (
                                 <div 
                                     key={tc.id} 
@@ -423,22 +452,35 @@ except Exception as e:
                 </div>
             )}
 
-            {/* DIAGNOSTIC DRAWER */}
-            <div className={`absolute bottom-0 left-0 right-0 transition-transform duration-500 z-50 ${isTraceOpen ? 'translate-y-0' : 'translate-y-[calc(100%-40px)]'}`}>
-                <div className="bg-[#0c0c0e] border-t border-borderLine shadow-2xl h-[300px] flex flex-col">
-                    <button 
-                        onClick={() => setIsTraceOpen(!isTraceOpen)}
-                        className="h-10 border-b border-white/5 bg-white/5 flex items-center justify-center hover:bg-highlight/5 transition-colors"
-                    >
-                        <div className="flex items-center space-x-2 text-[9px] font-black text-textSecondary uppercase tracking-widest">
-                            {isTraceOpen ? <ChevronRight size={14} className="rotate-90" /> : <ChevronRight size={14} className="-rotate-90" />}
-                            <span>Log Diagnostic Trace</span>
+            {/* FLOATING LOG BUTTON & OVERLAY */}
+            <div className="absolute bottom-6 right-6 z-[100] flex flex-col items-end space-y-4">
+                {isTraceOpen && (
+                    <div className="w-[300px] h-[400px] bg-[#0c0c0e]/95 backdrop-blur-xl border border-highlight/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+                        <div className="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                                <TerminalIcon size={14} className="text-highlight" />
+                                <span className="text-[10px] font-black text-textPrimary uppercase tracking-widest">System Trace</span>
+                            </div>
+                            <button onClick={() => setIsTraceOpen(false)} className="text-textSecondary hover:text-white transition-colors">
+                                <ChevronRight size={14} className="rotate-90" />
+                            </button>
                         </div>
-                    </button>
-                    <div ref={feedRef} className="flex-1 p-6 overflow-y-auto custom-scrollbar font-mono text-[10px] text-highlight space-y-1">
-                        {agentThoughts.map((t, i) => <div key={i}>{t}</div>)}
+                        <div ref={feedRef} className="flex-1 p-6 overflow-y-auto custom-scrollbar font-mono text-[9px] text-highlight space-y-1">
+                            {agentThoughts.length > 0 ? (
+                                agentThoughts.map((t, i) => <div key={i}>{t}</div>)
+                            ) : (
+                                <div className="opacity-40 italic">System idle. Awaiting mission start...</div>
+                            )}
+                        </div>
                     </div>
-                </div>
+                )}
+                
+                <button 
+                    onClick={() => setIsTraceOpen(!isTraceOpen)}
+                    className={`p-4 rounded-2xl shadow-2xl transition-all active:scale-95 group ${isTraceOpen ? 'bg-highlight text-black' : 'bg-black border border-white/10 text-highlight hover:border-highlight/40'}`}
+                >
+                    <TerminalIcon size={20} className={isTraceOpen ? '' : 'group-hover:animate-pulse'} />
+                </button>
             </div>
         </div>
     );

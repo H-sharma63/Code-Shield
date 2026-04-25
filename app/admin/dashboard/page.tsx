@@ -1,10 +1,10 @@
-
 'use client'
 
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import Link from "next/link";
+import { Terminal } from "lucide-react";
 
 interface User {
   name: string;
@@ -82,6 +82,15 @@ export default function AdminDashboard() {
                   </button>
                 </div>
               </Link>
+              <Link href="/admin/terminal">
+                <div className="bg-cardPanel rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center cursor-pointer hover:shadow-lg transition-shadow duration-200">
+                  <Terminal size={32} className="text-primaryAccent mb-2" />
+                  <p className="text-lg font-semibold text-textPrimary mb-2">Admin Terminal</p>
+                  <button className="w-[250px] bg-primaryAccent hover:opacity-80 text-cardPanel font-bold py-2 px-4 rounded-[20px]">
+                    Launch Full Power Shell
+                  </button>
+                </div>
+              </Link>
               <Link href="https://student-brn.sentry.io/projects/ai-code-reviewer/" target="_blank" rel="noopener noreferrer">
                 <div className="bg-cardPanel rounded-lg shadow p-4 h-40 flex flex-col items-center justify-center cursor-pointer hover:shadow-lg transition-shadow duration-200">
                   <p className="text-lg font-semibold text-textPrimary mb-2">Error Monitoring</p>
@@ -107,5 +116,5 @@ export default function AdminDashboard() {
         </div>
       </main>
     </div>
-)
+  )
 }

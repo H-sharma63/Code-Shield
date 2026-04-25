@@ -1,0 +1,52 @@
+<h2>The "Hybrid" Dynamic Router</h2>
+<p class="subtitle">Automatic Tunneling & Failover logic</p>
+
+<div class="mockup">
+  <div class="mockup-header">Logic Flow: Tunnel Manager (on GCP)</div>
+  <div class="mockup-body">
+    <div style="padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+      <!-- Step 1 -->
+      <div style="border: 1px solid #444; padding: 0.8rem; border-radius: 4px; background: #111;">
+        <div class="label" style="color: #3b82f6;">1. Request Named URL</div>
+        <p style="font-size: 0.8rem;">Attempt <code>lt --subdomain <strong>harshit-codeshield</strong></code></p>
+      </div>
+      
+      <div style="text-align: center; color: #666; font-size: 0.8rem;">&darr; IF TAKEN OR OFFLINE &darr;</div>
+
+      <!-- Step 2 -->
+      <div style="border: 1px solid #444; padding: 0.8rem; border-radius: 4px; background: #111;">
+        <div class="label" style="color: #f6821f;">2. Fallback to Cloudflare</div>
+        <p style="font-size: 0.8rem;">Spawn <code>cloudflared tunnel --url http://localhost:3000</code></p>
+      </div>
+
+      <div style="text-align: center; color: #666; font-size: 0.8rem;">&darr; RESULT &darr;</div>
+
+      <!-- Step 3 -->
+      <div style="border: 1px solid #00ff00; padding: 0.8rem; border-radius: 4px; background: #002200;">
+        <div class="label" style="color: #00ff00;">3. Return URL to Frontend</div>
+        <p style="font-size: 0.8rem; font-family: monospace;">{ "success": true, "url": "https://..." }</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="hybrid_router" onclick="toggleSelect(this)">
+    <div class="letter">&check;</div>
+    <div class="content">
+      <h3>Implement Hybrid Manager</h3>
+      <p>We'll write a Node.js utility on the GCP VM that manages these processes, monitors their health, and reports the live URL back to your Next.js app.</p>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>Why this is the "Pro" way</h4>
+    <ul>
+      <li><strong>Reliability:</strong> If one service is down, your app still works.</li>
+      <li><strong>Best of both:</strong> You get your custom name whenever possible, and a stable random one when you can't.</li>
+      <li><strong>Transparent:</strong> The user just sees a "Live Preview" button; they don't care how the tunnel works.</li>
+    </ul>
+  </div>
+</div>

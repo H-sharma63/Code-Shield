@@ -1,0 +1,56 @@
+<h2>Storage Planning & Management</h2>
+<p class="subtitle">How much space do we have for <code>node_modules</code>?</p>
+
+<div class="mockup">
+  <div class="mockup-header">GCP Disk Allocation (Free Tier)</div>
+  <div class="mockup-body">
+    <div style="padding: 1rem;">
+      <div style="display: flex; height: 30px; border-radius: 15px; overflow: hidden; border: 1px solid #444; background: #222;">
+        <div style="width: 20%; background: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #fff;">OS (6GB)</div>
+        <div style="width: 50%; background: #00ff00; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #000;">Available (15GB)</div>
+        <div style="width: 30%; background: #666; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #fff;">Buffers (9GB)</div>
+      </div>
+      <p style="font-size: 0.8rem; color: #aaa; margin-top: 1rem; text-align: center;">
+        <strong>30GB Total</strong> (Standard Persistent Disk)
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="cards">
+  <div class="card">
+    <div class="card-body">
+      <h3>Project Capacity</h3>
+      <p style="font-size: 0.8rem; color: #aaa;">Assuming ~800MB per Next.js project:</p>
+      <ul style="font-size: 0.75rem; padding-left: 1.2rem; margin-top: 0.5rem;">
+        <li>&check; 15-20 Projects comfortably</li>
+        <li>&check; Shared <code>npm cache</code> to save space</li>
+        <li>&check; Automated cleanup for idle repos (>30 days)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="30gb" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Standard (30GB Free)</h3>
+      <p>Perfect for 10-15 active projects. We can use <code>pnpm</code> or <code>npm link</code> to share common packages and save ~40% space.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="custom" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Paid Tier (100GB+)</h3>
+      <p>Only if you expect 50+ concurrent users or very large monorepos (e.g. Android/iOS builds).</p>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>Optimization Tip</h4>
+    <p>We'll configure the GCP VM to use <strong>Shared Package Caching</strong>. This means if 10 users all use <code>react</code>, we only store the actual React files once on disk, saving massive amounts of space!</p>
+  </div>
+</div>

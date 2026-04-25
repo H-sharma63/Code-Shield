@@ -1,0 +1,62 @@
+<h2>Zero-Cost Public URLs</h2>
+<p class="subtitle">Getting "Codeanywhere" vibes with ₹0 budget</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Strategy 1: Cloudflare Tunnel (Free)</div>
+    <div class="mockup-body">
+      <div style="padding: 1rem; font-size: 0.8rem;">
+        <div style="background: #111; border: 1px dashed #f6821f; padding: 0.5rem; margin-bottom: 0.5rem;">
+          https://<strong>user-app-xyz.trycloudflare.com</strong>
+        </div>
+        <ul style="padding-left: 1.2rem;">
+          <li>&check; No Domain Needed</li>
+          <li>&check; Real HTTPS (SSL) built-in</li>
+          <li>&check; Works behind any firewall</li>
+        </ul>
+        <p style="color: #aaa; font-style: italic;">Requires running the <code>cloudflared</code> binary on your GCP VM.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">Strategy 2: Nip.io (Wildcard Magic)</div>
+    <div class="mockup-body">
+      <div style="padding: 1rem; font-size: 0.8rem;">
+        <div style="background: #111; border: 1px dashed #3b82f6; padding: 0.5rem; margin-bottom: 0.5rem;">
+          http://<strong>3000.34.120.5.nip.io</strong>
+        </div>
+        <ul style="padding-left: 1.2rem;">
+          <li>&check; No Setup Required</li>
+          <li>&check; Uses your GCP IP directly</li>
+          <li>&check; Perfect for Hot Reload</li>
+        </ul>
+        <p style="color: #aaa; font-style: italic;">Maps any IP address to a hostname automatically. 100% free.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="cloudflare" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>Cloudflare Tunnel</h3>
+      <p>Pros: Professional URLs, HTTPS. Cons: Setup on VM required.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="nipio" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>Nip.io (IP-based)</h3>
+      <p>Pros: Zero setup, works instantly. Cons: HTTP only (unless you add certs).</p>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros">
+    <h4>My Recommendation</h4>
+    <p>Go with <strong>Cloudflare Tunnels (Strategy 1)</strong>. It gives you a clean <code>.trycloudflare.com</code> URL that looks much better for a major project, and it's completely free.</p>
+  </div>
+</div>
