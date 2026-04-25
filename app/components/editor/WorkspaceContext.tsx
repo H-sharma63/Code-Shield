@@ -160,7 +160,7 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     projectInfoRef.current = { owner, repo };
 
     // This boot-specific socket is for general events, not a specific terminal session.
-    const gcpUrl = process.env.NEXT_PUBLIC_GCP_URL || 'ws://34.44.252.138:8080';
+    const gcpUrl = process.env.NEXT_PUBLIC_GCP_URL || 'ws://34.10.151.8:8080';
     const queryParams = { owner, repo, sessionId: 'control-' + Math.random().toString(36).substring(7) };
     const controlSocket = io(gcpUrl, { query: queryParams, reconnectionAttempts: 3, timeout: 5000 });
 
@@ -300,7 +300,7 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         console.warn("[Session] Failed to fetch env vars", e);
     }
 
-    const gcpUrl = process.env.NEXT_PUBLIC_GCP_URL || 'ws://34.44.252.138:8080'; 
+    const gcpUrl = process.env.NEXT_PUBLIC_GCP_URL || 'ws://34.10.151.8:8080'; 
     const sessionSocket = io(gcpUrl, { 
         query: {
             owner: projectInfoRef.current.owner,

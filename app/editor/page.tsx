@@ -112,7 +112,8 @@ const EditorPage = () => {
     sendCommand,
     createSession,
     boot,
-    diagnostics
+    diagnostics,
+    setDiagnostics
   } = useWorkspace();
 
   const [nodeModulesDismissed, setNodeModulesDismissed] = useState(false);
@@ -189,27 +190,6 @@ const EditorPage = () => {
   useEffect(() => {
     if (lastDiagnostic) setDiagnosticOpen(true);
   }, [lastDiagnostic]);
-  
-  // 🔍 Real-time Monaco Diagnostics Bridge
-  useEffect(() => {
-    if (!monacoRef.current) return;
-    
-    const handleMarkerChange = () => {
-      const markers = monacoRef.current!.editor.getModelMarkers({});
-      const newDiagnostics: any[] = markers.map(m => ({
-        id: `${m.owner}-${m.startLineNumber}-${m.message}`,
-        filePath: tabs.find(t => t.id === activeTabId)?.name || 'active file',
-        line: m.startLineNumber,
-        message: m.message,
-        severity: m.severity === 8 ? 'error' : m.severity === 4 ? 'warning' : 'info',
-        source: m.source || 'Monaco'
-      }));
-      setDiagnostics(newDiagnostics);
-    };
-
-    const disposable = monacoRef.current.editor.onDidChangeMarkers(handleMarkerChange);
-    return () => disposable.dispose();
-  }, [tabs, activeTabId, setDiagnostics]);
 
   // 🚫 Global Browser Shortcut Intercept
   useEffect(() => {
@@ -311,6 +291,27 @@ const EditorPage = () => {
   const [isCommitting, setIsCommitting] = useState(false);
   const [isTerminalMaximized, setIsTerminalMaximized] = useState(false);
   const [isDiscardModalOpen, setIsDiscardModalOpen] = useState(false);
+
+  // 🔍 Real-time Monaco Diagnostics Bridge
+  useEffect(() => {
+    if (!monacoRef.current) return;
+    
+    const handleMarkerChange = () => {
+      const markers = monacoRef.current!.editor.getModelMarkers({});
+      const newDiagnostics: any[] = markers.map(m => ({
+        id: `${m.owner}-${m.startLineNumber}-${m.message}`,
+        filePath: tabs.find(t => t.id === activeTabId)?.name || 'active file',
+        line: m.startLineNumber,
+        message: m.message,
+        severity: m.severity === 8 ? 'error' : m.severity === 4 ? 'warning' : 'info',
+        source: m.source || 'Monaco'
+      }));
+      setDiagnostics(newDiagnostics);
+    };
+
+    const disposable = monacoRef.current.editor.onDidChangeMarkers(handleMarkerChange);
+    return () => disposable.dispose();
+  }, [tabs, activeTabId, setDiagnostics]);
 
   const handleAgentFileCreate = (name: string, content: string) => {
     const newPath = `ai/${name}`;

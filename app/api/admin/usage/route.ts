@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
 
     let engineStats = null;
     try {
-        const gcpUrl = process.env.NEXT_PUBLIC_GCP_URL || 'http://34.44.252.138:8080';
+        const gcpUrl = process.env.NEXT_PUBLIC_GCP_URL || 'http://34.10.151.8:8080';
         const statsUrl = gcpUrl.replace('ws://', 'http://').replace('wss://', 'https://') + '/stats';
         
         const res = await fetch(statsUrl, { signal: AbortSignal.timeout(3000) });

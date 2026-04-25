@@ -279,13 +279,16 @@ const Terminal = ({ projectId, fileToSync, onClose, isMaximized, onMaximizeToggl
         </div>
       )}
       
-      {activeTab === 'terminal' ? (
-        <div 
-            ref={terminalRef}
-            className={`flex-1 w-full bg-[#0a0a0c] overflow-hidden terminal-container z-10 ${bootStatus !== 'ready' ? 'hidden' : 'block'}`}
-        />
-      ) : (
-        <div className="flex-1 w-full bg-[#0a0a0c] overflow-y-auto p-4 custom-scrollbar">
+      {/* --- TERMINAL TAB --- */}
+      <div className={`flex-1 w-full relative min-h-0 z-10 ${activeTab !== 'terminal' || bootStatus !== 'ready' ? 'hidden' : 'block'}`}>
+          <div 
+              ref={terminalRef}
+              className="absolute inset-0 bg-[#0a0a0c] overflow-hidden terminal-container"
+          />
+      </div>
+
+      {/* --- PROBLEMS TAB --- */}
+      <div className={`flex-1 w-full bg-[#0a0a0c] overflow-y-auto p-4 custom-scrollbar ${activeTab !== 'problems' ? 'hidden' : 'block'}`}>
             {diagnostics.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-white/10 gap-2">
                     <ShieldCheck size={48} strokeWidth={1} />
@@ -316,7 +319,6 @@ const Terminal = ({ projectId, fileToSync, onClose, isMaximized, onMaximizeToggl
                 </div>
             )}
         </div>
-      )}
       <div className="h-2.5 bg-[#0a0a0c] shrink-0 w-full" />
 
       <style jsx global>{`

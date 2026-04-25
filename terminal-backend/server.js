@@ -101,6 +101,37 @@ io.on('connection', async (socket) => {
     
     console.log(`\x1b[34m[CONN] User: ${actualOwner}, Repo: ${actualRepo}, Session: ${actualSessionId}\x1b[0m`);
 
+    // --- VS CODE BRIDGE ROUTER ---
+    if (actualSessionId === 'vscode-bridge') {
+        console.log(`\x1b[35m[BRIDGE] VS Code Extension connected to router.\x1b[0m`);
+        
+        socket.on('vscode-active-file', (data) => {
+            // Broadcast to all connected Next.js frontends
+            socket.broadcast.emit('vscode-active-file', data);
+        });
+
+        socket.on('vscode-active-content', (data) => {
+            socket.broadcast.emit('vscode-active-content', data);
+        });
+
+        socket.on('vscode-cursor', (data) => {
+            socket.broadcast.emit('vscode-cursor', data);
+        });
+
+        socket.on('disconnect', () => {
+            console.log(`\x1b[31m[BRIDGE] VS Code Extension disconnected.\x1b[0m`);
+        });
+        
+        // Stop execution here so we don't spawn a PTY shell for the bridge
+        return;
+    }
+
+    // --- FRONTEND ROUTER ---
+    // If a frontend sends a fix, broadcast it to the bridge
+    socket.on('vscode-apply-fix', (data) => {
+        socket.broadcast.emit('vscode-apply-fix', data);
+    });
+
     let projectPath;
     let projectExists = false;
     try {
@@ -141,7 +172,7 @@ io.on('connection', async (socket) => {
 
         console.log(`\x1b[36m🌐 [BACKEND] Direct access available for Port ${port}\x1b[0m`);
         
-        const gcpIp = '34.44.252.138'; 
+        const gcpIp = '34.10.151.8'; 
         const directUrl = `http://${gcpIp}:${port}`;
         
         activeTunnels.set(port, { status: 'active', provider: 'gcp-direct', url: directUrl });
@@ -185,7 +216,7 @@ io.on('connection', async (socket) => {
     ptyProcess.onData(data => {
         // High-performance rewrite: Catch common ports immediately even before scanner hits
         let out = data.toString();
-        const gcpIp = '34.44.252.138';
+        const gcpIp = '34.10.151.8';
         const COMMON_PORTS = [3000, 3001, 5173, 8000, 8080];
         
         COMMON_PORTS.forEach(p => {
