@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useCallback, useMemo, } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import Editor, { Monaco } from '@monaco-editor/react';
 import type * as monaco from 'monaco-editor';
@@ -11,18 +11,19 @@ import {
   Github, 
   CheckSquare, 
   ShieldCheck, 
-  Key, 
   Bug,
-  ChevronUp,
-  ChevronDown,
   Play,
   Plus,
   Minus,
   Save,
-  GitBranch,
   ExternalLink,
   Network,
-  Bot
+  Bot,
+  Settings as SettingsIcon,
+  Key,
+  Rocket,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import FileExplorer from '../components/editor/FileExplorer';
 import Search from '../components/editor/Search';
@@ -44,6 +45,7 @@ import { OPFSStorage } from '../lib/editor/opfs-storage';
 import { useWorkspace } from '../components/editor/WorkspaceContext';
 import UnsavedChangesModal from '../components/editor/UnsavedChangesModal';
 import { AgentSplitView } from '../components/agents/AgentSplitView';
+import SettingsPanel from '../components/editor/SettingsPanel';
 
 interface GlobalSearchResult {
   path: string;
@@ -299,7 +301,7 @@ const EditorPage = () => {
     const handleMarkerChange = () => {
       const markers = monacoRef.current!.editor.getModelMarkers({});
       const newDiagnostics: any[] = markers.map(m => ({
-        id: `${m.owner}-${m.startLineNumber}-${m.message}`,
+        id: `${m.owner}-${m.startLineNumber}-${m.message}-${activeTabId}`,
         filePath: tabs.find(t => t.id === activeTabId)?.name || 'active file',
         line: m.startLineNumber,
         message: m.message,
@@ -475,6 +477,73 @@ const EditorPage = () => {
       try { setAddedFiles(JSON.parse(savedAdded)); } catch (e) { }
     }
   }, [repoFullName]);
+  
+  // 📄 AUTO-OPEN README: If no tabs are open on a fresh load, try to open README.md
+  useEffect(() => {
+    if (repoFullName && tabs.length === 0 && bootStatus === 'ready' && !searchParams.get('template')) {
+      handleFileClick('README.md');
+    }
+  }, [repoFullName, tabs.length, bootStatus]);
+
+  // 🏗️ AUTO-INITIALIZE TEMPLATE: If a template is specified, run the setup command
+  useEffect(() => {
+    const template = searchParams.get('template');
+    if (template && template !== 'blank' && bootStatus === 'ready' && repoFullName && socket) {
+      // Clear the template param from URL so it doesn't re-run on refresh
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.delete('template');
+      router.replace(`${window.location.pathname}?${newParams.toString()}`);
+
+      handleNotify(`Initializing ${template} project...`, 'info');
+      setIsTerminalOpen(true);
+
+      // Inject git config to ensure initial commit works
+      const gitSetup = 'git config --global user.email "codeshield@google.com" && git config --global user.name "CodeShield AI" && ';
+      const gitFlow = ' && git add . && git commit -m "Initialize project" && git push origin main';
+
+      let command = '';
+      switch (template) {
+        case 'nextjs':
+          command = `${gitSetup} npx -y create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm ${gitFlow}`;
+          break;
+        case 'vite-react':
+          command = `${gitSetup} npx -y create-vite@latest . --template react-ts && npm install ${gitFlow}`;
+          break;
+        case 'angular':
+          command = `${gitSetup} npx -y @angular/cli new . --directory . --defaults && npm install ${gitFlow}`;
+          break;
+        case 'svelte':
+          command = `${gitSetup} npx -y create-vite@latest . --template svelte-ts && npm install ${gitFlow}`;
+          break;
+        case 'node':
+          command = `${gitSetup} npm init -y && mkdir src && echo "console.log('Hello CodeShield');" > src/index.js ${gitFlow}`;
+          break;
+        case 'python':
+          command = `${gitSetup} mkdir app && echo "from flask import Flask\napp = Flask(__name__)\n@app.route('/')\ndef hello(): return 'Hello CodeShield'" > app/main.py && echo "flask" > requirements.txt && pip install -r requirements.txt ${gitFlow}`;
+          break;
+        case 'vanilla-vite':
+          command = `${gitSetup} npx -y create-vite@latest . --template vanilla-ts && npm install ${gitFlow}`;
+          break;
+      }
+
+      if (command) {
+        setTimeout(() => {
+           console.log("[Boot] Executing initialization command...");
+           sendCommand(command + '\n');
+           
+           // 🔄 AUTO-REFRESH EXPLORER: Poll for new files every 5s for the first minute
+           const poller = setInterval(() => {
+             setRefreshExplorer(prev => !prev);
+           }, 5000);
+           
+           // Cleanup poller after 60 seconds
+           setTimeout(() => clearInterval(poller), 60000);
+           
+           handleNotify(`Framework installation started. Files will appear automatically in the explorer.`, 'info');
+        }, 2500); // Increased delay to ensure terminal socket is fully warm
+      }
+    }
+  }, [searchParams, bootStatus, repoFullName, router, socket, sendCommand]);
 
   // 💾 Save repo-scoped tabs whenever they change
   useEffect(() => {
@@ -542,11 +611,24 @@ const EditorPage = () => {
       // Mark as clean in UI (update originalContent)
       setTabs(prev => prev.map(t => t.id === activeTab.id ? { ...t, originalContent: t.content } : t));
       
+      // 🛰️ LOG ACTIVITY: Record edit event in Kernel Logs (DB)
+      if (session?.user?.email) {
+        fetch('/api/save-project', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            projectName: projectName || (repoFullName ? repoFullName.split('/')[1] : 'untitled-project'),
+            fileName: activeTab.id, // Full path for better traceability
+            fileData: activeTab.content
+          })
+        }).catch(err => console.error("Activity Log Error:", err));
+      }
+
       handleNotify(`Saved ${activeTab.name}`, 'success');
     } catch (e) {
       handleNotify(`Failed to save: ${activeTab.name}`, 'error');
     }
-  }, [activeTab, persistFile, handleNotify]);
+  }, [activeTab, persistFile, handleNotify, session, projectName, repoFullName]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -603,7 +685,7 @@ const EditorPage = () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              projectName: pName || fName.split('.')[0],
+              projectName: pName || projectName || fName.split('.')[0],
               fileName: fName,
               fileData: content
             }),
@@ -946,7 +1028,11 @@ const EditorPage = () => {
   // (Removed local interval)
 
   const handleSmartFix = async () => {
-    if (!activeTab || !repoFullName) return;
+    const codeTab = tabs.find(t => t.id === lastActiveCodeTabId);
+    if (!codeTab || !repoFullName) {
+        handleNotify("No active code file found for smart fix.", "error");
+        return;
+    }
 
     setIsRefactoring(true);
     handleNotify("Generating Smart Fix...", "success");
@@ -954,7 +1040,7 @@ const EditorPage = () => {
       const response = await fetch('/api/refactor', {
         method: 'POST',
         body: JSON.stringify({
-          code: activeTab.content,
+          code: codeTab.content,
           context: analysis?.suggestions.join('\n'),
           action: 'fix',
           modelId: selectedModel
@@ -962,6 +1048,7 @@ const EditorPage = () => {
       });
       const data = await response.json();
       if (response.ok) {
+        setActiveTabId(lastActiveCodeTabId);
         setRefactoredContent(data.code);
         setIsDiffMode(true);
       } else {
@@ -975,7 +1062,11 @@ const EditorPage = () => {
   };
 
   const handleGenTests = async () => {
-    if (!activeTab || !repoFullName) return;
+    const codeTab = tabs.find(t => t.id === lastActiveCodeTabId);
+    if (!codeTab || !repoFullName) {
+        handleNotify("No active code file found for test generation.", "error");
+        return;
+    }
 
     setIsRefactoring(true);
     handleNotify("Generating Unit Tests...", "success");
@@ -983,7 +1074,7 @@ const EditorPage = () => {
       const response = await fetch('/api/refactor', {
         method: 'POST',
         body: JSON.stringify({
-          code: activeTab.content,
+          code: codeTab.content,
           context: "Generate professional unit tests for this file.",
           action: 'test',
           modelId: selectedModel
@@ -991,14 +1082,14 @@ const EditorPage = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        const testFileName = activeTab.name.replace(/\.[^/.]+$/, "") + ".test" + activeTab.name.substring(activeTab.name.lastIndexOf("."));
-        const testPath = activeTab.id.substring(0, activeTab.id.lastIndexOf('/') + 1) + testFileName;
+        const testFileName = codeTab.name.replace(/\.[^/.]+$/, "") + ".test" + codeTab.name.substring(codeTab.name.lastIndexOf("."));
+        const testPath = codeTab.id.substring(0, codeTab.id.lastIndexOf('/') + 1) + testFileName;
 
         const newTab: Tab = {
           id: testPath,
           name: testFileName,
           content: data.code,
-          language: activeTab.language,
+          language: codeTab.language,
           originalContent: ""
         };
         setTabs([...tabs, newTab]);
@@ -1186,7 +1277,12 @@ const EditorPage = () => {
   };
 
   const handleNeuralFix = async (suggestion: string) => {
-    if (!activeTab || !repoFullName) return;
+    const codeTab = tabs.find(t => t.id === lastActiveCodeTabId);
+    if (!codeTab || !repoFullName) {
+        handleNotify("No active code file found for neural fix.", "error");
+        return;
+    }
+
     setIsRefactoring(true);
     handleNotify("Applying Neural Fix...", "success");
     try {
@@ -1194,7 +1290,7 @@ const EditorPage = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          code: activeTab.content,
+          code: codeTab.content,
           context: suggestion,
           action: 'fix',
           modelId: selectedModel
@@ -1202,6 +1298,7 @@ const EditorPage = () => {
       });
       const data = await response.json();
       if (response.ok) {
+        setActiveTabId(lastActiveCodeTabId);
         setRefactoredContent(data.code);
         setIsDiffMode(true);
         handleNotify("Neural Fix generated. Review in Diff View.", "success");
@@ -1273,10 +1370,23 @@ const EditorPage = () => {
             onGenTests={handleGenTests}
           />
         )}
-        {activeView === 'env' && <EnvManager repoFullName={repoFullName} onNotify={handleNotify} />}
+        {activeView === 'settings' && (
+          <SettingsPanel 
+            repoFullName={repoFullName} 
+            userEmail={session?.user?.email || null} 
+            onNotify={handleNotify} 
+            onClose={() => setActiveView(null)}
+          />
+        )}
+        {activeView === 'env' && (
+          <div className="h-full bg-[#09090b]">
+             <EnvManager repoFullName={repoFullName} onNotify={handleNotify} />
+          </div>
+        )}
         {activeView === 'audit' && (
           <QualityAudit
             code={activeTab?.content || ''}
+            fileName={activeTabId || 'script.py'}
             selectedModel={selectedModel}
             repoFullName={repoFullName}
             onNotify={handleNotify}
@@ -1453,7 +1563,6 @@ const EditorPage = () => {
               >
                 <Bug size={18} />
               </button>
-              <button onClick={() => setActiveView(v => v === 'env' ? null : 'env')} className={`p-2 rounded-lg transition-all ${activeView === 'env' ? 'bg-highlight/10 text-highlight shadow-[0_0_10px_rgba(255,222,89,0.2)]' : 'text-textSecondary hover:text-white hover:bg-white/5'}`} title="Environment Variables"><Key size={22} /></button>
             </div>
           )}
 
@@ -1462,6 +1571,16 @@ const EditorPage = () => {
           <button onClick={() => setIsTerminalOpen(!isTerminalOpen)} className={`p-2 rounded-lg transition-all ${isTerminalOpen ? 'bg-indigo-500/10 text-indigo-400 shadow-[0_0_15px_rgba(129,140,248,0.3)]' : 'text-textSecondary hover:text-white hover:bg-white/5'}`} title="Terminal">
             <SquareTerminal size={22} />
           </button>
+
+          <div className="relative">
+            <button 
+              onClick={() => setActiveView(v => v === 'env' ? null : 'env')} 
+              className={`p-2 rounded-lg mt-8 transition-all ${activeView === 'env' ? 'bg-highlight/10 text-highlight shadow-[0_0_10px_rgba(255,222,89,0.2)]' : 'text-textSecondary hover:text-white hover:bg-white/5'}`} 
+              title="Environment Manager"
+            >
+              <SettingsIcon size={22} />
+            </button>
+          </div>
         </div>
       </div>
 

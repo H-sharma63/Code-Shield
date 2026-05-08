@@ -187,3 +187,8 @@
   scrollbar-width: thin;
   scrollbar-color: #b0b2ba #37373b;
 }
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}

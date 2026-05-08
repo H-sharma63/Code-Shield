@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { DiffEditor } from '@monaco-editor/react';
 import { X } from 'lucide-react';
 
@@ -30,8 +30,8 @@ const DiffView = ({ original, modified, language, fileName, onClose, onAccept }:
         editorRef.current = editor;
     };
 
-    const originalPath = `original-${fileName}-${Date.now()}`;
-    const modifiedPath = `modified-${fileName}-${Date.now()}`;
+    const originalPath = useMemo(() => `original-${fileName}-${Date.now()}`, [fileName]);
+    const modifiedPath = useMemo(() => `modified-${fileName}-${Date.now()}`, [fileName]);
 
     return (
         <div className="h-full flex flex-col bg-base relative animate-in fade-in duration-300">

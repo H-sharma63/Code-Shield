@@ -5,19 +5,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import CreateProjectModal from '@/app/components/CreateProjectModal';
-import ProjectMenu from '@/app/components/ProjectMenu';
-import RenameProjectModal from '@/app/components/RenameProjectModal';
-import DeleteConfirmationModal from '@/app/components/DeleteConfirmationModal';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import { Folder, Github, FileCode, Lock, ExternalLink, Shield } from 'lucide-react';
+import { Github, Lock, ExternalLink, Shield, GitFork } from 'lucide-react';
 
-interface Project {
-  id: number;
-  projectName: string;
-  fileName: string;
-  blobUrl: string;
-}
 
 interface GitHubRepo {
   id: number;
@@ -26,6 +17,7 @@ interface GitHubRepo {
   description: string;
   url: string;
   isPrivate: boolean;
+  isFork: boolean;
   updatedAt: string;
   language: string;
 }
@@ -34,16 +26,11 @@ export default function ProjectsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   
-  const [projects, setProjects] = useState<Project[]>([]);
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   const [isCreateModalOpen, setCreateIsModalOpen] = useState(false);
-  const [isRenameModalOpen, setRenameModalOpen] = useState(false);
-  const [projectToRename, setProjectToRename] = useState<Project | null>(null);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -53,22 +40,11 @@ export default function ProjectsPage() {
   const fetchAllData = async () => {
     setLoading(true);
     try {
-      const endpoints = [fetch('/api/get-projects')];
       const isGithub = (session as any)?.provider === 'github';
       
       if (isGithub) {
-        endpoints.push(fetch('/api/github/repos'));
-      }
-
-      const results = await Promise.all(endpoints);
-      
-      const projData = await results[0].json();
-      if (projData.projects) {
-        setProjects(projData.projects);
-      }
-
-      if (isGithub && results[1]) {
-        const repoData = await results[1].json();
+        const response = await fetch('/api/github/repos');
+        const repoData = await response.json();
         if (repoData.repos) {
           setRepos(repoData.repos);
         }
@@ -90,59 +66,6 @@ export default function ProjectsPage() {
     }
   }, [session, status]);
 
-  const handleRename = (project: Project) => {
-    setProjectToRename(project);
-    setRenameModalOpen(true);
-  };
-
-  const handleConfirmRename = async (newProjectName: string) => {
-    if (!projectToRename) return;
-    try {
-      const response = await fetch('/api/rename-project', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: projectToRename.id, newProjectName }),
-      });
-      if (response.ok) {
-        fetchAllData();
-        setRenameModalOpen(false);
-        setProjectToRename(null);
-        setSnackbarMessage('Project renamed successfully!');
-        setSnackbarSeverity('success');
-        setSnackbarOpen(true);
-      }
-    } catch (error) {
-      setSnackbarMessage('Error renaming project.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-    }
-  };
-
-  const handleDelete = (project: Project) => {
-    setProjectToDelete(project);
-    setDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = async (project: Project) => {
-    try {
-      const response = await fetch('/api/delete-project', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: project.id }),
-      });
-      if (response.ok) {
-        fetchAllData();
-        setDeleteModalOpen(false);
-        setSnackbarMessage('Project deleted successfully!');
-        setSnackbarSeverity('success');
-        setSnackbarOpen(true);
-      }
-    } catch (error) {
-      setSnackbarMessage('Error deleting project.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-    }
-  };
 
   if (loading) {
     return (
@@ -158,8 +81,6 @@ export default function ProjectsPage() {
   return (
     <div className="min-h-screen bg-[#060608] text-textPrimary selection:bg-white/10 p-8 font-vscode-ui relative">
       <CreateProjectModal isOpen={isCreateModalOpen} onClose={() => setCreateIsModalOpen(false)} />
-      <RenameProjectModal isOpen={isRenameModalOpen} onClose={() => setRenameModalOpen(false)} project={projectToRename} onRename={handleConfirmRename} />
-      <DeleteConfirmationModal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)} project={projectToDelete} onConfirm={handleConfirmDelete} />
       
       {/* Background Glows */}
       <div className="fixed inset-0 z-0 pointer-events-none">
@@ -177,9 +98,9 @@ export default function ProjectsPage() {
           </div>
           <button
             onClick={() => setCreateIsModalOpen(true)}
-            className="bg-white text-[#060608] hover:bg-white/90 font-bold py-2.5 px-6 rounded-xl transition-all shadow-xl shadow-white/5 font-exo"
+            className="bg-white text-[#060608] hover:bg-white/90 font-bold py-2.5 px-6 rounded-xl transition-all shadow-xl shadow-white/5 font-exo flex items-center gap-2"
           >
-            Create New Project
+            <Github size={18} /> Create Blank Repo
           </button>
         </div>
 
@@ -217,8 +138,18 @@ export default function ProjectsPage() {
                     <div className="bg-white/5 border border-white/10 rounded-2xl p-5 flex flex-col justify-between hover:bg-white/[0.08] hover:border-white/20 transition-all group h-full cursor-pointer">
                       <div>
                         <div className="flex justify-between items-start mb-2">
-                          <h2 className="text-base font-bold text-white group-hover:text-primaryAccent transition-colors truncate pr-2 font-exo">{repo.name}</h2>
-                          {repo.isPrivate && <Lock size={14} className="text-white/20 shrink-0" />}
+                          <div className="flex flex-col truncate pr-2">
+                            <span className="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-0.5 group-hover:text-primaryAccent/50 transition-colors">
+                              {repo.fullName.split('/')[0]} /
+                            </span>
+                            <h2 className="text-base font-bold text-white group-hover:text-primaryAccent transition-colors truncate font-exo">
+                              {repo.name}
+                            </h2>
+                          </div>
+                          <div className="flex items-center gap-2 mt-1">
+                            {repo.isFork && <GitFork size={14} className="text-white/20 shrink-0" />}
+                            {repo.isPrivate && <Lock size={14} className="text-white/20 shrink-0" />}
+                          </div>
                         </div>
                         <p className="text-xs text-white/40 line-clamp-2 h-8 font-medium mb-4">{repo.description || 'No description provided.'}</p>
                       </div>

@@ -6,28 +6,19 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import CreateProjectModal from '@/app/components/CreateProjectModal';
 import {
-  Plus,
-  Folder,
   Clock,
   Activity as ActivityIcon,
   ChevronRight,
   Shield,
-  FileCode,
   AlertCircle,
   Github,
   Lock,
   ExternalLink,
   Code,
-  Zap
+  Zap,
+  GitFork
 } from 'lucide-react';
 
-interface Project {
-  id: number;
-  projectName: string;
-  fileName: string;
-  blobUrl: string;
-  updatedAt: string;
-}
 
 interface GitHubRepo {
   id: number;
@@ -36,6 +27,8 @@ interface GitHubRepo {
   description: string;
   url: string;
   isPrivate: boolean;
+  isFork: boolean;
+  forkSource?: string | null;
   updatedAt: string;
   language: string;
 }
@@ -44,7 +37,7 @@ interface ActivityItem {
   id: number;
   projectName: string;
   fileName: string;
-  eventType: 'created' | 'edited';
+  eventType: 'created' | 'edited' | 'github_push';
   eventTimestamp: string;
 }
 
@@ -67,7 +60,6 @@ export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
-  const [activeProjects, setActiveProjects] = useState<Project[]>([]);
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -140,7 +132,7 @@ export default function DashboardPage() {
             onClick={() => setCreateModalOpen(true)}
             className="group flex items-center gap-2 px-6 py-3 bg-white text-[#060608] font-bold rounded-xl hover:bg-white/90 transition-all active:scale-95 shadow-xl shadow-white/5 font-exo"
           >
-            <Plus size={18} /> New Project
+            <Github size={18} /> Create Blank Repo
           </button>
         </div>
 
@@ -208,7 +200,7 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {repos.slice(0, 4).map((r) => (
+                  {repos.slice(0, 8).map((r) => (
                     <div
                       key={`repo-${r.id}`}
                       className="group p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 relative overflow-hidden cursor-pointer"
@@ -223,6 +215,12 @@ export default function DashboardPage() {
                             <div className="px-2 py-1 border rounded text-[9px] font-mono uppercase tracking-tighter bg-white/5 border-white/10 text-white/40">
                               GitHub
                             </div>
+                            {r.isFork && (
+                              <div className="px-2 py-1 bg-primaryAccent/10 border border-primaryAccent/20 rounded text-[9px] font-mono text-primaryAccent uppercase tracking-tighter flex items-center gap-1.5">
+                                <GitFork size={10} />
+                                {r.forkSource && <span className="opacity-80 font-bold">{r.forkSource.split('/')[0]}</span>}
+                              </div>
+                            )}
                             {r.isPrivate && (
                               <div className="px-2 py-1 bg-white/5 border border-white/10 rounded text-[9px] font-mono text-white/20 uppercase tracking-tighter">
                                 <Lock size={10} />
@@ -230,9 +228,14 @@ export default function DashboardPage() {
                             )}
                           </div>
                         </div>
-                        <h3 className="text-base font-bold text-white mb-2 group-hover:text-primaryAccent transition-colors truncate font-exo">
-                          {r.name}
-                        </h3>
+                        <div className="flex flex-col mb-2">
+                           <span className="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-0.5 group-hover:text-primaryAccent/50 transition-colors">
+                              {r.fullName.split('/')[0]} /
+                           </span>
+                           <h3 className="text-base font-bold text-white group-hover:text-primaryAccent transition-colors truncate font-exo">
+                             {r.name}
+                           </h3>
+                        </div>
                         <p className="text-xs text-white/30 line-clamp-2 h-8 font-medium mb-4">
                           {r.description || "No description protocol available."}
                         </p>
@@ -262,22 +265,46 @@ export default function DashboardPage() {
                 activities.slice(0, 6).map((activity) => (
                   <div
                     key={`${activity.id}-${activity.eventType}`}
-                    className="p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/[0.08] transition-all group"
+                    className="group p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/[0.08] hover:border-white/20 transition-all cursor-pointer relative overflow-hidden"
+                    onClick={() => {
+                        // Attempt to find the full repo name for navigation
+                        const repo = repos.find(r => r.name === activity.projectName || r.fullName.endsWith('/' + activity.projectName));
+                        if (repo) router.push(`/editor?repo=${repo.fullName}`);
+                        else router.push(`/editor?projectName=${activity.projectName}&fileName=${activity.fileName}`);
+                    }}
                   >
+                    {/* Progress Bar / Scanning Effect */}
+                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primaryAccent/40 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite]"></div>
+                    
                     <div className="flex justify-between items-start gap-3 mb-2">
-                      <p className="text-[13px] font-medium text-white/80 leading-snug">
-                        <span className="text-white font-bold group-hover:text-secondaryAccent transition-colors">{activity.projectName}</span>
-                        {activity.eventType === 'created' ? ' audit initialized.' : ' patch applied.'}
-                      </p>
-                      <span className="text-[10px] font-mono text-white/20 shrink-0 mt-1 uppercase">
+                      <div className="flex-1">
+                        <p className="text-[12px] font-mono text-white/50 leading-snug break-all">
+                          <span className="text-primaryAccent font-bold">[{activity.projectName}]</span>
+                          {activity.eventType === 'github_push' ? (
+                            <span className="text-white/30"> :: remote_push_detected</span>
+                          ) : activity.eventType === 'created' ? (
+                            <span className="text-white/30"> :: init_audit</span>
+                          ) : (
+                            <>
+                               <span className="text-white/30"> :: patch_applied </span>
+                               <span className="text-secondaryAccent font-bold text-[11px]">{activity.fileName}</span>
+                            </>
+                          )}
+                        </p>
+                      </div>
+                      <span className="text-[9px] font-mono text-white/20 shrink-0 mt-0.5 uppercase tracking-tighter">
                         {timeSince(activity.eventTimestamp)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className={`w-1.5 h-1.5 rounded-full ${activity.eventType === 'created' ? 'bg-primaryAccent shadow-[0_0_8px_#12c2e9]' : 'bg-secondaryAccent shadow-[0_0_8px_#c471f5]'}`}></div>
-                      <span className="text-[10px] font-mono text-white/40 uppercase tracking-tighter">
-                        STATUS: VERIFIED
-                      </span>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-1 h-1 rounded-full ${activity.eventType === 'github_push' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : activity.eventType === 'created' ? 'bg-primaryAccent' : 'bg-secondaryAccent'} animate-pulse`}></div>
+                        <span className="text-[9px] font-mono text-white/40 uppercase tracking-[0.2em]">
+                          STATUS: {activity.eventType === 'github_push' ? 'VERIFIED_ON_REMOTE' : activity.eventType === 'created' ? 'INITIALIZED' : 'SYNCHRONIZED'}
+                        </span>
+                      </div>
+                      <ChevronRight size={12} className="text-white/10 group-hover:text-white/40 group-hover:translate-x-1 transition-all" />
                     </div>
                   </div>
                 ))

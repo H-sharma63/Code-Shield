@@ -1,9 +1,10 @@
 'use client';
 
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
-import { ChevronRight, ChevronDown, Github, FilePlus, FolderPlus, RotateCcw, X, Trash2, Network } from 'lucide-react';
+import { ChevronRight, ChevronDown, Github, FilePlus, FolderPlus, RotateCcw, X, Trash2, Network, Rocket } from 'lucide-react';
 import FileUpload from './FileUpload';
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import FileIcon from './FileIcon';
 import DeleteConfirmationModal from '../DeleteConfirmationModal';
 import EnvGuidanceModal from './EnvGuidanceModal';
@@ -39,6 +40,7 @@ const FileExplorer = ({
     refreshExplorer, activeFileName, repoFullName, branchName = 'main', onItemCreated, onItemDeleted, onNotify, onSwitchToEnvManager 
 }: FileExplorerProps) => {
     const { changedFiles, nodeModulesMissing } = useWorkspace();
+    const searchParams = useSearchParams();
     const [fetchedItems, setFetchedItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [localExpanded, setLocalExpanded] = useState<string[]>([]);
@@ -178,18 +180,15 @@ const FileExplorer = ({
             if (repoFullName) {
                 // 1. Fetch Core Files (GitHub)
                 const response = await fetch(`/api/github/contents?repo=${encodeURIComponent(repoFullName)}&ref=${branchName}`);
+                
+                if (response.status === 404) {
+                    console.log("[Explorer] Repo is empty (404)");
+                    setFetchedItems([]);
+                    return;
+                }
+
                 const data = await response.json();
                 let explorerItems = data.items || [];
-
-                // 2. Fetch/Inject node_modules (Only if they actually exist)
-                const hasPackageJson = explorerItems.some((i: any) => i.path === 'package.json');
-                
-                // Only show node_modules if we explicitly know it's not missing (e.g. backend reported it)
-                // For now, let's not eagerly inject it unless we have a way to verify its presence on GCP.
-                // We can add a socket event later to check for its existence.
-                // if (hasPackageJson && !nodeModulesMissing && !explorerItems.some((i: any) => i.path === 'node_modules')) {
-                //     explorerItems.push({ path: 'node_modules', type: 'dir' });
-                // }
 
                 const nestedTree = buildTree(explorerItems);
                 setFetchedItems(nestedTree);
@@ -329,6 +328,45 @@ const FileExplorer = ({
             <div className="flex-1 overflow-y-auto custom-scrollbar mt-2">
                 {loading && fetchedItems.length === 0 ? (
                     <p className="text-textSecondary text-center mt-4 animate-pulse">Building project map...</p>
+                ) : fetchedItems.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center text-white/10 gap-4 px-6 text-center">
+                        <div className="relative">
+                            <Github size={48} strokeWidth={1} className="animate-pulse" />
+                            {searchParams.get('template') && searchParams.get('template') !== 'blank' && (
+                                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-indigo-500 rounded-full flex items-center justify-center animate-bounce shadow-[0_0_10px_#6366f1]">
+                                    <Rocket size={8} className="text-white" />
+                                </div>
+                            )}
+                        </div>
+                        <div className="space-y-2 w-full">
+                            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/30">
+                                {searchParams.get('template') && searchParams.get('template') !== 'blank' 
+                                    ? `Initializing ${searchParams.get('template')}...` 
+                                    : 'Empty Repository'}
+                            </p>
+                            
+                            {searchParams.get('template') && searchParams.get('template') !== 'blank' && (
+                                <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                                    <div className="h-full bg-indigo-500 animate-[progress_60s_linear_infinite]" style={{ width: '100%' }}></div>
+                                </div>
+                            )}
+
+                            <p className="text-[9px] text-white/10 leading-relaxed italic max-w-[200px] mx-auto">
+                                {searchParams.get('template') && searchParams.get('template') !== 'blank'
+                                    ? "Installing dependencies on GCP Server. Files will appear here automatically."
+                                    : "Use the terminal to initialize your framework or create a file to begin."}
+                            </p>
+                        </div>
+                        
+                        {!searchParams.get('template') && (
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); setIsCreating('file'); }}
+                                className="mt-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/5 rounded-md text-[10px] font-bold uppercase tracking-wider text-indigo-400/80 transition-all"
+                            >
+                                Create First File
+                            </button>
+                        )}
+                    </div>
                 ) : (
                     <SimpleTreeView
                         expandedItems={localExpanded}
@@ -338,6 +376,13 @@ const FileExplorer = ({
                     </SimpleTreeView>
                 )}
             </div>
+
+            <style jsx>{`
+                @keyframes progress {
+                    0% { transform: translateX(-100%); }
+                    100% { transform: translateX(0); }
+                }
+            `}</style>
 
             <DeleteConfirmationModal 
                 isOpen={!!itemToDelete}

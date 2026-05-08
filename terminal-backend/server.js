@@ -172,7 +172,7 @@ io.on('connection', async (socket) => {
 
         console.log(`\x1b[36m🌐 [BACKEND] Direct access available for Port ${port}\x1b[0m`);
         
-        const gcpIp = '34.10.151.8'; 
+        const gcpIp = process.env.GCP_IP || '34.10.151.8'; 
         const directUrl = `http://${gcpIp}:${port}`;
         
         activeTunnels.set(port, { status: 'active', provider: 'gcp-direct', url: directUrl });
@@ -216,7 +216,7 @@ io.on('connection', async (socket) => {
     ptyProcess.onData(data => {
         // High-performance rewrite: Catch common ports immediately even before scanner hits
         let out = data.toString();
-        const gcpIp = '34.10.151.8';
+        const gcpIp = process.env.GCP_IP || '34.10.151.8';
         const COMMON_PORTS = [3000, 3001, 5173, 8000, 8080];
         
         COMMON_PORTS.forEach(p => {

@@ -228,63 +228,38 @@ const Terminal = ({ projectId, fileToSync, onClose, isMaximized, onMaximizeToggl
         </div>
       </div>
 
-      {bootStatus === 'error' && (
-        <div className="flex-1 flex flex-col items-center justify-center bg-[#0a0a0c] text-red-400 gap-4 p-8 text-center animate-in fade-in duration-500">
-            <X size={48} className="text-red-500/50" />
-            <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Fatal Boot Error</span>
-                <p className="text-xs text-white/40 font-mono max-w-md">{error || 'An unexpected error occurred during ignition.'}</p>
-            </div>
-            <button 
-                onClick={() => window.location.reload()}
-                className="mt-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all"
-            >
-                Retry Boot
-            </button>
-            <button 
-                onClick={async () => { 
-                    if (confirm("This will permanently delete your local workspace snapshot and start fresh. Continue?")) {
-                        const root = await navigator.storage.getDirectory();
-                        const entries = (dir: any) => dir.entries();
-                        for await (const [name] of entries(root)) {
-                            await root.removeEntry(name, { recursive: true });
-                        }
-                        window.location.reload();
-                    }
-                }}
-                className="text-[9px] text-white/20 hover:text-red-400/60 font-bold uppercase tracking-widest underline underline-offset-4"
-            >
-                Reset System Disk (Wipe Data)
-            </button>
-        </div>
-      )}
-
-      {isTerminalBusy && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0c]/80 backdrop-blur-sm text-white/50 gap-3">
-            <ProgressBar progress={syncProgress} status={syncStatus} />
-        </div>
-      )}
-
-      {bootStatus === 'booting' && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0c] text-white/20 gap-3 animate-pulse z-50">
-            <TerminalIcon size={40} strokeWidth={1} />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Connecting to CodeShield Engine...</span>
-        </div>
-      )}
-
-      {bootStatus === 'ready' && !activeSession?.hasOutput && (
-        <div className="flex-1 flex flex-col items-center justify-center bg-[#0a0a0c] text-white/20 gap-3 animate-pulse">
-            <TerminalIcon size={40} strokeWidth={1} />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Connecting SSH to CodeShield Engine...</span>
-        </div>
-      )}
-      
       {/* --- TERMINAL TAB --- */}
-      <div className={`flex-1 w-full relative min-h-0 z-10 ${activeTab !== 'terminal' || bootStatus !== 'ready' ? 'hidden' : 'block'}`}>
-          <div 
-              ref={terminalRef}
-              className="absolute inset-0 bg-[#0a0a0c] overflow-hidden terminal-container"
-          />
+      <div className={`flex-1 w-full relative min-h-0 z-10 ${activeTab !== 'terminal' ? 'hidden' : 'block'}`}>
+          {bootStatus === 'error' ? (
+            <div className="flex-1 h-full flex flex-col items-center justify-center bg-[#0a0a0c] text-red-400 gap-4 p-8 text-center animate-in fade-in duration-500">
+                <X size={48} className="text-red-500/50" />
+                <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Fatal Boot Error</span>
+                    <p className="text-xs text-white/40 font-mono max-w-md">{error || 'An unexpected error occurred during ignition.'}</p>
+                </div>
+                <button 
+                    onClick={() => window.location.reload()}
+                    className="mt-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all"
+                >
+                    Retry Boot
+                </button>
+            </div>
+          ) : bootStatus === 'booting' ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0c] text-white/20 gap-3 animate-pulse z-50">
+                <TerminalIcon size={40} strokeWidth={1} />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Connecting to CodeShield Engine...</span>
+            </div>
+          ) : bootStatus === 'ready' && !activeSession?.hasOutput ? (
+            <div className="flex-1 h-full flex flex-col items-center justify-center bg-[#0a0a0c] text-white/20 gap-3 animate-pulse">
+                <TerminalIcon size={40} strokeWidth={1} />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Connecting SSH to CodeShield Engine...</span>
+            </div>
+          ) : (
+            <div 
+                ref={terminalRef}
+                className="absolute inset-0 bg-[#0a0a0c] overflow-hidden terminal-container"
+            />
+          )}
       </div>
 
       {/* --- PROBLEMS TAB --- */}
@@ -298,7 +273,7 @@ const Terminal = ({ projectId, fileToSync, onClose, isMaximized, onMaximizeToggl
                 <div className="flex flex-col gap-1">
                     {diagnostics.map((diag, idx) => (
                         <div 
-                            key={diag.id || idx} 
+                            key={`${diag.id}-${idx}`} 
                             onClick={() => onProblemClick?.(diag.filePath, diag.line)}
                             className="flex items-start gap-3 p-2 hover:bg-white/5 rounded-md group transition-all border border-transparent hover:border-white/10 cursor-pointer"
                         >

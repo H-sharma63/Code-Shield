@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Rocket, 
     ExternalLink, 
@@ -25,39 +25,79 @@ interface Deployment {
     commit: string;
 }
 
-export const DeploymentVault: React.FC = () => {
+interface DeploymentVaultProps {
+    repoFullName: string | null;
+    userEmail: string | null;
+    onNotify: (msg: string, type: 'success' | 'error') => void;
+}
+
+export const DeploymentVault: React.FC<DeploymentVaultProps> = ({ repoFullName, userEmail, onNotify }) => {
     const [isConnected, setIsConnected] = useState(false);
     const [isDeploying, setIsDeploying] = useState(false);
-    const [deployments, setDeployments] = useState<Deployment[]>([
-        {
-            id: '1',
-            url: 'codeshield-v9.vercel.app',
-            status: 'ready',
-            branch: 'main',
-            timestamp: new Date(Date.now() - 3600000),
-            commit: 'feat: integrated neural debugger'
-        },
-        {
-            id: '2',
-            url: 'codeshield-v9-git-dev.vercel.app',
-            status: 'building',
-            branch: 'dev',
-            timestamp: new Date(),
-            commit: 'refactor: architecture map evolution'
+    const [projectName, setProjectName] = useState('');
+    const [deployments, setDeployments] = useState<Deployment[]>([]);
+
+    useEffect(() => {
+        // Check if connected (we can try to fetch deployments, if it returns 401, we aren't connected)
+        checkConnection();
+    }, []);
+
+    const checkConnection = async () => {
+        try {
+            const res = await fetch('/api/vercel/deployments');
+            if (res.ok) {
+                setIsConnected(true);
+                const data = await res.json();
+                if (data.deployments) {
+                    setDeployments(data.deployments.map((d: any) => ({
+                        id: d.uid,
+                        url: d.url,
+                        status: d.state === 'READY' ? 'ready' : (d.state === 'ERROR' ? 'error' : 'building'),
+                        branch: d.meta?.githubCommitRef || 'main',
+                        timestamp: new Date(d.createdAt),
+                        commit: d.meta?.githubCommitMessage || 'Initial Deployment'
+                    })));
+                }
+            }
+        } catch (e) {
+            console.error("Vercel connection check failed", e);
         }
-    ]);
+    };
 
     const handleConnectVercel = () => {
-        // Mock connection flow
-        setIsConnected(true);
+        // Redirect to our OAuth start route
+        window.location.href = '/api/vercel/auth';
     };
 
     const handleTriggerDeploy = async () => {
+        if (!projectName.trim()) {
+            onNotify("Please enter a Vercel Project Name", "error");
+            return;
+        }
+
         setIsDeploying(true);
-        // Simulate deployment trigger
-        setTimeout(() => {
+        try {
+            const res = await fetch('/api/vercel/deploy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    projectName: projectName.trim(), 
+                    repoFullName, 
+                    userEmail 
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                onNotify("Deployment triggered successfully!", "success");
+                checkConnection(); // Refresh history
+            } else {
+                onNotify(data.error || "Deployment failed", "error");
+            }
+        } catch (e) {
+            onNotify("Failed to trigger deployment", "error");
+        } finally {
             setIsDeploying(false);
-        }, 3000);
+        }
     };
 
     return (
@@ -70,10 +110,15 @@ export const DeploymentVault: React.FC = () => {
                     </div>
                     <div>
                         <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">Deployment Vault</h2>
-                        <span className="text-[7px] font-black uppercase tracking-widest text-white/20">Vercel & GCP Cloud</span>
+                        <span className="text-[7px] font-black uppercase tracking-widest text-white/20">Vercel Integration</span>
                     </div>
                 </div>
-                <button className="p-2 text-white/20 hover:text-white transition-all"><RefreshCw size={14} className={isDeploying ? 'animate-spin' : ''} /></button>
+                <button 
+                    onClick={checkConnection}
+                    className="p-2 text-white/20 hover:text-white transition-all"
+                >
+                    <RefreshCw size={14} className={isDeploying ? 'animate-spin' : ''} />
+                </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
@@ -89,23 +134,35 @@ export const DeploymentVault: React.FC = () => {
                                 </div>
                                 <div className="px-2 py-0.5 bg-green-500/20 border border-green-500/40 rounded text-[7px] text-green-400 font-black uppercase tracking-widest">Active</div>
                             </div>
-                            <div className="flex items-center gap-4 text-[10px] text-white/40 font-medium">
-                                <div className="flex items-center gap-1.5"><Github size={12} /> H-sharma63/CodeShield</div>
-                                <div className="flex items-center gap-1.5"><Lock size={12} /> Production</div>
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-4 text-[10px] text-white/40 font-medium">
+                                    <div className="flex items-center gap-1.5"><Github size={12} /> {repoFullName || 'No repo'}</div>
+                                    <div className="flex items-center gap-1.5"><Lock size={12} /> Production</div>
+                                </div>
+                                <div className="mt-2">
+                                    <label className="text-[8px] font-black uppercase tracking-widest text-white/30 block mb-1">Vercel Project Name</label>
+                                    <input 
+                                        type="text"
+                                        placeholder="Enter project name..."
+                                        value={projectName}
+                                        onChange={(e) => setProjectName(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))}
+                                        className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-[10px] font-mono text-white outline-none focus:border-orange-500/40"
+                                    />
+                                </div>
                             </div>
                         </div>
                     ) : (
                         <div className="flex flex-col items-center text-center py-4 space-y-4">
                             <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white/20"><Plus size={24} /></div>
                             <div>
-                                <h3 className="text-xs font-black uppercase tracking-widest text-white/60">Connect Vercel Account</h3>
-                                <p className="text-[9px] text-white/20 mt-2 leading-relaxed">Auto-sync your repository with Vercel for instant preview and production deployments.</p>
+                                <h3 className="text-xs font-black uppercase tracking-widest text-white/60">Connect with Vercel</h3>
+                                <p className="text-[9px] text-white/20 mt-2 leading-relaxed">Login with Vercel to enable auto-deployments and environment sync.</p>
                             </div>
                             <button 
                                 onClick={handleConnectVercel}
                                 className="w-full py-3 bg-white text-black font-black uppercase text-[9px] tracking-[0.2em] rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all"
                             >
-                                Connect Vercel Host
+                                Connect with Vercel
                             </button>
                         </div>
                     )}
@@ -115,13 +172,13 @@ export const DeploymentVault: React.FC = () => {
                 {isConnected && (
                     <button 
                         onClick={handleTriggerDeploy}
-                        disabled={isDeploying}
-                        className="w-full group relative overflow-hidden p-6 rounded-3xl bg-transparent border border-orange-500/50 flex flex-col items-center gap-2 transition-all hover:bg-orange-500/5"
+                        disabled={isDeploying || !projectName}
+                        className={`w-full group relative overflow-hidden p-6 rounded-3xl bg-transparent border flex flex-col items-center gap-2 transition-all ${isDeploying || !projectName ? 'border-white/10 opacity-50 cursor-not-allowed' : 'border-orange-500/50 hover:bg-orange-500/5'}`}
                     >
                         <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/5 to-orange-500/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                         <Rocket size={24} className={`text-orange-400 ${isDeploying ? 'animate-bounce' : 'group-hover:-translate-y-1 transition-transform'}`} />
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-orange-400/80">Ship current snapshot</span>
-                        <span className="text-[7px] font-bold text-white/20 uppercase tracking-widest italic">Trigger GitHub Push & Vercel Fetch</span>
+                        <span className="text-[7px] font-bold text-white/20 uppercase tracking-widest italic">Sync Env & Trigger Vercel Build</span>
                     </button>
                 )}
 

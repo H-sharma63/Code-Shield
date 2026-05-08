@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/app/lib/auth';
 import { db } from '@/app/lib/db';
 import { repoEnvironments, projects, testRuns } from '@/app/lib/schema';
 import { count } from 'drizzle-orm';
@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
 
     let engineStats = null;
     try {
-        const gcpUrl = process.env.NEXT_PUBLIC_GCP_URL || 'http://34.10.151.8:8080';
+        const gcpUrl = process.env.NEXT_PUBLIC_GCP_URL || 'http://34.46.62.220:8080';
         const statsUrl = gcpUrl.replace('ws://', 'http://').replace('wss://', 'https://') + '/stats';
         
         const res = await fetch(statsUrl, { signal: AbortSignal.timeout(3000) });

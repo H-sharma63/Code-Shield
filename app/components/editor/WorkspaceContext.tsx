@@ -160,9 +160,16 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     projectInfoRef.current = { owner, repo };
 
     // This boot-specific socket is for general events, not a specific terminal session.
-    const gcpUrl = process.env.NEXT_PUBLIC_GCP_URL || 'ws://34.10.151.8:8080';
+    const rawGcpUrl = process.env.NEXT_PUBLIC_GCP_URL || 'http://34.10.151.8:8080';
+    const gcpUrl = rawGcpUrl.replace(/^ws:\/\//, 'http://').replace(/^wss:\/\//, 'https://');
+
     const queryParams = { owner, repo, sessionId: 'control-' + Math.random().toString(36).substring(7) };
-    const controlSocket = io(gcpUrl, { query: queryParams, reconnectionAttempts: 3, timeout: 5000 });
+    const controlSocket = io(gcpUrl, { 
+        query: queryParams, 
+        reconnectionAttempts: 5, 
+        timeout: 15000,
+        transports: ['websocket']
+    });
 
     controlSocket.on('connect', () => {
         console.log('🔗 [CONTROL] Connected to GCP Control Socket');
@@ -300,7 +307,9 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         console.warn("[Session] Failed to fetch env vars", e);
     }
 
-    const gcpUrl = process.env.NEXT_PUBLIC_GCP_URL || 'ws://34.10.151.8:8080'; 
+    const rawGcpUrl = process.env.NEXT_PUBLIC_GCP_URL || 'http://34.10.151.8:8080';
+    const gcpUrl = rawGcpUrl.replace(/^ws:\/\//, 'http://').replace(/^wss:\/\//, 'https://');
+
     const sessionSocket = io(gcpUrl, { 
         query: {
             owner: projectInfoRef.current.owner,
@@ -308,8 +317,9 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             sessionId: sessionId,
             env: envVarsStr
         },
-        reconnectionAttempts: 3,
-        timeout: 5000
+        reconnectionAttempts: 5,
+        timeout: 15000,
+        transports: ['websocket']
     });
 
     sessionSocket.on('connect', () => {
@@ -487,15 +497,68 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setSyncStatus('Fetching file tree...');
     
     return new Promise(async (resolve, reject) => {
+        const onSyncComplete = () => {
+            socketRef.current?.off('sync-complete', onSyncComplete);
+            socketRef.current?.off('sync-error', onSyncError);
+            clearTimeout(syncTimeout);
+            lastSyncedProjectId.current = projectId;
+            setIsSyncing(false);
+            setIsTerminalBusy(false);
+            setSyncProgress(0);
+            setSyncStatus('');
+            commandQueue.current.forEach(cmd => sendCommand(cmd));
+            commandQueue.current = [];
+            resolve();
+        };
+
+        const onSyncError = (err: any) => {
+            socketRef.current?.off('sync-complete', onSyncComplete);
+            socketRef.current?.off('sync-error', onSyncError);
+            clearTimeout(syncTimeout);
+            setIsSyncing(false);
+            setIsTerminalBusy(false);
+            setSyncProgress(0);
+            setSyncStatus('');
+            reject(new Error(err.message || 'Sync failed'));
+        };
+
+        const syncTimeout = setTimeout(() => {
+            console.warn('[Sync] Timeout reached. Unlocking.');
+            onSyncComplete();
+        }, 15000);
+
         try {
           const treeRes = await fetch(`/api/github/contents?repo=${encodeURIComponent(projectId)}`);
+          if (treeRes.status === 404) {
+              console.log("[Sync] Repository is empty or not found (404). Treating as empty workspace.");
+              onSyncComplete();
+              return;
+          }
           if (!treeRes.ok) throw new Error('Failed to fetch project tree');
 
           const data = await treeRes.json();
           const items = data.items || [];
-          const CONCURRENCY_LIMIT = 15;
-          const fileItems = items.filter((item: any) => item.type === 'file');
+          
+          if (data.isEmpty || items.length === 0) {
+              console.log("[Sync] Repository is empty. Treating as empty workspace.");
+              onSyncComplete();
+              return;
+          }
+
+          const CONCURRENCY_LIMIT = 25; // Increased for faster sync
+          const fileItems = items.filter((item: any) => 
+              item.type === 'file' && 
+              !item.path.includes('node_modules/') && 
+              !item.path.includes('.git/') &&
+              !item.path.endsWith('.lock')
+          );
           const totalFiles = fileItems.length;
+          
+          if (totalFiles === 0) {
+              onSyncComplete();
+              return;
+          }
+
           let filesSynced = 0;
           const syncedPaths = new Set<string>();
 
@@ -548,43 +611,9 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           setSyncStatus('Synchronizing with Remote Engine...');
           setSyncProgress(100);
 
-          const term = sessionsRef.current[0]?.terminal;
-          
-          const onSyncComplete = () => {
-              socketRef.current?.off('sync-complete', onSyncComplete);
-              socketRef.current?.off('sync-error', onSyncError);
-              clearTimeout(syncTimeout);
-              term?.write(`\x1b[32m[System] Project synchronized. Terminal ready.\x1b[0m
-`);
-              lastSyncedProjectId.current = projectId;
-              setIsSyncing(false);
-              setIsTerminalBusy(false);
-              setSyncProgress(0);
-              setSyncStatus('');
-              commandQueue.current.forEach(cmd => sendCommand(cmd));
-              commandQueue.current = [];
-              resolve();
-          };
-
-          const onSyncError = (err: any) => {
-              socketRef.current?.off('sync-complete', onSyncComplete);
-              socketRef.current?.off('sync-error', onSyncError);
-              clearTimeout(syncTimeout);
-              setIsSyncing(false);
-              setIsTerminalBusy(false);
-              setSyncProgress(0);
-              setSyncStatus('');
-              reject(new Error(err.message));
-          };
-
-          const syncTimeout = setTimeout(() => {
-              console.warn('[Sync] Timeout reached. Unlocking.');
-              onSyncComplete();
-          }, 10000);
-
           socketRef.current?.on('sync-complete', onSyncComplete);
           socketRef.current?.on('sync-error', onSyncError);
-          socketRef.current?.emit('bulk-sync', { files: filesToSync });
+          socketRef.current?.emit('bulk-sync', { repoFullName: projectId, files: filesToSync });
           
           const allFiles = await OPFSStorage.getAllFiles();
           const currentPaths = Object.keys(allFiles).filter(p => !p.startsWith('.shield/') && !p.includes('node_modules/'));

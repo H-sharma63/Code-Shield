@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import mermaid from 'mermaid';
-import elkLayouts from '@mermaid-js/layout-elk';
 import { Layers, RefreshCw, ZoomIn, ZoomOut, Maximize2, Terminal, X, Search, Activity, Code2, GitMerge } from 'lucide-react';
+import GitFlowDiagram from './GitFlowDiagram';
 
 interface ArchitectureMapProps {
     repoFullName: string | null;
@@ -19,14 +18,11 @@ interface NodeData {
 }
 
 const ArchitectureMap: React.FC<ArchitectureMapProps> = ({ repoFullName, onNotify }) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const mermaidRef = useRef<HTMLDivElement>(null);
     const [loading, setLoading] = useState(false);
-    const [summary, setSummary] = useState<string>("");
+    const [summary, setSummary] = useState<string | null>(null);
     const [nodes, setNodes] = useState<NodeData[]>([]);
+    const [edges, setEdges] = useState<any[]>([]);
     const [viewState, setViewState] = useState({ x: 0, y: 0, scale: 0.8 });
-    const [isDragging, setIsDragging] = useState(false);
-    const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const [selectedModule, setSelectedModule] = useState<NodeData | null>(null);
     const [isDebugMode, setIsDebugMode] = useState(false);
 
@@ -37,101 +33,38 @@ const ArchitectureMap: React.FC<ArchitectureMapProps> = ({ repoFullName, onNotif
             const res = await fetch(`/api/github/architecture?repo=${encodeURIComponent(repoFullName)}`);
             const data = await res.json();
 
-            if (res.ok && data.mermaid) {
+            if (res.ok) {
                 setSummary(data.summary);
                 setNodes(data.nodes || []);
-                
-                mermaid.initialize({
-                    startOnLoad: false,
-                    theme: 'base',
-                    securityLevel: 'loose',
-                    flowchart: { 
-                        defaultRenderer: 'elk', 
-                        curve: 'linear', 
-                        nodeSpacing: 120, 
-                        rankSpacing: 180,
-                        padding: 50
-                    },
-                    themeVariables: {
-                        primaryColor: isDebugMode ? '#ef4444' : '#1e293b',
-                        primaryBorderColor: isDebugMode ? '#ef4444' : '#3178c6',
-                        primaryTextColor: '#fff',
-                        lineColor: isDebugMode ? '#ef444488' : '#3178c688',
-                        mainBkg: '#0d1117',
-                        clusterBkg: isDebugMode ? '#1a0d0d' : '#111827',
-                        clusterBorder: isDebugMode ? '#ef444422' : '#3178c644'
-                    }
-                });
-
-                if (mermaidRef.current) {
-                    mermaidRef.current.innerHTML = '';
-                    const id = `mermaid-${Math.random().toString(36).slice(2)}`;
-                    const { svg } = await mermaid.render(id, data.mermaid);
-                    mermaidRef.current.innerHTML = svg;
-                    onNotify("Project blueprint synchronized via AI Engine.", "success");
-                }
+                setEdges(data.edges || []);
+                onNotify("Project blueprint synchronized via AI Engine.", "success");
             }
         } catch (err) {
             onNotify("Neural engine failure.", "error");
         } finally {
             setLoading(false);
         }
-    }, [repoFullName, onNotify, isDebugMode]);
+    }, [repoFullName, onNotify]);
 
     useEffect(() => {
         fetchMapData();
     }, [fetchMapData]);
 
-    useEffect(() => {
-        const handleGlobalClick = (e: MouseEvent) => {
-            const node = (e.target as HTMLElement).closest('.node');
-            if (node) {
-                const id = node.id.replace(/^mermaid-/, '').replace(/-\d+$/, '');
-                // Try to find by ID first, then by Label
-                const label = node.querySelector('.nodeLabel')?.textContent;
-                const foundNode = nodes.find(n => n.id.replace(/[^a-zA-Z0-9]/g, '_') === id) || nodes.find(n => n.label === label);
-                if (foundNode) setSelectedModule(foundNode);
-            }
-        };
-        window.addEventListener('click', handleGlobalClick);
-        return () => window.removeEventListener('click', handleGlobalClick);
-    }, [nodes]);
-
-    const handleMouseDown = (e: React.MouseEvent) => {
-        if ((e.target as HTMLElement).closest('button')) return;
-        setIsDragging(true);
-        setDragStart({ x: e.clientX - viewState.x, y: e.clientY - viewState.y });
-    };
-
-    const handleMouseMove = (e: React.MouseEvent) => {
-        if (!isDragging) return;
-        setViewState(prev => ({ ...prev, x: e.clientX - dragStart.x, y: e.clientY - dragStart.y }));
-    };
-
-    const handleMouseUp = () => setIsDragging(false);
-
-    const handleWheel = (e: React.WheelEvent) => {
-        const delta = e.deltaY > 0 ? 0.92 : 1.08;
-        setViewState(prev => ({ 
-            ...prev, 
-            scale: Math.max(0.05, Math.min(5, prev.scale * delta)) 
-        }));
-    };
 
     return (
-        <div className={`h-full w-full relative overflow-hidden font-exo select-none transition-colors duration-1000 ${isDebugMode ? 'bg-[#0a0505]' : 'bg-[#050507]'}`}>
+        <div className="h-full w-full relative overflow-hidden font-exo select-none bg-[#050507]">
             {/* HUD Top: Title & Tools */}
             <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-10 py-8 pointer-events-none">
                 <div className="flex items-center gap-5 pointer-events-auto">
-                    <div className={`p-4 border rounded-2xl shadow-2xl backdrop-blur-md transition-all duration-500 ${isDebugMode ? 'bg-red-500/10 border-red-500/30 shadow-red-500/20' : 'bg-indigo-500/10 border-indigo-500/20 shadow-indigo-500/20'}`}>
-                        <Layers size={24} className={isDebugMode ? 'text-red-500' : 'text-indigo-400'} />
+                    <div className="p-4 border rounded-2xl shadow-2xl backdrop-blur-md bg-indigo-500/10 border-indigo-500/20 shadow-indigo-500/20">
+                        <Layers size={24} className="text-indigo-400" />
                     </div>
                     <div>
                         <h2 className="text-lg font-black uppercase tracking-widest text-white drop-shadow-lg font-exo">
-                            {isDebugMode ? 'Neural Debugger' : 'Neural Architecture'}
+                            Neural Architecture
                         </h2>
                         <div className="flex items-center gap-2 mt-1">
-                            <span className={`w-2 h-2 rounded-full animate-pulse shadow-lg ${isDebugMode ? 'bg-red-500 shadow-red-500' : 'bg-indigo-500 shadow-indigo-500'}`} />
+                            <span className="w-2 h-2 rounded-full animate-pulse shadow-lg bg-indigo-500 shadow-indigo-500" />
                             <p className="text-[10px] font-mono opacity-50 uppercase tracking-[0.2em]">{repoFullName || 'scanning...'}</p>
                         </div>
                     </div>
@@ -139,18 +72,17 @@ const ArchitectureMap: React.FC<ArchitectureMapProps> = ({ repoFullName, onNotif
 
                 <div className="flex gap-4 pointer-events-auto">
                    <div className="flex bg-black/60 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden p-1.5 shadow-2xl">
-                        <button 
-                            onClick={() => setIsDebugMode(!isDebugMode)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${isDebugMode ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'hover:bg-white/5 text-white/40'}`}
-                        >
-                            <Terminal size={14} />
-                            {isDebugMode ? 'Debugger Active' : 'Neural Debug'}
-                        </button>
-                        <div className="w-[1px] bg-white/10 mx-2 my-2" />
-                        <button onClick={() => setViewState(p => ({ ...p, scale: p.scale * 1.2 }))} className="p-2.5 hover:bg-white/5 text-white/50 hover:text-white transition-all rounded-lg">
+                        <button onClick={() => {
+                            // Find the ReactFlow instance and zoom
+                            const btn = document.querySelector('.react-flow__controls-zoomin') as HTMLButtonElement;
+                            btn?.click();
+                        }} className="p-2.5 hover:bg-white/5 text-white/50 hover:text-white transition-all rounded-lg">
                             <ZoomIn size={18} />
                         </button>
-                        <button onClick={() => setViewState(p => ({ ...p, scale: p.scale * 0.8 }))} className="p-2.5 hover:bg-white/5 text-white/50 hover:text-white transition-all rounded-lg">
+                        <button onClick={() => {
+                            const btn = document.querySelector('.react-flow__controls-zoomout') as HTMLButtonElement;
+                            btn?.click();
+                        }} className="p-2.5 hover:bg-white/5 text-white/50 hover:text-white transition-all rounded-lg">
                             <ZoomOut size={18} />
                         </button>
                     </div>
@@ -179,29 +111,19 @@ const ArchitectureMap: React.FC<ArchitectureMapProps> = ({ repoFullName, onNotif
                 </div>
             </div>
 
-            {/* Interaction Stage */}
-            <div 
-                ref={containerRef}
-                className="w-full h-full cursor-grab active:cursor-grabbing flex items-center justify-center transition-all duration-300"
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-                onWheel={handleWheel}
-            >
-                <div 
-                    ref={mermaidRef}
-                    className={`mermaid transition-transform duration-100 ease-out will-change-transform ${isDebugMode ? 'debug-active' : ''}`}
-                    style={{ 
-                        transform: `translate(${viewState.x}px, ${viewState.y}px) scale(${viewState.scale})`,
-                        transformOrigin: 'center center'
-                    }}
-                />
+            <div className="w-full h-full relative overflow-hidden">
+                {repoFullName && (
+                    <GitFlowDiagram 
+                        nodes={nodes} 
+                        edges={edges} 
+                        onNodeClick={(node) => setSelectedModule(node)}
+                    />
+                )}
             </div>
 
             {/* HUD: Module Selection (DRILLDOWN) */}
             {selectedModule && (
-                <div className="absolute bottom-10 right-10 z-40 w-[400px] pointer-events-auto animate-in slide-in-from-right duration-500">
+                <div className="absolute bottom-10 right-10 z-50 w-[400px] pointer-events-auto animate-in slide-in-from-right duration-500">
                     <div className="p-8 rounded-[2rem] bg-[#0d1117]/95 backdrop-blur-2xl border border-indigo-500/40 shadow-[0_0_60px_rgba(129,140,248,0.2)] relative overflow-hidden">
                         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500/0 via-indigo-500/50 to-indigo-500/0" />
                         
@@ -227,7 +149,7 @@ const ArchitectureMap: React.FC<ArchitectureMapProps> = ({ repoFullName, onNotif
                                      <h5 className="text-[8px] font-black uppercase tracking-[0.2em] text-white">Logic Junctions</h5>
                                 </div>
                                 <div className="grid grid-cols-1 gap-2">
-                                    {(selectedModule.internal_functions || ["Entry Logic", "Data Serializer", "Export Handler"]).map((func, idx) => (
+                                    {(selectedModule.internal_functions || ["Entry Logic", "Data Serializer", "Export Handler"]).map((func: string, idx: number) => (
                                         <div key={idx} className="p-3 bg-white/[0.02] border border-white/5 rounded-xl flex items-center justify-between group hover:bg-white/5 transition-all">
                                             <span className="text-[10px] font-mono text-white/70">{func}</span>
                                             <span className="text-[7px] font-black uppercase text-white/20 group-hover:text-indigo-400 transition-all tracking-tighter cursor-pointer">Deep Dive</span>

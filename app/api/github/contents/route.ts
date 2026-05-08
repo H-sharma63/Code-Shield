@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/app/lib/auth';
 import { Octokit } from 'octokit';
 
 async function withRetry<T>(fn: () => Promise<T>, retries = 3): Promise<T> {
@@ -116,6 +116,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ items }, { status: 200 });
 
   } catch (error: any) {
+    if (error.status === 409 && error.message.includes('Git Repository is empty')) {
+        return NextResponse.json({ 
+            items: [],
+            message: 'Repository is empty.',
+            isEmpty: true
+        }, { status: 200 });
+    }
     if (error.status === 404) {
         return NextResponse.json({ 
             message: 'Path not found on GitHub.', 

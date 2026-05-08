@@ -6,12 +6,13 @@ import {
     Terminal as TerminalIcon, AlertCircle, TrendingUp, Trophy, 
     ZapIcon, Eye, Target, MessageSquareCode, Sparkles, Activity,
     LayoutGrid, ChevronRight, CheckCircle2, FlaskConical, Microscope, 
-    ShieldAlert, Zap as ZapFilled, Network, Cpu, Info
+    ShieldAlert, Zap as ZapFilled, Network, Cpu, Info, Download
 } from 'lucide-react';
 import { getDeepProjectContext } from '@/app/lib/editor/workspace-context';
 
 interface QualityAuditProps {
     code: string;
+    fileName: string;
     selectedModel: string;
     repoFullName: string | null;
     onNotify: (msg: string, type: 'success' | 'error') => void;
@@ -23,8 +24,11 @@ type Tier = 'unit' | 'integration' | 'security' | 'performance';
 
 const TIERS: Tier[] = ['unit', 'integration', 'security', 'performance'];
 
-const QualityAudit = ({ code, selectedModel, repoFullName, onNotify, onSmartFix }: QualityAuditProps) => {
-    const [activeTier, setActiveTier] = useState<'all' | Tier>('all');
+const QualityAudit = ({ code, fileName, selectedModel, repoFullName, onNotify, onSmartFix }: QualityAuditProps) => {
+    const isJS = fileName.match(/\.(js|ts|jsx|tsx)$/);
+    const langId = isJS ? 93 : 71;
+
+    const [selectedTiers, setSelectedTiers] = useState<Tier[]>(['unit', 'integration', 'security', 'performance']);
     const [tierStates, setTierStates] = useState<Record<Tier, { 
         phase: MissionPhase; 
         findings: any[]; 
@@ -38,91 +42,124 @@ const QualityAudit = ({ code, selectedModel, repoFullName, onNotify, onSmartFix 
         security: { phase: 'idle', findings: [], logs: '', status: 'pending' },
         performance: { phase: 'idle', findings: [], logs: '', status: 'pending' },
     });
-    
-    const [healthScore, setHealthScore] = useState(0);
+        const [healthScore, setHealthScore] = useState(0);
     const [isGlobalMission, setIsGlobalMission] = useState(false);
+    const [hasResults, setHasResults] = useState(false);
     const [agentThoughts, setAgentThoughts] = useState<string[]>([]);
-    const [isTraceOpen, setIsTraceOpen] = useState(false);
     const [focusedTier, setFocusedTier] = useState<Tier | null>(null);
-    const [selectedTestCaseId, setSelectedTestCaseId] = useState<number | null>(null);
-    
+
     const feedRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (feedRef.current) feedRef.current.scrollTop = feedRef.current.scrollHeight;
-    }, [agentThoughts, isTraceOpen]);
+    }, [agentThoughts]);
 
-    const logThought = (msg: string) => setAgentThoughts(prev => [...prev, `[${new Date().toLocaleTimeString()}] > ${msg}`]);
+    const downloadLogs = () => {
+        const logContent = [
+            `CODESHIELD AUDIT REPORT\n====================\n`,
+            `Health Score: ${healthScore}%\n`,
+            `--- SYSTEM TRACE ---\n`,
+            ...agentThoughts,
+            `\n--- TIER OUTPUTS ---\n`,
+            ...Object.entries(tierStates).map(([tier, state]) => `[${tier.toUpperCase()}] ${state.logs}`)
+        ].join('\n');
+        const blob = new Blob([logContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `audit-report-${Date.now()}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const logThought = (msg: string) => setAgentThoughts(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
 
     const updateTierState = (tier: Tier, updates: Partial<typeof tierStates[Tier]>) => {
         setTierStates(prev => ({ ...prev, [tier]: { ...prev[tier], ...updates } }));
+    };
+
+    const toggleTier = (tier: Tier) => {
+        setSelectedTiers(prev => 
+            prev.includes(tier) 
+                ? prev.filter(t => t !== tier) 
+                : [...prev, tier]
+        );
+    };
+
+    const handleSelectAll = () => {
+        if (selectedTiers.length === TIERS.length) setSelectedTiers([]);
+        else setSelectedTiers([...TIERS]);
     };
 
     const runTestCase = async (tier: Tier, testCase: any) => {
         const suite = tierStates[tier].testSuite;
         if (!suite) return;
 
-        updateTierState(tier, { 
-            testResults: { ...tierStates[tier].testResults, [testCase.id]: { status: 'running', output: '' } } 
+        updateTierState(tier, {
+            testResults: { ...tierStates[tier].testResults, [testCase.id]: { status: 'running', output: '' } }
         });
 
-        const testScript = `
+        const testScript = isJS ? `
 ${code}
-
-# AI Test Runner Wrapper
+// Test Vector Runner (JS)
+try {
+    const result = ${suite.functionName}(...${JSON.stringify(testCase.input)});
+    const expected = ${JSON.stringify(testCase.expectedOutput)};
+    if (JSON.stringify(result) === JSON.stringify(expected)) console.log("PASS");
+    else console.log("FAIL: " + JSON.stringify(result) + " != " + JSON.stringify(expected));
+} catch (e) {
+    console.log("ERROR: " + e.message);
+}
+` : `
+${code}
+# Test Vector Runner (Python)
 try:
-    import json
     result = ${suite.functionName}(*${JSON.stringify(testCase.input)})
     expected = ${JSON.stringify(testCase.expectedOutput)}
-    
-    if result == expected:
-        print("PASS")
-    else:
-        print(f"FAIL: expected {expected}, got {result}")
+    if result == expected: print("PASS")
+    else: print(f"FAIL: {result} != {expected}")
 except Exception as e:
-    if str("${testCase.expectedOutput}") == "error":
-        print("PASS")
-    else:
-        print(f"ERROR: {str(e)}")
+    print(f"ERROR: {e}")
 `;
 
         try {
             const res = await fetch('/api/run-code', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: testScript, language_id: 71 })
+                body: JSON.stringify({ code: testScript, language_id: langId })
             });
             const data = await res.json();
-            const output = data.stdout || data.stderr || data.compile_output || "";
+            const output = data.stdout || data.stderr || "";
             const isPass = output.includes("PASS");
             
-            updateTierState(tier, { 
-                testResults: { ...tierStates[tier].testResults, [testCase.id]: { status: isPass ? 'pass' : 'fail', output } } 
+            // Update individual result and append to global tier logs
+            updateTierState(tier, {
+                testResults: { ...tierStates[tier].testResults, [testCase.id]: { status: isPass ? 'pass' : 'fail', output } },
+                logs: (tierStates[tier].logs || "") + `\n--- TEST CASE: ${testCase.description} ---\n${output}\n`
             });
         } catch (e) {
-            updateTierState(tier, { 
-                testResults: { ...tierStates[tier].testResults, [testCase.id]: { status: 'error', output: 'Execution failed' } } 
+            updateTierState(tier, {
+                testResults: { ...tierStates[tier].testResults, [testCase.id]: { status: 'error', output: 'Execution Failed' } },
+                logs: (tierStates[tier].logs || "") + `\n--- TEST CASE: ${testCase.description} ---\nERROR: Execution Failed\n`
             });
         }
     };
 
     const runSingleMission = async (tier: Tier, projectContext: string) => {
-        updateTierState(tier, { phase: 'scouting', status: 'active', testResults: {} });
-        logThought(`[${tier.toUpperCase()}] Scouting mission starting...`);
-        
+        updateTierState(tier, { phase: 'scouting', status: 'active', testResults: {}, logs: "" });
+        logThought(`Starting ${tier} audit [Engine: ${isJS ? 'Node.js' : 'Python'}]...`);
+
         try {
-            // PHASE 2: SCOUTING
             const scoutRes = await fetch('/api/missions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phase: 'scout', code, context: projectContext, tier })
+                body: JSON.stringify({ phase: 'scout', code, context: projectContext, tier, language: isJS ? 'javascript' : 'python' })
             });
             const scoutData = await scoutRes.json();
             updateTierState(tier, { phase: 'scripting', findings: scoutData.strategy || [] });
-            
-            // SPECIAL PHASE: TEST GENERATION (For Unit Tier)
+
             if (tier === 'unit') {
-                logThought(`[UNIT] Deep Analysis: Generating 8-10 targeted test cases...`);
+                logThought(`Synthesizing test vectors...`);
                 const genRes = await fetch('/api/generate-tests', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -130,12 +167,9 @@ except Exception as e:
                 });
                 const genData = await genRes.json();
                 updateTierState(tier, { testSuite: genData });
-                logThought(`[UNIT] Test Suite Ready: ${genData.testCases.length} cases generated.`);
+                for (const tc of genData.testCases) await runTestCase('unit', tc);
             }
 
-            logThought(`[${tier.toUpperCase()}] Logic strategy acquired. Authoring proofs...`);
-
-            // PHASE 3: SCRIPTING
             const scriptRes = await fetch('/api/missions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -143,46 +177,47 @@ except Exception as e:
             });
             const scriptData = await scriptRes.json();
             updateTierState(tier, { phase: 'verifying' });
-            logThought(`[${tier.toUpperCase()}] Executing verification suite...`);
 
-            // PHASE 4: VERIFICATION
             const verifyRes = await fetch('/api/run-code', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code: scriptData.testSuite, language_id: 71 })
             });
             const verifyData = await verifyRes.json();
-            const log = verifyData.stdout || verifyData.stderr || verifyData.compile_output;
-            updateTierState(tier, { phase: 'complete', status: 'complete', logs: log });
-            logThought(`[${tier.toUpperCase()}] Mission finalized.`);
-
+            updateTierState(tier, { phase: 'complete', status: 'complete', logs: verifyData.stdout || verifyData.stderr || "" });
+            logThought(`${tier.toUpperCase()} audit complete.`);
         } catch (error: any) {
-            logThought(`[${tier.toUpperCase()}] FAILED: ${error.message}`);
+            logThought(`Audit Error: ${error.message}`);
             updateTierState(tier, { status: 'pending', phase: 'idle' });
         }
     };
 
     const executeFullMission = async () => {
+        if (selectedTiers.length === 0) return;
+        
         setIsGlobalMission(true);
-        setAgentThoughts([`[SYSTEM] INITIALIZING HIGH-DENSITY MISSION HUB...`]);
-        setHealthScore(0);
+        setHasResults(false);
+        setAgentThoughts([`[${new Date().toLocaleTimeString()}] Audit engine initializing...`]);
+
+        const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
         try {
-            logThought(`INGESTION: Deep project-context scan initiating...`);
             const projectContext = repoFullName ? await getDeepProjectContext(repoFullName) : "";
-            logThought(`READY: Project vision calibrated. Launching tier agents...`);
-
-            if (activeTier === 'all') {
-                for (const tier of TIERS) {
-                    await runSingleMission(tier, projectContext);
-                }
-            } else {
-                await runSingleMission(activeTier, projectContext);
-            }
-
-            setHealthScore(Math.floor(Math.random() * 40) + 60); // Simulated health calculation
-            onNotify("Mission Grid complete.", "success");
-
+            
+            // Execute all selected missions with a slight staggered delay to prevent 429 rate limits
+            await Promise.all(selectedTiers.map(async (tier, index) => {
+                await delay(index * 2000); // Stagger by 2 seconds
+                return runSingleMission(tier, projectContext);
+            }));
+            
+            // Calculate actual score
+            const allResults = Object.values(tierStates).flatMap(t => Object.values(t.testResults || {}));
+            const total = allResults.length;
+            const passed = allResults.filter(r => r.status === 'pass').length;
+            const score = total > 0 ? Math.round((passed / total) * 100) : 0;
+            
+            setHealthScore(score);
+            setHasResults(true);
         } catch (error: any) {
             onNotify(error.message, "error");
         } finally {
@@ -190,7 +225,7 @@ except Exception as e:
         }
     };
 
-    const resetMissions = () => {
+    const reset = () => {
         setTierStates({
             unit: { phase: 'idle', findings: [], logs: '', status: 'pending' },
             integration: { phase: 'idle', findings: [], logs: '', status: 'pending' },
@@ -198,350 +233,148 @@ except Exception as e:
             performance: { phase: 'idle', findings: [], logs: '', status: 'pending' },
         });
         setAgentThoughts([]);
-        setHealthScore(0);
+        setHasResults(false);
     };
 
     const stats = {
-        passed: Object.values(tierStates).filter(t => t.status === 'complete').length,
-        errors: Object.values(tierStates).filter(t => (t.logs || "").toLowerCase().includes('failed') || (t.logs || "").toLowerCase().includes('error')).length,
-        total: TIERS.length
+        passed: Object.values(tierStates).reduce((acc, t) => acc + Object.values(t.testResults || {}).filter(r => r.status === 'pass').length, 0),
+        failed: Object.values(tierStates).reduce((acc, t) => acc + Object.values(t.testResults || {}).filter(r => r.status === 'fail' || r.status === 'error').length, 0),
     };
 
-    const isAnyMissionActiveOrComplete = Object.values(tierStates).some(s => s.status !== 'pending');
-
     return (
-        <div className="h-full flex flex-col space-y-6 font-vscode-ui animate-in fade-in duration-500 overflow-hidden relative @container">
+        <div className="h-full p-5 flex flex-col space-y-4 @container animate-in fade-in duration-500 overflow-hidden font-vscode-ui bg-editorBackground">
+            <h2 className="text-[12px] font-black text-textSecondary uppercase tracking-[0.2em] mb-2 shrink-0">Mission Control</h2>
             
-            {/* FOCUSED MISSION BOARD (OVERLAY) */}
-            {focusedTier && (
-                <div className="absolute inset-0 z-[60] bg-[#0c0c0e]/95 backdrop-blur-2xl p-4 sm:p-10 flex flex-col @md:flex-row animate-in zoom-in-95 duration-300 overflow-hidden">
-                    <div className="flex-1 flex flex-col min-w-0">
-                        <div className="flex flex-col @lg:flex-row @lg:items-center justify-between mb-8 gap-4">
-                            <div className="flex items-center space-x-4">
-                                <button onClick={() => setFocusedTier(null)} className="p-2 hover:bg-white/10 rounded-full transition-colors text-textSecondary">
-                                    <ChevronRight className="rotate-180" size={24} />
-                                </button>
-                                <div>
-                                    <h1 className="text-xl @lg:text-2xl font-black text-textPrimary uppercase tracking-tight truncate">Mission: {focusedTier}</h1>
-                                    <p className="text-[10px] text-textSecondary font-bold uppercase tracking-widest opacity-60">Architectural Proving Grounds</p>
-                                </div>
+            {/* CONFIG HEADER */}
+            {!isGlobalMission && !hasResults && (
+                <div className="bg-white/5 rounded-xl p-5 border border-white/5 shadow-lg space-y-6 animate-in slide-in-from-top-4 duration-500">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <div className="flex items-center space-x-2 text-highlight mb-1">
+                                <ShieldCheck size={20} />
+                                <h2 className="text-sm font-bold uppercase tracking-[0.2em]">Quality Audit</h2>
                             </div>
-                            <div className="flex items-center space-x-3">
-                                <button 
-                                    onClick={() => {
-                                        const cases = tierStates[focusedTier].testSuite?.testCases;
-                                        if (cases) cases.forEach(c => runTestCase(focusedTier, c));
-                                    }}
-                                    className="bg-highlight text-black px-4 @lg:px-6 py-2 rounded-xl text-[9px] @lg:text-[10px] font-black uppercase tracking-widest shadow-lg shadow-highlight/20 whitespace-nowrap"
-                                >
-                                    Run All
-                                </button>
-                                <button onClick={() => setFocusedTier(null)} className="text-[10px] font-black uppercase text-textSecondary hover:text-white px-2">Close</button>
-                            </div>
-                        </div>
-
-                        {/* TEST CASE LISTING - RESPONSIVE GRID */}
-                        <div className="flex-1 grid grid-cols-1 @lg:grid-cols-2 @2xl:grid-cols-3 gap-4 @lg:gap-6 overflow-y-auto custom-scrollbar p-2">
-                            {/* LIVE PERFORMANCE MONITOR */}
-                            <div className="col-span-full bg-highlight/5 border border-highlight/20 rounded-2xl p-6 mb-4 animate-in fade-in slide-in-from-top-4 duration-500">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center space-x-3">
-                                        <Activity className="text-highlight animate-pulse" size={18} />
-                                        <h3 className="text-xs font-black uppercase tracking-widest text-textPrimary">Mission Control Center</h3>
-                                    </div>
-                                    <div className="text-[10px] font-mono text-highlight/60 uppercase">Target: {focusedTier.toUpperCase()} Protocol</div>
-                                </div>
-                                <div className="grid grid-cols-1 @lg:grid-cols-2 gap-6">
-                                    <div className="space-y-3">
-                                        <div className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Execution Trace</div>
-                                        <div className="bg-black/60 rounded-xl p-4 h-[120px] overflow-y-auto custom-scrollbar font-mono text-[10px] text-highlight space-y-1 border border-white/5">
-                                            {agentThoughts.filter(t => t.includes(`[${focusedTier.toUpperCase()}]`)).length > 0 ? (
-                                                agentThoughts.filter(t => t.includes(`[${focusedTier.toUpperCase()}]`)).map((t, i) => <div key={i}>{t}</div>)
-                                            ) : (
-                                                <div className="opacity-40 italic">Waiting for telemetry...</div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <div className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">Runtime Integrity</div>
-                                        <div className="bg-black/60 rounded-xl p-4 h-[120px] overflow-y-auto custom-scrollbar font-mono text-[9px] text-green-400 space-y-1 border border-white/5 whitespace-pre-wrap">
-                                            {tierStates[focusedTier].logs || "Analyzing structural patterns..."}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {tierStates[focusedTier].testSuite?.testCases.map((tc: any) => (
-                                <div 
-                                    key={tc.id} 
-                                    onClick={() => setSelectedTestCaseId(tc.id)}
-                                    className={`bg-cardPanel/60 border rounded-2xl p-4 @lg:p-5 flex flex-col space-y-4 transition-all group cursor-pointer h-fit ${selectedTestCaseId === tc.id ? 'border-highlight ring-1 ring-highlight/50' : 'border-white/5 hover:border-highlight/30'}`}
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-2">
-                                            <div className="text-[8px] font-black bg-highlight/10 text-highlight px-2 py-0.5 rounded uppercase">{tc.type}</div>
-                                            <span className="text-[10px] font-bold text-textPrimary">Case #{tc.id}</span>
-                                        </div>
-                                        {tierStates[focusedTier].testResults?.[tc.id] && (
-                                            <div className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${
-                                                tierStates[focusedTier].testResults?.[tc.id].status === 'pass' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
-                                                tierStates[focusedTier].testResults?.[tc.id].status === 'running' ? 'bg-highlight/10 text-highlight' : 'bg-red-500/10 text-red-500 border border-red-500/20'
-                                            }`}>
-                                                {tierStates[focusedTier].testResults?.[tc.id].status}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <p className="text-[11px] text-textSecondary font-medium leading-relaxed line-clamp-2">{tc.description}</p>
-                                    <div className="flex-1 bg-black/40 rounded-xl p-3 font-mono text-[9px] text-textSecondary overflow-hidden">
-                                        <div className="mb-2 uppercase text-white/20 text-[7px] font-black tracking-widest">Input</div>
-                                        <div className="text-highlight/80 truncate">{JSON.stringify(tc.input)}</div>
-                                        <div className="mt-3 mb-1 uppercase text-white/20 text-[7px] font-black tracking-widest">Expected</div>
-                                        <div className="text-green-500/80 truncate">{JSON.stringify(tc.expectedOutput)}</div>
-                                    </div>
-                                    <button 
-                                        onClick={(e) => { e.stopPropagation(); runTestCase(focusedTier, tc); }}
-                                        className={`w-full py-2 border border-white/5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${selectedTestCaseId === tc.id ? 'bg-highlight text-black' : 'group-hover:bg-highlight group-hover:text-black'}`}
-                                    >
-                                        Verify Proof
-                                    </button>
-                                </div>
-                            ))}
+                            <p className="text-[10px] text-textSecondary font-medium">Verify system integrity & logic proofs.</p>
                         </div>
                     </div>
 
-                    {/* LONE WOLF: ISOLATED PROOF CONSOLE */}
-                    {selectedTestCaseId && (
-                        <div className="mt-4 @md:mt-0 @md:ml-6 w-full @md:w-[300px] @lg:w-[350px] bg-[#0c0c0e] border border-highlight/20 rounded-2xl flex flex-col overflow-hidden animate-in slide-in-from-right-4 duration-300 shadow-2xl shrink-0">
-                            <div className="p-4 @lg:p-5 border-b border-white/5 bg-white/5 flex items-center justify-between">
-                                <div className="flex items-center space-x-2">
-                                    <TerminalIcon size={14} className="text-highlight" />
-                                    <span className="text-[9px] @lg:text-[10px] font-black text-textPrimary uppercase tracking-widest">Isolated Console</span>
-                                </div>
-                                <button onClick={() => setSelectedTestCaseId(null)} className="text-textSecondary hover:text-white transition-colors">
-                                    <Boxes size={14} />
+                    <div className="space-y-4">
+                        <div className="flex flex-col space-y-2">
+                            <div className="flex justify-between items-end">
+                                <label className="text-[10px] font-bold text-textSecondary uppercase tracking-widest opacity-60">Audit Tiers</label>
+                                <button 
+                                    onClick={handleSelectAll}
+                                    className="text-[9px] font-bold text-highlight uppercase tracking-widest hover:opacity-80 transition-all"
+                                >
+                                    {selectedTiers.length === TIERS.length ? 'Deselect All' : 'Select All'}
                                 </button>
                             </div>
-                            <div className="flex-1 p-4 @lg:p-6 font-mono text-[10px] space-y-4 overflow-y-auto custom-scrollbar">
-                                <div>
-                                    <div className="text-white/20 text-[7px] font-black uppercase tracking-widest mb-1.5">Strategy</div>
-                                    <div className="text-textPrimary leading-relaxed">
-                                        {tierStates[focusedTier].testSuite?.testCases.find(tc => tc.id === selectedTestCaseId)?.description}
-                                    </div>
-                                </div>
-                                <div className="p-4 bg-black/60 rounded-xl border border-white/5">
-                                    <div className="text-white/20 text-[7px] font-black uppercase tracking-widest mb-2">EVIDENCE (STDOUT)</div>
-                                    <div className="text-green-400/80 whitespace-pre-wrap flex items-center">
-                                        {tierStates[focusedTier].testResults?.[selectedTestCaseId]?.status === 'running' ? (
-                                            <span className="animate-pulse">Waiting for proofs...</span>
-                                        ) : (
-                                            tierStates[focusedTier].testResults?.[selectedTestCaseId]?.output || "Ready."
-                                        )}
-                                    </div>
-                                </div>
+                            <div className="grid grid-cols-2 gap-1 bg-base/40 p-1 rounded-lg border border-borderLine/50">
+                                {TIERS.map((tier: Tier) => (
+                                    <button 
+                                        key={tier}
+                                        onClick={() => toggleTier(tier)}
+                                        className={`py-1.5 text-[10px] font-bold rounded-md transition-all uppercase tracking-widest ${selectedTiers.includes(tier) ? 'bg-highlight text-black shadow-md' : 'text-textSecondary hover:text-white hover:bg-white/5'}`}
+                                    >
+                                        {tier}
+                                    </button>
+                                ))}
                             </div>
                         </div>
-                    )}
+
+                        <button 
+                            onClick={executeFullMission}
+                            disabled={selectedTiers.length === 0}
+                            className="w-full flex items-center justify-center space-x-2 bg-highlight hover:bg-highlight/80 text-black py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all shadow-md active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
+                        >
+                            <Play size={12} fill="currentColor" />
+                            <span>Launch Mission</span>
+                        </button>
+                    </div>
                 </div>
             )}
 
-            {/* TOP DASHBOARD: HEALTH & BRANDING */}
-            <div className="flex flex-col @lg:flex-row items-center gap-6 bg-cardPanel/40 backdrop-blur-xl p-6 @lg:p-8 rounded-3xl border border-borderLine shadow-2xl relative overflow-hidden shrink-0">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-highlight/5 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
-                
-                <div className="relative w-28 h-28 @lg:w-36 @lg:h-36 flex items-center justify-center shrink-0">
-                    <svg className="w-full h-full -rotate-90">
-                        <circle cx="50%" cy="50%" r="40%" className="stroke-white/5 fill-none" strokeWidth="8" />
-                        <circle 
-                            cx="50%" cy="50%" r="40%" 
-                            className="stroke-highlight transition-all duration-1000 fill-none" 
-                            strokeWidth="8" 
-                            strokeDasharray="251.2%"
-                            strokeDashoffset={`${251.2 * (1 - healthScore / 100)}%`}
-                            strokeLinecap="round"
-                        />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-xl @lg:text-3xl font-black text-white">{healthScore}%</span>
-                        <span className="text-[8px] @lg:text-[10px] font-bold text-textSecondary uppercase tracking-widest opacity-60">Health</span>
+            {/* FOCUSED RUNNING STATE */}
+            {isGlobalMission && (
+                <div className="flex-1 bg-cardPanel rounded-lg border border-borderLine flex flex-col items-center justify-center p-8 text-center space-y-6">
+                    <div className="relative">
+                        <div className="w-12 h-12 border-2 border-highlight/10 border-t-highlight rounded-full animate-spin" />
+                        <ShieldCheck className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-highlight animate-pulse" size={20} />
+                    </div>
+                    <div className="space-y-2">
+                        <p className="text-highlight text-[10px] uppercase font-bold tracking-[0.2em] animate-pulse">Audit in Progress</p>
+                        <p className="text-textSecondary text-[9px] uppercase tracking-widest">Executing security protocols...</p>
+                    </div>
+                    <div className="w-full max-w-sm bg-base/40 rounded-lg p-4 h-48 overflow-y-auto custom-scrollbar font-mono text-[10px] text-textSecondary text-left space-y-1" ref={feedRef}>
+                        {agentThoughts.map((t, i) => <div key={i} className="opacity-60">{t}</div>)}
                     </div>
                 </div>
+            )}
 
-                <div className="flex-1 w-full space-y-4 relative z-10">
-                    <div className="flex flex-col @2xl:flex-row @2xl:items-center justify-between gap-4">
-                        <div className="text-center @lg:text-left">
-                            <div className="flex flex-wrap items-center justify-center @lg:justify-start gap-2 mb-1">
-                                <h1 className="text-xl @lg:text-2xl font-black text-textPrimary tracking-tight uppercase">CodeShield Agent</h1>
-                                <span className="bg-highlight/20 text-highlight text-[8px] @lg:text-[10px] font-black px-2 @lg:px-3 py-1 rounded-full border border-highlight/20 uppercase tracking-widest leading-none">Grade A-</span>
+            {/* RESULTS AREA */}
+            {!isGlobalMission && hasResults && (
+                <div className="bg-cardPanel rounded-lg flex-1 flex flex-col border border-borderLine min-h-0 overflow-hidden shadow-inner">
+                    <div className="p-4 border-b border-borderLine flex justify-between items-center bg-base/30">
+                        <div className="flex items-center space-x-4">
+                            <h3 className="text-[10px] font-bold text-textSecondary uppercase tracking-widest flex items-center">
+                                <CheckCircle2 size={12} className="mr-2 text-green-500" />
+                                Audit Results
+                            </h3>
+                            <div className="flex items-center bg-highlight/10 px-2 py-0.5 rounded border border-highlight/20">
+                                <span className="text-[10px] font-black text-highlight">{healthScore}</span>
+                                <span className="text-[7px] font-bold text-highlight/60 ml-0.5 uppercase">Score</span>
                             </div>
-                            <p className="text-[10px] @lg:text-xs text-textSecondary font-medium max-w-[400px]">AI Quality Inspector — analyzing architectural logic & cross-tier security vulnerabilities.</p>
                         </div>
-                        
-                        <div className="bg-[#0c0c0e]/80 border border-borderLine rounded-2xl px-4 @lg:px-6 py-2 @lg:py-3 flex items-center justify-around shadow-inner min-w-[200px]">
-                            <div className="text-center px-2">
-                                <div className="text-xs @lg:text-sm font-black text-green-500">{stats.passed}</div>
-                                <div className="text-[7px] @lg:text-[8px] font-bold text-textSecondary uppercase tracking-widest opacity-60">Passed</div>
-                            </div>
-                            <div className="text-center border-x border-white/5 px-4 @lg:px-6">
-                                <div className="text-xs @lg:text-sm font-black text-red-500">{stats.errors}</div>
-                                <div className="text-[7px] @lg:text-[8px] font-bold text-textSecondary uppercase tracking-widest opacity-60">Errors</div>
-                            </div>
-                            <div className="text-center px-2">
-                                <div className="text-xs @lg:text-sm font-black text-highlight">{stats.total}</div>
-                                <div className="text-[7px] @lg:text-[8px] font-bold text-textSecondary uppercase tracking-widest opacity-60">Missions</div>
-                            </div>
+                        <div className="flex gap-2">
+                            <button onClick={downloadLogs} className="p-1.5 text-textSecondary hover:text-highlight transition-all"><Download size={14} /></button>
+                            <button onClick={reset} className="px-3 py-1 bg-highlight text-black text-[9px] font-bold uppercase rounded-md shadow-sm">New Mission</button>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            {/* ACTION LAYER (OPTIONS): HIDDEN WHEN MISSION IS ACTIVE/DONE */}
-            {!isAnyMissionActiveOrComplete ? (
-                <div className="flex flex-col @2xl:flex-row items-center justify-between gap-4 bg-cardPanel/60 backdrop-blur-lg p-4 @lg:p-5 rounded-2xl border border-borderLine shrink-0 animate-in slide-in-from-top duration-500">
-                    <div className="flex items-center space-x-2 overflow-x-auto custom-scrollbar pb-1 w-full @2xl:w-auto">
-                        {['all', ...TIERS].map((t) => (
-                            <button
-                                key={t}
-                                onClick={() => setActiveTier(t as any)}
-                                className={`px-4 @lg:px-6 py-2 rounded-xl text-[8px] @lg:text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTier === t ? 'bg-highlight text-black shadow-lg shadow-highlight/20' : 'bg-white/5 text-textSecondary hover:bg-white/10 hover:text-white'}`}
-                            >
-                                {t}
-                            </button>
+                    <div className="flex-1 bg-base/50 p-4 overflow-y-auto custom-scrollbar space-y-6">
+                        {Object.entries(tierStates).map(([tier, state]) => (
+                            <div key={tier} className="space-y-3">
+                                <h4 className="text-[10px] font-black text-highlight uppercase tracking-[0.1em] flex items-center">
+                                    <div className="w-1 h-3 bg-highlight mr-2 rounded-full" />
+                                    {tier} Audit
+                                </h4>
+                                <div className="space-y-2">
+                                    {state.testSuite?.testCases?.map((tc: any) => (
+                                        <div key={tc.id} className="flex items-center justify-between bg-white/[0.02] p-3 rounded-lg border border-white/5 hover:bg-white/5 transition-all group">
+                                            <div className="flex items-center space-x-3">
+                                                <div className={`w-1.5 h-1.5 rounded-full ${state.testResults?.[tc.id]?.status === 'pass' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,44,44,0.4)]'}`} />
+                                                <span className="text-[11px] text-textPrimary/90 font-medium">{tc.description}</span>
+                                            </div>
+                                            <button 
+                                                onClick={() => setFocusedTier(tier as Tier)}
+                                                className="text-[9px] font-bold text-textSecondary hover:text-highlight uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all"
+                                            >
+                                                Inspect
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {(!state.testSuite || state.testSuite.testCases.length === 0) && (
+                                        <div className="text-[10px] text-textSecondary/40 italic px-2">No anomalies detected.</div>
+                                    )}
+                                </div>
+                            </div>
                         ))}
                     </div>
-
-                    <button 
-                        onClick={executeFullMission}
-                        disabled={isGlobalMission}
-                        className="w-full @2xl:w-auto bg-highlight ring-4 ring-highlight/10 hover:ring-highlight/20 hover:scale-[1.02] text-black px-8 @lg:px-10 py-3 rounded-2xl flex items-center justify-center space-x-3 transition-all active:scale-[0.98] disabled:opacity-30"
-                    >
-                        {isGlobalMission ? <Loader2 className="animate-spin" size={18} /> : <Play size={18} fill="currentColor" />}
-                        <span className="text-[10px] @lg:text-[12px] font-black uppercase tracking-[0.1em]">Execute MISSION</span>
-                    </button>
-                </div>
-            ) : (
-                /* Header visible only when results are showing */
-                <div className="flex items-center justify-between px-2 shrink-0 animate-in fade-in duration-700">
-                    <div className="flex items-center space-x-2">
-                        <div className="w-1 h-4 bg-highlight rounded-full" />
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-textSecondary">Active Deployment Results</h3>
-                    </div>
-                    <button 
-                        onClick={resetMissions}
-                        className="text-[9px] font-black uppercase tracking-widest text-highlight border border-highlight/20 px-4 py-1.5 rounded-lg hover:bg-highlight hover:text-black transition-all"
-                    >
-                        New Mission
-                    </button>
                 </div>
             )}
 
-            {/* RESULTS GRID: VISIBLE ONLY WHEN RESULTS EXIST */}
-            {isAnyMissionActiveOrComplete && (
-                <div className={`flex-1 grid gap-4 min-h-0 overflow-y-auto custom-scrollbar p-1 animate-in zoom-in-95 duration-500 ${activeTier === 'all' ? 'grid-cols-[repeat(auto-fit,minmax(250px,1fr))]' : 'grid-cols-1'}`}>
-                    {(activeTier === 'all' || activeTier === 'unit') && tierStates.unit.status !== 'pending' && (
-                        <MissionCard tier="unit" icon={<Cpu size={20} />} state={tierStates.unit} onSmartFix={onSmartFix} onFocused={() => setFocusedTier('unit')} />
-                    )}
-                    {(activeTier === 'all' || activeTier === 'integration') && tierStates.integration.status !== 'pending' && (
-                        <MissionCard tier="integrations" icon={<Network size={20} />} state={tierStates.integration} onSmartFix={onSmartFix} onFocused={() => setFocusedTier('integration')} />
-                    )}
-                    {(activeTier === 'all' || activeTier === 'security') && tierStates.security.status !== 'pending' && (
-                        <MissionCard tier="security & risk" icon={<ShieldAlert size={20} />} state={tierStates.security} onSmartFix={onSmartFix} onFocused={() => setFocusedTier('security')} />
-                    )}
-                    {(activeTier === 'all' || activeTier === 'performance') && tierStates.performance.status !== 'pending' && (
-                        <MissionCard tier="efficiency & perf" icon={<ZapFilled size={20} />} state={tierStates.performance} onSmartFix={onSmartFix} onFocused={() => setFocusedTier('performance')} />
-                    )}
+            {/* DIAGNOSTIC MODAL */}
+            {focusedTier && (
+                <div className="absolute inset-0 z-[60] bg-base/95 backdrop-blur-md p-8 flex flex-col animate-in zoom-in-95 duration-200">
+                    <div className="flex items-center justify-between mb-8">
+                        <h3 className="text-[10px] font-bold text-highlight uppercase tracking-[0.2em]">{focusedTier} Diagnostic Trace</h3>
+                        <button onClick={() => setFocusedTier(null)} className="p-2 text-textSecondary hover:text-highlight"><Activity size={16} /></button>
+                    </div>
+                    <div className="flex-1 bg-black/40 rounded-xl border border-white/5 p-6 font-mono text-[11px] text-white/50 overflow-y-auto custom-scrollbar whitespace-pre-wrap">
+                        {tierStates[focusedTier].logs || "No logs available for this session."}
+                    </div>
                 </div>
             )}
-
-            {/* FLOATING LOG BUTTON & OVERLAY */}
-            <div className="absolute bottom-6 right-6 z-[100] flex flex-col items-end space-y-4">
-                {isTraceOpen && (
-                    <div className="w-[300px] h-[400px] bg-[#0c0c0e]/95 backdrop-blur-xl border border-highlight/20 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
-                        <div className="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                                <TerminalIcon size={14} className="text-highlight" />
-                                <span className="text-[10px] font-black text-textPrimary uppercase tracking-widest">System Trace</span>
-                            </div>
-                            <button onClick={() => setIsTraceOpen(false)} className="text-textSecondary hover:text-white transition-colors">
-                                <ChevronRight size={14} className="rotate-90" />
-                            </button>
-                        </div>
-                        <div ref={feedRef} className="flex-1 p-6 overflow-y-auto custom-scrollbar font-mono text-[9px] text-highlight space-y-1">
-                            {agentThoughts.length > 0 ? (
-                                agentThoughts.map((t, i) => <div key={i}>{t}</div>)
-                            ) : (
-                                <div className="opacity-40 italic">System idle. Awaiting mission start...</div>
-                            )}
-                        </div>
-                    </div>
-                )}
-                
-                <button 
-                    onClick={() => setIsTraceOpen(!isTraceOpen)}
-                    className={`p-4 rounded-2xl shadow-2xl transition-all active:scale-95 group ${isTraceOpen ? 'bg-highlight text-black' : 'bg-black border border-white/10 text-highlight hover:border-highlight/40'}`}
-                >
-                    <TerminalIcon size={20} className={isTraceOpen ? '' : 'group-hover:animate-pulse'} />
-                </button>
-            </div>
-        </div>
-    );
-};
-
-const MissionCard = ({ tier, icon, state, onSmartFix, onFocused }: { tier: string, icon: React.ReactNode, state: any, onSmartFix: any, onFocused: () => void }) => {
-    const isError = (state.logs || "").toLowerCase().includes('failed') || (state.logs || "").toLowerCase().includes('error');
-    
-    return (
-        <div className={`p-6 bg-cardPanel/60 rounded-3xl border transition-all duration-500 flex flex-col space-y-4 hover:bg-cardPanel/80 ${state.status === 'active' ? 'border-highlight shadow-[0_0_50px_-15px_rgba(var(--highlight-rgb),0.3)] ring-1 ring-highlight/50 scale-[0.99]' : 'border-borderLine shadow-xl grayscale-[0.5] opacity-80 hover:grayscale-0 hover:opacity-100'}`}>
-            <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                    <div className={`p-2.5 rounded-xl ${state.status === 'active' ? 'bg-highlight text-black' : 'bg-white/5 text-highlight'}`}>
-                        {icon}
-                    </div>
-                    <div>
-                        <h3 className="text-[11px] font-black uppercase tracking-widest text-textPrimary leading-none mb-1">{tier}</h3>
-                        <div className="text-[9px] font-bold text-textSecondary uppercase tracking-tighter opacity-60">Verified Exploration</div>
-                    </div>
-                </div>
-                {state.status === 'complete' && (
-                     <CheckCircle2 size={18} className={isError ? "text-red-500" : "text-green-500"} />
-                )}
-                {state.status === 'active' && (
-                     <Loader2 size={18} className="text-highlight animate-spin" />
-                )}
-            </div>
-
-            <div className="flex-1 min-h-[100px] border border-white/5 bg-black/40 rounded-2xl p-4 font-mono text-[9px] text-textSecondary overflow-y-auto custom-scrollbar relative">
-                <div className="space-y-1">
-                    {state.phase !== 'complete' && <div className="text-highlight animate-pulse flex items-center"><Sparkles size={8} className="mr-1.5" /> Agent is exploring code context...</div>}
-                    {state.findings.slice(0, 3).map((f: any, i: number) => (
-                        <div key={i} className="flex items-start space-x-2 border-l-2 border-white/10 pl-3 py-1 my-2">
-                            <div className="h-1 w-1 rounded-full bg-highlight mt-1" />
-                            <div className="flex-1">
-                                <span className="text-textPrimary font-bold">{f.label}:</span>
-                                <span className="ml-1 opacity-70 italic">{f.intent}</span>
-                            </div>
-                        </div>
-                    ))}
-                    {state.logs && <div className={`mt-4 p-2 rounded bg-black/60 border border-white/5 text-[8px] whitespace-pre-wrap ${isError ? 'text-red-400' : 'text-green-400'}`}>{state.logs}</div>}
-                </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-2">
-                <div className="flex items-center space-x-1.5 text-textSecondary hover:text-highlight cursor-pointer" onClick={onFocused}>
-                    <div className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${state.status === 'complete' ? (isError ? 'bg-red-500/10 text-red-500' : 'bg-green-500/10 text-green-500') : 'bg-white/5'}`}>
-                         {state.status === 'active' ? state.phase : (state.testSuite ? 'View Mission Results' : state.status)}
-                    </div>
-                    {state.testSuite && <ChevronRight size={14} className="animate-pulse" />}
-                </div>
-                {isError && (
-                    <button 
-                        onClick={onSmartFix}
-                        className="flex items-center space-x-1.5 text-highlight hover:bg-highlight/10 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
-                    >
-                        <ZapIcon size={12} fill="currentColor" />
-                        <span>Heal Tier</span>
-                    </button>
-                )}
-            </div>
         </div>
     );
 };

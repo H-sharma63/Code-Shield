@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/app/lib/auth';
 import { callVertexAI, callGeminiFallback } from '@/app/lib/ai/vertex-service';
 
 export async function POST(req: NextRequest) {
@@ -44,15 +44,19 @@ Return this EXACT JSON shape:
     // Clean up markdown and common AI expressions that break JSON.parse
     let cleanedJson = responseContent.replace(/```json\n?|```/gi, '').trim();
 
-    // REGEX SAFETY NET: Catch Python-style string multiplication (e.g. "a" * 10) 
-    // and replace it with the actual repeated string literal.
+    // 🛡️ ADVANCED CLEANUP: Fix expressions that break JSON.parse
+    // 1. Handle "str" * 10
     cleanedJson = cleanedJson.replace(/"([^"]+)"\s*\*\s*(\d+)/g, (match, str, count) => {
-        try {
-            return JSON.stringify(str.repeat(parseInt(count)));
-        } catch (e) {
-            return match; // Fallback to original if repeat fails
-        }
+        try { return JSON.stringify(str.repeat(parseInt(count))); } catch (e) { return match; }
     });
+
+    // 2. Handle "str".repeat(10)
+    cleanedJson = cleanedJson.replace(/"([^"]+)"\.repeat\((\d+)\)/g, (match, str, count) => {
+        try { return JSON.stringify(str.repeat(parseInt(count))); } catch (e) { return match; }
+    });
+
+    // 3. Handle simple concatenation "a" + "b"
+    cleanedJson = cleanedJson.replace(/"([^"]+)"\s*\+\s*"([^"]+)"/g, (match, s1, s2) => `"${s1}${s2}"`);
     
     try {
         const parsedData = JSON.parse(cleanedJson);

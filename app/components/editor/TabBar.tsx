@@ -140,19 +140,6 @@ function BreadcrumbPicker({ path, repoFullName, anchor, onClose, onNavigate }: {
                 if (repoFullName) {
                     const response = await fetch(`/api/github/contents?repo=${encodeURIComponent(repoFullName)}&path=${encodeURIComponent(parentPath)}`);
                     data = await response.json();
-                } else {
-                    // Local Project Support
-                    const response = await fetch('/api/get-projects');
-                    const localData = await response.json();
-                    if (localData.projects) {
-                        data = { 
-                            items: localData.projects.map((p: any) => ({
-                                name: p.fileName,
-                                path: p.fileName,
-                                type: 'file'
-                            }))
-                        };
-                    }
                 }
 
                 if (data && data.items) {

@@ -18,7 +18,7 @@ export const testRuns = pgTable('test_runs', {
   totalTests: integer('total_tests'),
   passed: integer('passed'),
   failed: integer('failed'),
-  results: text('results'), // JSON stringified full results
+  results: text('results'), 
 });
 
 export const repoEnvironments = pgTable('repo_environments', {
@@ -28,11 +28,3 @@ export const repoEnvironments = pgTable('repo_environments', {
   envVars: jsonb('env_vars').default({}).notNull(),
   updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull(),
 });
-
-// export const apiUsage = pgTable('api_usage', {
-//     id: serial('id').primaryKey(),
-//     model: varchar('model', { length: 256 }),
-//     tokens: integer('tokens'),
-//     createdAt: timestamp('created_at').defaultNow(),
-//     userEmail: varchar('user_email', { length: 256 }),
-// });

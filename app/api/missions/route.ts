@@ -8,7 +8,7 @@ const VERTEX_MODELS: Record<string, { type: 'google' | 'anthropic' | 'mistral'; 
 
 export async function POST(req: NextRequest) {
   try {
-    const { phase, code, context, tier = 'security', modelId = 'gemini-1.5-pro' } = await req.json();
+    const { phase, code, context, tier = 'security', modelId = 'gemini-1.5-pro', language = 'python' } = await req.json();
 
     const vertexConfig = VERTEX_MODELS[modelId] || VERTEX_MODELS['gemini-1.5-pro'];
 
@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
         1. "Ingest" the README, schemas, and file structure to understand intent.
         2. Propose specific, adversarial test missions (e.g. "Simulate Auth0 bypass", "Fuzz the JSON parser").
         3. Do NOT code yet. Just provide a strategic list.
+        4. LANGUAGE AWARENESS: The target code is in ${language}. Ensure the strategy is feasible for this environment.
 
         Return ONLY a JSON object:
         {
@@ -30,21 +31,26 @@ export async function POST(req: NextRequest) {
           ],
           "ingestionSummary": "Short recap of what you learned about the project"
         }`;
-        userPrompt = `--- PROJECT SCOPE ---\n${context}\n\n MISSION FOCUS: ${tier.toUpperCase()}`;
+        userPrompt = `--- PROJECT SCOPE ---\n${context}\n\n MISSION FOCUS: ${tier.toUpperCase()} [Language: ${language}]`;
     } else if (phase === 'script') {
-        systemPrompt = `You are a Resident Senior QA Agent. Use the project context to author a VERIFIABLE test suite.
+        const mockInstruction = language === 'python' 
+            ? "You MUST use 'unittest.mock' for ALL external imports."
+            : "You MUST use 'jest.mock' or simple object mocks for ALL external imports. Do NOT use Python's unittest.mock in JavaScript.";
+
+        systemPrompt = `You are a Resident Senior QA Agent. Use the project context to author a VERIFIABLE test suite in ${language}.
         
         CRITICAL RULES:
-        1. MOCKING MASTER: You MUST use 'unittest.mock' for ALL external imports (google-cloud, github, anthropic, auth0, etc.). Focus ONLY on the code logic.
-        2. SUBJECT FILE: Assume the code is in "subject_code.py". Your testSuite MUST 'import subject_code'.
-        3. REAL PROOFS: Write Python code (unittest/pytest) that validates the logic.
+        1. MOCKING MASTER: ${mockInstruction} Focus ONLY on the code logic.
+        2. SUBJECT FILE: Assume the code is in "subject_code". Your testSuite MUST import this module.
+        3. REAL PROOFS: Write code that validates the logic.
+        4. NO CROSS-POLLINATION: Do NOT use Python patterns (like 'patch' or decorators) if the language is JavaScript.
 
         Return ONLY a JSON object:
         {
-          "testSuite": "PYTHON_CODE_STRING",
+          "testSuite": "SOURCE_CODE_STRING",
           "intentExplainer": "How this script verifies the proposed strategy"
         }`;
-        userPrompt = `--- TARGET CODE ---\n${code}\n\n--- MISSION CONTEXT ---\n${context}`;
+        userPrompt = `--- TARGET CODE (${language}) ---\n${code}\n\n--- MISSION CONTEXT ---\n${context}`;
     }
 
     let responseContent: string;

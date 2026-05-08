@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/app/lib/auth';
 import { Octokit } from 'octokit';
 
 export async function GET(req: NextRequest) {
@@ -25,27 +25,54 @@ export async function GET(req: NextRequest) {
       auth: process.env.GITHUB_TOKEN || session?.accessToken
     });
 
-    // Fetch all repositories for the authenticated user
-    const response = await octokit.rest.repos.listForAuthenticatedUser({
-      sort: 'updated',
-      per_page: 100,
+    // Use GraphQL to fetch everything in one request to avoid N+1 slowness
+    const query = `
+      query($count: Int!) {
+        viewer {
+          repositories(first: $count, orderBy: {field: UPDATED_AT, direction: DESC}) {
+            nodes {
+              databaseId
+              name
+              nameWithOwner
+              description
+              url
+              isPrivate
+              isFork
+              updatedAt
+              primaryLanguage {
+                name
+              }
+              parent {
+                nameWithOwner
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const response: any = await octokit.graphql(query, {
+      count: 50 // Fetch enough to cover the dashboard needs
     });
 
-    const repos = response.data.map(repo => ({
-      id: repo.id,
+    const repos = response.viewer.repositories.nodes.map((repo: any) => ({
+      id: repo.databaseId,
       name: repo.name,
-      fullName: repo.full_name,
+      fullName: repo.nameWithOwner,
       description: repo.description,
-      url: repo.html_url,
-      isPrivate: repo.private,
-      updatedAt: repo.updated_at,
-      language: repo.language,
+      url: repo.url,
+      isPrivate: repo.isPrivate,
+      isFork: repo.isFork,
+      forkSource: repo.parent?.nameWithOwner || null,
+      updatedAt: repo.updatedAt,
+      language: repo.primaryLanguage?.name || null,
     }));
 
     return NextResponse.json({ repos }, { status: 200 });
 
   } catch (error: any) {
-    console.error('Error fetching GitHub repos:', error);
+    console.error('Error fetching GitHub repos (GraphQL):', error);
+    // Fallback or error reporting
     return NextResponse.json({ 
       message: 'Failed to fetch repositories.', 
       error: error.message 

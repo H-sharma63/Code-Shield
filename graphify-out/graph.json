@@ -9,7 +9,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\drizzle.config.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_drizzle_config_ts",
-      "community": 53,
+      "community": 56,
       "norm_label": "drizzle.config.ts"
     },
     {
@@ -18,7 +18,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\eslint.config.mjs",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_eslint_config_mjs",
-      "community": 54,
+      "community": 57,
       "norm_label": "eslint.config.mjs"
     },
     {
@@ -27,7 +27,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\instrumentation-client.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_instrumentation_client_ts",
-      "community": 55,
+      "community": 58,
       "norm_label": "instrumentation-client.ts"
     },
     {
@@ -54,7 +54,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\next-env.d.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_next_env_d_ts",
-      "community": 56,
+      "community": 59,
       "norm_label": "next-env.d.ts"
     },
     {
@@ -63,7 +63,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\next.config.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_next_config_ts",
-      "community": 57,
+      "community": 60,
       "norm_label": "next.config.ts"
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\postcss.config.js",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_postcss_config_js",
-      "community": 58,
+      "community": 61,
       "norm_label": "postcss.config.js"
     },
     {
@@ -81,7 +81,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\sentry.client.config.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_sentry_client_config_ts",
-      "community": 59,
+      "community": 62,
       "norm_label": "sentry.client.config.ts"
     },
     {
@@ -90,7 +90,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\sentry.edge.config.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_sentry_edge_config_ts",
-      "community": 60,
+      "community": 63,
       "norm_label": "sentry.edge.config.ts"
     },
     {
@@ -99,7 +99,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\sentry.server.config.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_sentry_server_config_ts",
-      "community": 61,
+      "community": 64,
       "norm_label": "sentry.server.config.ts"
     },
     {
@@ -108,7 +108,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\tailwind.config.js",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_tailwind_config_js",
-      "community": 62,
+      "community": 65,
       "norm_label": "tailwind.config.js"
     },
     {
@@ -117,7 +117,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\test-regex.js",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_test_regex_js",
-      "community": 63,
+      "community": 66,
       "norm_label": "test-regex.js"
     },
     {
@@ -126,7 +126,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\vitest.config.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_vitest_config_ts",
-      "community": 64,
+      "community": 67,
       "norm_label": "vitest.config.ts"
     },
     {
@@ -225,7 +225,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\admin\\login\\page.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_admin_login_page_tsx",
-      "community": 65,
+      "community": 68,
       "norm_label": "page.tsx"
     },
     {
@@ -234,7 +234,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\admin\\terminal\\page.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_admin_terminal_page_tsx",
-      "community": 17,
+      "community": 18,
       "norm_label": "page.tsx"
     },
     {
@@ -243,7 +243,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\admin\\terminal\\page.tsx",
       "source_location": "L122",
       "id": "page_handleuserclick",
-      "community": 17,
+      "community": 18,
       "norm_label": "handleuserclick()"
     },
     {
@@ -252,7 +252,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\admin\\terminal\\page.tsx",
       "source_location": "L144",
       "id": "page_handlesendcmd",
-      "community": 17,
+      "community": 18,
       "norm_label": "handlesendcmd()"
     },
     {
@@ -261,7 +261,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\admin\\user-monitoring\\page.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_admin_user_monitoring_page_tsx",
-      "community": 66,
+      "community": 69,
       "norm_label": "page.tsx"
     },
     {
@@ -276,8 +276,8 @@
     {
       "label": "GET()",
       "file_type": "code",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\github\\search\\route.ts",
-      "source_location": "L10",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\vercel\\deployments\\route.ts",
+      "source_location": "L4",
       "id": "route_get",
       "community": 2,
       "norm_label": "get()"
@@ -303,8 +303,8 @@
     {
       "label": "POST()",
       "file_type": "code",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\save-project\\route.ts",
-      "source_location": "L9",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\vercel\\deploy\\route.ts",
+      "source_location": "L7",
       "id": "route_post",
       "community": 1,
       "norm_label": "post()"
@@ -324,7 +324,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\auth\\[...nextauth]\\route.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_api_auth_nextauth_route_ts",
-      "community": 67,
+      "community": 70,
       "norm_label": "route.ts"
     },
     {
@@ -441,6 +441,15 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\github\\create-item\\route.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_api_github_create_item_route_ts",
+      "community": 1,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\github\\create-repo\\route.ts",
+      "source_location": "L1",
+      "id": "d_project_ai_based_code_reviewer_app_api_github_create_repo_route_ts",
       "community": 1,
       "norm_label": "route.ts"
     },
@@ -571,12 +580,57 @@
       "norm_label": "route.ts"
     },
     {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\test-runs\\route.ts",
+      "source_location": "L1",
+      "id": "d_project_ai_based_code_reviewer_app_api_test_runs_route_ts",
+      "community": 1,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\vercel\\auth\\route.ts",
+      "source_location": "L1",
+      "id": "d_project_ai_based_code_reviewer_app_api_vercel_auth_route_ts",
+      "community": 2,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\vercel\\callback\\route.ts",
+      "source_location": "L1",
+      "id": "d_project_ai_based_code_reviewer_app_api_vercel_callback_route_ts",
+      "community": 2,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\vercel\\deploy\\route.ts",
+      "source_location": "L1",
+      "id": "d_project_ai_based_code_reviewer_app_api_vercel_deploy_route_ts",
+      "community": 1,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\vercel\\deployments\\route.ts",
+      "source_location": "L1",
+      "id": "d_project_ai_based_code_reviewer_app_api_vercel_deployments_route_ts",
+      "community": 2,
+      "norm_label": "route.ts"
+    },
+    {
       "label": "ConditionalNavbar.tsx",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\ConditionalNavbar.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_conditionalnavbar_tsx",
-      "community": 68,
+      "community": 71,
       "norm_label": "conditionalnavbar.tsx"
     },
     {
@@ -585,26 +639,17 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\CreateProjectModal.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_createprojectmodal_tsx",
-      "community": 18,
+      "community": 32,
       "norm_label": "createprojectmodal.tsx"
     },
     {
-      "label": "onDrop()",
+      "label": "handleCreateRepo()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\CreateProjectModal.tsx",
-      "source_location": "L33",
-      "id": "createprojectmodal_ondrop",
-      "community": 18,
-      "norm_label": "ondrop()"
-    },
-    {
-      "label": "handleCreateProject()",
-      "file_type": "code",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\CreateProjectModal.tsx",
-      "source_location": "L54",
-      "id": "createprojectmodal_handlecreateproject",
-      "community": 18,
-      "norm_label": "handlecreateproject()"
+      "source_location": "L32",
+      "id": "createprojectmodal_handlecreaterepo",
+      "community": 32,
+      "norm_label": "handlecreaterepo()"
     },
     {
       "label": "DeleteConfirmationModal.tsx",
@@ -612,7 +657,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\DeleteConfirmationModal.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_deleteconfirmationmodal_tsx",
-      "community": 32,
+      "community": 33,
       "norm_label": "deleteconfirmationmodal.tsx"
     },
     {
@@ -621,7 +666,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\DeleteConfirmationModal.tsx",
       "source_location": "L21",
       "id": "deleteconfirmationmodal_deleteconfirmationmodal",
-      "community": 32,
+      "community": 33,
       "norm_label": "deleteconfirmationmodal()"
     },
     {
@@ -630,7 +675,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\LoginCard.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_logincard_tsx",
-      "community": 69,
+      "community": 72,
       "norm_label": "logincard.tsx"
     },
     {
@@ -639,7 +684,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\Navbar.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_navbar_tsx",
-      "community": 33,
+      "community": 34,
       "norm_label": "navbar.tsx"
     },
     {
@@ -648,7 +693,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\Navbar.tsx",
       "source_location": "L18",
       "id": "navbar_handleclickoutside",
-      "community": 33,
+      "community": 34,
       "norm_label": "handleclickoutside()"
     },
     {
@@ -657,7 +702,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\ProjectContext.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_projectcontext_tsx",
-      "community": 34,
+      "community": 35,
       "norm_label": "projectcontext.tsx"
     },
     {
@@ -666,7 +711,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\ProjectContext.tsx",
       "source_location": "L25",
       "id": "projectcontext_useproject",
-      "community": 34,
+      "community": 35,
       "norm_label": "useproject()"
     },
     {
@@ -675,7 +720,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\ProjectMenu.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_projectmenu_tsx",
-      "community": 35,
+      "community": 36,
       "norm_label": "projectmenu.tsx"
     },
     {
@@ -684,7 +729,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\ProjectMenu.tsx",
       "source_location": "L22",
       "id": "projectmenu_handledownload",
-      "community": 35,
+      "community": 36,
       "norm_label": "handledownload()"
     },
     {
@@ -693,7 +738,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\PusherContext.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_pushercontext_tsx",
-      "community": 36,
+      "community": 37,
       "norm_label": "pushercontext.tsx"
     },
     {
@@ -702,7 +747,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\PusherContext.tsx",
       "source_location": "L13",
       "id": "pushercontext_usepusher",
-      "community": 36,
+      "community": 37,
       "norm_label": "usepusher()"
     },
     {
@@ -711,7 +756,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\PusherProvider.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_pusherprovider_tsx",
-      "community": 70,
+      "community": 73,
       "norm_label": "pusherprovider.tsx"
     },
     {
@@ -720,7 +765,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\RenameProjectModal.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_renameprojectmodal_tsx",
-      "community": 37,
+      "community": 38,
       "norm_label": "renameprojectmodal.tsx"
     },
     {
@@ -729,7 +774,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\RenameProjectModal.tsx",
       "source_location": "L19",
       "id": "renameprojectmodal_renameprojectmodal",
-      "community": 37,
+      "community": 38,
       "norm_label": "renameprojectmodal()"
     },
     {
@@ -756,7 +801,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\Analysis.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_analysis_tsx",
-      "community": 38,
+      "community": 39,
       "norm_label": "analysis.tsx"
     },
     {
@@ -765,7 +810,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\Analysis.tsx",
       "source_location": "L25",
       "id": "analysis_handledownload",
-      "community": 38,
+      "community": 39,
       "norm_label": "handledownload()"
     },
     {
@@ -828,7 +873,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\ArchitectureTabView.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_architecturetabview_tsx",
-      "community": 71,
+      "community": 74,
       "norm_label": "architecturetabview.tsx"
     },
     {
@@ -837,7 +882,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\CommitModal.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_commitmodal_tsx",
-      "community": 39,
+      "community": 40,
       "norm_label": "commitmodal.tsx"
     },
     {
@@ -846,7 +891,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\CommitModal.tsx",
       "source_location": "L17",
       "id": "commitmodal_handlesubmit",
-      "community": 39,
+      "community": 40,
       "norm_label": "handlesubmit()"
     },
     {
@@ -855,7 +900,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\Debug.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_debug_tsx",
-      "community": 40,
+      "community": 41,
       "norm_label": "debug.tsx"
     },
     {
@@ -864,7 +909,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\Debug.tsx",
       "source_location": "L50",
       "id": "debug_handlestarttrace",
-      "community": 40,
+      "community": 41,
       "norm_label": "handlestarttrace()"
     },
     {
@@ -873,25 +918,34 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\DeploymentVault.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_deploymentvault_tsx",
-      "community": 19,
+      "community": 13,
       "norm_label": "deploymentvault.tsx"
+    },
+    {
+      "label": "checkConnection()",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\DeploymentVault.tsx",
+      "source_location": "L45",
+      "id": "deploymentvault_checkconnection",
+      "community": 13,
+      "norm_label": "checkconnection()"
     },
     {
       "label": "handleConnectVercel()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\DeploymentVault.tsx",
-      "source_location": "L50",
+      "source_location": "L67",
       "id": "deploymentvault_handleconnectvercel",
-      "community": 19,
+      "community": 13,
       "norm_label": "handleconnectvercel()"
     },
     {
       "label": "handleTriggerDeploy()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\DeploymentVault.tsx",
-      "source_location": "L55",
+      "source_location": "L72",
       "id": "deploymentvault_handletriggerdeploy",
-      "community": 19,
+      "community": 13,
       "norm_label": "handletriggerdeploy()"
     },
     {
@@ -900,7 +954,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\DiffView.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_diffview_tsx",
-      "community": 41,
+      "community": 42,
       "norm_label": "diffview.tsx"
     },
     {
@@ -909,7 +963,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\DiffView.tsx",
       "source_location": "L29",
       "id": "diffview_handleeditordidmount",
-      "community": 41,
+      "community": 42,
       "norm_label": "handleeditordidmount()"
     },
     {
@@ -918,7 +972,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\DiscardConfirmationModal.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_discardconfirmationmodal_tsx",
-      "community": 72,
+      "community": 75,
       "norm_label": "discardconfirmationmodal.tsx"
     },
     {
@@ -927,7 +981,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\EnvGuidanceModal.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_envguidancemodal_tsx",
-      "community": 42,
+      "community": 43,
       "norm_label": "envguidancemodal.tsx"
     },
     {
@@ -936,7 +990,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\EnvGuidanceModal.tsx",
       "source_location": "L12",
       "id": "envguidancemodal_envguidancemodal",
-      "community": 42,
+      "community": 43,
       "norm_label": "envguidancemodal()"
     },
     {
@@ -1017,16 +1071,16 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\FileExplorer.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_fileexplorer_tsx",
-      "community": 43,
+      "community": 44,
       "norm_label": "fileexplorer.tsx"
     },
     {
       "label": "if()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\FileExplorer.tsx",
-      "source_location": "L178",
+      "source_location": "L180",
       "id": "fileexplorer_if",
-      "community": 43,
+      "community": 44,
       "norm_label": "if()"
     },
     {
@@ -1035,7 +1089,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\FileIcon.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_fileicon_tsx",
-      "community": 73,
+      "community": 76,
       "norm_label": "fileicon.tsx"
     },
     {
@@ -1044,7 +1098,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\FileUpload.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_fileupload_tsx",
-      "community": 44,
+      "community": 45,
       "norm_label": "fileupload.tsx"
     },
     {
@@ -1053,7 +1107,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\FileUpload.tsx",
       "source_location": "L28",
       "id": "fileupload_ondrop",
-      "community": 44,
+      "community": 45,
       "norm_label": "ondrop()"
     },
     {
@@ -1062,7 +1116,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\GeminiCLI.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_geminicli_tsx",
-      "community": 45,
+      "community": 46,
       "norm_label": "geminicli.tsx"
     },
     {
@@ -1071,7 +1125,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\GeminiCLI.tsx",
       "source_location": "L50",
       "id": "geminicli_handleexecute",
-      "community": 45,
+      "community": 46,
       "norm_label": "handleexecute()"
     },
     {
@@ -1080,7 +1134,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\GeminiSidebar.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_geminisidebar_tsx",
-      "community": 20,
+      "community": 19,
       "norm_label": "geminisidebar.tsx"
     },
     {
@@ -1089,7 +1143,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\GeminiSidebar.tsx",
       "source_location": "L52",
       "id": "geminisidebar_handlesendmessage",
-      "community": 20,
+      "community": 19,
       "norm_label": "handlesendmessage()"
     },
     {
@@ -1098,7 +1152,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\GeminiSidebar.tsx",
       "source_location": "L105",
       "id": "geminisidebar_clearchat",
-      "community": 20,
+      "community": 19,
       "norm_label": "clearchat()"
     },
     {
@@ -1107,7 +1161,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\OpenCodeAgent.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_opencodeagent_tsx",
-      "community": 21,
+      "community": 20,
       "norm_label": "opencodeagent.tsx"
     },
     {
@@ -1116,7 +1170,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\OpenCodeAgent.tsx",
       "source_location": "L48",
       "id": "opencodeagent_handlectrlp",
-      "community": 21,
+      "community": 20,
       "norm_label": "handlectrlp()"
     },
     {
@@ -1125,7 +1179,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\OpenCodeAgent.tsx",
       "source_location": "L59",
       "id": "opencodeagent_handleexecute",
-      "community": 21,
+      "community": 20,
       "norm_label": "handleexecute()"
     },
     {
@@ -1134,7 +1188,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\Output.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_output_tsx",
-      "community": 46,
+      "community": 47,
       "norm_label": "output.tsx"
     },
     {
@@ -1143,7 +1197,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\Output.tsx",
       "source_location": "L7",
       "id": "output_output",
-      "community": 46,
+      "community": 47,
       "norm_label": "output()"
     },
     {
@@ -1152,7 +1206,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\ProgressBar.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_progressbar_tsx",
-      "community": 47,
+      "community": 48,
       "norm_label": "progressbar.tsx"
     },
     {
@@ -1161,7 +1215,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\ProgressBar.tsx",
       "source_location": "L10",
       "id": "progressbar_progressbar",
-      "community": 47,
+      "community": 48,
       "norm_label": "progressbar()"
     },
     {
@@ -1222,7 +1276,7 @@
       "label": "resetMissions()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\QualityAudit.tsx",
-      "source_location": "L193",
+      "source_location": "L218",
       "id": "qualityaudit_resetmissions",
       "community": 4,
       "norm_label": "resetmissions()"
@@ -1233,8 +1287,26 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\Search.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_search_tsx",
-      "community": 74,
+      "community": 77,
       "norm_label": "search.tsx"
+    },
+    {
+      "label": "SettingsPanel.tsx",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\SettingsPanel.tsx",
+      "source_location": "L1",
+      "id": "d_project_ai_based_code_reviewer_app_components_editor_settingspanel_tsx",
+      "community": 49,
+      "norm_label": "settingspanel.tsx"
+    },
+    {
+      "label": "SettingsPanel()",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\SettingsPanel.tsx",
+      "source_location": "L15",
+      "id": "settingspanel_settingspanel",
+      "community": 49,
+      "norm_label": "settingspanel()"
     },
     {
       "label": "SourceControl.tsx",
@@ -1296,7 +1368,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\TabBar.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_tabbar_tsx",
-      "community": 13,
+      "community": 14,
       "norm_label": "tabbar.tsx"
     },
     {
@@ -1305,7 +1377,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\TabBar.tsx",
       "source_location": "L41",
       "id": "tabbar_handlesegmentclick",
-      "community": 13,
+      "community": 14,
       "norm_label": "handlesegmentclick()"
     },
     {
@@ -1314,16 +1386,16 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\TabBar.tsx",
       "source_location": "L132",
       "id": "tabbar_fetchitems",
-      "community": 13,
+      "community": 14,
       "norm_label": "fetchitems()"
     },
     {
       "label": "handleClickOutside()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\TabBar.tsx",
-      "source_location": "L172",
+      "source_location": "L159",
       "id": "tabbar_handleclickoutside",
-      "community": 13,
+      "community": 14,
       "norm_label": "handleclickoutside()"
     },
     {
@@ -1332,7 +1404,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\Terminal.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_terminal_tsx",
-      "community": 11,
+      "community": 10,
       "norm_label": "terminal.tsx"
     },
     {
@@ -1341,7 +1413,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\Terminal.tsx",
       "source_location": "L62",
       "id": "terminal_sync",
-      "community": 11,
+      "community": 10,
       "norm_label": "sync()"
     },
     {
@@ -1350,7 +1422,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\Terminal.tsx",
       "source_location": "L79",
       "id": "terminal_handleresize",
-      "community": 11,
+      "community": 10,
       "norm_label": "handleresize()"
     },
     {
@@ -1359,7 +1431,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\Terminal.tsx",
       "source_location": "L102",
       "id": "terminal_handleexportoutput",
-      "community": 11,
+      "community": 10,
       "norm_label": "handleexportoutput()"
     },
     {
@@ -1368,7 +1440,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\Terminal.tsx",
       "source_location": "L245",
       "id": "terminal_async",
-      "community": 11,
+      "community": 10,
       "norm_label": "async()"
     },
     {
@@ -1377,7 +1449,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\UnsavedChangesModal.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_unsavedchangesmodal_tsx",
-      "community": 48,
+      "community": 50,
       "norm_label": "unsavedchangesmodal.tsx"
     },
     {
@@ -1386,7 +1458,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\UnsavedChangesModal.tsx",
       "source_location": "L14",
       "id": "unsavedchangesmodal_unsavedchangesmodal",
-      "community": 48,
+      "community": 50,
       "norm_label": "unsavedchangesmodal()"
     },
     {
@@ -1395,7 +1467,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\useLanguageDetector.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_uselanguagedetector_ts",
-      "community": 49,
+      "community": 51,
       "norm_label": "uselanguagedetector.ts"
     },
     {
@@ -1404,7 +1476,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\useLanguageDetector.ts",
       "source_location": "L13",
       "id": "uselanguagedetector_uselanguagedetector",
-      "community": 49,
+      "community": 51,
       "norm_label": "uselanguagedetector()"
     },
     {
@@ -1413,7 +1485,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\VisualDebugger.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_components_editor_visualdebugger_tsx",
-      "community": 14,
+      "community": 15,
       "norm_label": "visualdebugger.tsx"
     },
     {
@@ -1422,7 +1494,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\VisualDebugger.tsx",
       "source_location": "L55",
       "id": "visualdebugger_dismissguide",
-      "community": 14,
+      "community": 15,
       "norm_label": "dismissguide()"
     },
     {
@@ -1431,7 +1503,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\VisualDebugger.tsx",
       "source_location": "L71",
       "id": "visualdebugger_handlestarttrace",
-      "community": 14,
+      "community": 15,
       "norm_label": "handlestarttrace()"
     },
     {
@@ -1440,7 +1512,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\VisualDebugger.tsx",
       "source_location": "L147",
       "id": "visualdebugger_handleapplyneuralfix",
-      "community": 14,
+      "community": 15,
       "norm_label": "handleapplyneuralfix()"
     },
     {
@@ -1474,7 +1546,7 @@
       "label": "useWorkspace()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\WorkspaceContext.tsx",
-      "source_location": "L711",
+      "source_location": "L735",
       "id": "workspacecontext_useworkspace",
       "community": 9,
       "norm_label": "useworkspace()"
@@ -1485,25 +1557,25 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\dashboard\\page.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_dashboard_page_tsx",
-      "community": 22,
+      "community": 21,
       "norm_label": "page.tsx"
     },
     {
       "label": "timeSince()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\dashboard\\page.tsx",
-      "source_location": "L51",
+      "source_location": "L44",
       "id": "page_timesince",
-      "community": 22,
+      "community": 21,
       "norm_label": "timesince()"
     },
     {
       "label": "fetchData()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\dashboard\\page.tsx",
-      "source_location": "L86",
+      "source_location": "L78",
       "id": "page_fetchdata",
-      "community": 22,
+      "community": 21,
       "norm_label": "fetchdata()"
     },
     {
@@ -1519,7 +1591,7 @@
       "label": "getMonacoLanguage()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L55",
+      "source_location": "L57",
       "id": "page_getmonacolanguage",
       "community": 0,
       "norm_label": "getmonacolanguage()"
@@ -1528,7 +1600,7 @@
       "label": "handleGlobalKeyDown()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L195",
+      "source_location": "L198",
       "id": "page_handleglobalkeydown",
       "community": 0,
       "norm_label": "handleglobalkeydown()"
@@ -1537,7 +1609,7 @@
       "label": "handleRunProject()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L223",
+      "source_location": "L226",
       "id": "page_handlerunproject",
       "community": 0,
       "norm_label": "handlerunproject()"
@@ -1546,7 +1618,7 @@
       "label": "handleRemoteOpen()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L255",
+      "source_location": "L258",
       "id": "page_handleremoteopen",
       "community": 0,
       "norm_label": "handleremoteopen()"
@@ -1555,16 +1627,25 @@
       "label": "handleRemoteAgent()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L275",
+      "source_location": "L278",
       "id": "page_handleremoteagent",
       "community": 0,
       "norm_label": "handleremoteagent()"
     },
     {
+      "label": "handleMarkerChange()",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
+      "source_location": "L301",
+      "id": "page_handlemarkerchange",
+      "community": 0,
+      "norm_label": "handlemarkerchange()"
+    },
+    {
       "label": "handleAgentFileCreate()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L294",
+      "source_location": "L318",
       "id": "page_handleagentfilecreate",
       "community": 0,
       "norm_label": "handleagentfilecreate()"
@@ -1573,7 +1654,7 @@
       "label": "onFileCreated()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L320",
+      "source_location": "L344",
       "id": "page_onfilecreated",
       "community": 0,
       "norm_label": "onfilecreated()"
@@ -1582,7 +1663,7 @@
       "label": "handleItemDeleted()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L324",
+      "source_location": "L348",
       "id": "page_handleitemdeleted",
       "community": 0,
       "norm_label": "handleitemdeleted()"
@@ -1591,7 +1672,7 @@
       "label": "handleRefreshSCM()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L335",
+      "source_location": "L359",
       "id": "page_handlerefreshscm",
       "community": 0,
       "norm_label": "handlerefreshscm()"
@@ -1600,7 +1681,7 @@
       "label": "handleBranchChange()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L371",
+      "source_location": "L395",
       "id": "page_handlebranchchange",
       "community": 0,
       "norm_label": "handlebranchchange()"
@@ -1609,7 +1690,7 @@
       "label": "handleCreateBranch()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L392",
+      "source_location": "L416",
       "id": "page_handlecreatebranch",
       "community": 0,
       "norm_label": "handlecreatebranch()"
@@ -1618,7 +1699,7 @@
       "label": "handleKeyDown()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L530",
+      "source_location": "L634",
       "id": "page_handlekeydown",
       "community": 5,
       "norm_label": "handlekeydown()"
@@ -1627,7 +1708,7 @@
       "label": "saveNewProject()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L578",
+      "source_location": "L682",
       "id": "page_savenewproject",
       "community": 0,
       "norm_label": "savenewproject()"
@@ -1636,7 +1717,7 @@
       "label": "handleSearchResultClick()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L636",
+      "source_location": "L740",
       "id": "page_handlesearchresultclick",
       "community": 0,
       "norm_label": "handlesearchresultclick()"
@@ -1645,16 +1726,16 @@
       "label": "handleEditorDidMount()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L680",
+      "source_location": "L784",
       "id": "page_handleeditordidmount",
-      "community": 15,
+      "community": 16,
       "norm_label": "handleeditordidmount()"
     },
     {
       "label": "handleFileClick()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L775",
+      "source_location": "L879",
       "id": "page_handlefileclick",
       "community": 0,
       "norm_label": "handlefileclick()"
@@ -1663,7 +1744,7 @@
       "label": "closeTab()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L864",
+      "source_location": "L968",
       "id": "page_closetab",
       "community": 0,
       "norm_label": "closetab()"
@@ -1672,7 +1753,7 @@
       "label": "forceCloseTab()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L877",
+      "source_location": "L981",
       "id": "page_forceclosetab",
       "community": 0,
       "norm_label": "forceclosetab()"
@@ -1681,7 +1762,7 @@
       "label": "handleContentChange()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L888",
+      "source_location": "L992",
       "id": "page_handlecontentchange",
       "community": 0,
       "norm_label": "handlecontentchange()"
@@ -1690,7 +1771,7 @@
       "label": "handleGitHubCommit()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L903",
+      "source_location": "L1007",
       "id": "page_handlegithubcommit",
       "community": 0,
       "norm_label": "handlegithubcommit()"
@@ -1699,7 +1780,7 @@
       "label": "handleSmartFix()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L926",
+      "source_location": "L1030",
       "id": "page_handlesmartfix",
       "community": 0,
       "norm_label": "handlesmartfix()"
@@ -1708,7 +1789,7 @@
       "label": "handleGenTests()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L955",
+      "source_location": "L1059",
       "id": "page_handlegentests",
       "community": 0,
       "norm_label": "handlegentests()"
@@ -1717,7 +1798,7 @@
       "label": "handleAcceptDiff()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L995",
+      "source_location": "L1099",
       "id": "page_handleacceptdiff",
       "community": 0,
       "norm_label": "handleacceptdiff()"
@@ -1726,7 +1807,7 @@
       "label": "handleApplyDiagnostic()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1003",
+      "source_location": "L1107",
       "id": "page_handleapplydiagnostic",
       "community": 0,
       "norm_label": "handleapplydiagnostic()"
@@ -1735,7 +1816,7 @@
       "label": "handleGitHubPull()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1060",
+      "source_location": "L1164",
       "id": "page_handlegithubpull",
       "community": 0,
       "norm_label": "handlegithubpull()"
@@ -1744,7 +1825,7 @@
       "label": "handleGenerateCommitMessage()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1072",
+      "source_location": "L1176",
       "id": "page_handlegeneratecommitmessage",
       "community": 0,
       "norm_label": "handlegeneratecommitmessage()"
@@ -1753,7 +1834,7 @@
       "label": "handleAnalyzeCode()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1105",
+      "source_location": "L1209",
       "id": "page_handleanalyzecode",
       "community": 4,
       "norm_label": "handleanalyzecode()"
@@ -1762,7 +1843,7 @@
       "label": "handleRunCode()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1135",
+      "source_location": "L1239",
       "id": "page_handleruncode",
       "community": 0,
       "norm_label": "handleruncode()"
@@ -1771,7 +1852,7 @@
       "label": "handleNeuralFix()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1166",
+      "source_location": "L1270",
       "id": "page_handleneuralfix",
       "community": 0,
       "norm_label": "handleneuralfix()"
@@ -1780,7 +1861,7 @@
       "label": "renderActiveView()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1196",
+      "source_location": "L1300",
       "id": "page_renderactiveview",
       "community": 0,
       "norm_label": "renderactiveview()"
@@ -1789,7 +1870,7 @@
       "label": "async()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1229",
+      "source_location": "L1333",
       "id": "page_async",
       "community": 0,
       "norm_label": "async()"
@@ -1797,10 +1878,55 @@
     {
       "label": "page.tsx",
       "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor-v2\\page.tsx",
+      "source_location": "L1",
+      "id": "d_project_ai_based_code_reviewer_app_editor_v2_page_tsx",
+      "community": 11,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "handleActiveFile()",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor-v2\\page.tsx",
+      "source_location": "L26",
+      "id": "page_handleactivefile",
+      "community": 11,
+      "norm_label": "handleactivefile()"
+    },
+    {
+      "label": "handleActiveContent()",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor-v2\\page.tsx",
+      "source_location": "L33",
+      "id": "page_handleactivecontent",
+      "community": 11,
+      "norm_label": "handleactivecontent()"
+    },
+    {
+      "label": "handleApplyFix()",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor-v2\\page.tsx",
+      "source_location": "L47",
+      "id": "page_handleapplyfix",
+      "community": 11,
+      "norm_label": "handleapplyfix()"
+    },
+    {
+      "label": "checkHealth()",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor-v2\\page.tsx",
+      "source_location": "L65",
+      "id": "page_checkhealth",
+      "community": 11,
+      "norm_label": "checkhealth()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\landing\\page.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_landing_page_tsx",
-      "community": 75,
+      "community": 78,
       "norm_label": "page.tsx"
     },
     {
@@ -1809,7 +1935,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\lib\\db.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_lib_db_ts",
-      "community": 76,
+      "community": 79,
       "norm_label": "db.ts"
     },
     {
@@ -1836,7 +1962,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\lib\\schema.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_lib_schema_ts",
-      "community": 77,
+      "community": 80,
       "norm_label": "schema.ts"
     },
     {
@@ -1908,7 +2034,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\lib\\editor\\ata.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_lib_editor_ata_ts",
-      "community": 15,
+      "community": 16,
       "norm_label": "ata.ts"
     },
     {
@@ -1917,7 +2043,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\lib\\editor\\ata.ts",
       "source_location": "L17",
       "id": "ata_cachedfetcher",
-      "community": 15,
+      "community": 16,
       "norm_label": "cachedfetcher()"
     },
     {
@@ -1926,7 +2052,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\lib\\editor\\ata.ts",
       "source_location": "L37",
       "id": "ata_createata",
-      "community": 15,
+      "community": 16,
       "norm_label": "createata()"
     },
     {
@@ -1935,7 +2061,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\lib\\editor\\icon-theme.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_lib_editor_icon_theme_ts",
-      "community": 50,
+      "community": 52,
       "norm_label": "icon-theme.ts"
     },
     {
@@ -1944,7 +2070,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\lib\\editor\\icon-theme.ts",
       "source_location": "L14",
       "id": "icon_theme_geticonconfig",
-      "community": 50,
+      "community": 52,
       "norm_label": "geticonconfig()"
     },
     {
@@ -2034,7 +2160,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\lib\\editor\\shield-sync.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_lib_editor_shield_sync_ts",
-      "community": 78,
+      "community": 81,
       "norm_label": "shield-sync.ts"
     },
     {
@@ -2088,53 +2214,17 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\projects\\page.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_projects_page_tsx",
-      "community": 10,
+      "community": 53,
       "norm_label": "page.tsx"
     },
     {
       "label": "fetchAllData()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\projects\\page.tsx",
-      "source_location": "L53",
+      "source_location": "L40",
       "id": "page_fetchalldata",
-      "community": 10,
+      "community": 53,
       "norm_label": "fetchalldata()"
-    },
-    {
-      "label": "handleRename()",
-      "file_type": "code",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\projects\\page.tsx",
-      "source_location": "L93",
-      "id": "page_handlerename",
-      "community": 10,
-      "norm_label": "handlerename()"
-    },
-    {
-      "label": "handleConfirmRename()",
-      "file_type": "code",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\projects\\page.tsx",
-      "source_location": "L98",
-      "id": "page_handleconfirmrename",
-      "community": 10,
-      "norm_label": "handleconfirmrename()"
-    },
-    {
-      "label": "handleDelete()",
-      "file_type": "code",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\projects\\page.tsx",
-      "source_location": "L121",
-      "id": "page_handledelete",
-      "community": 10,
-      "norm_label": "handledelete()"
-    },
-    {
-      "label": "handleConfirmDelete()",
-      "file_type": "code",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\projects\\page.tsx",
-      "source_location": "L126",
-      "id": "page_handleconfirmdelete",
-      "community": 10,
-      "norm_label": "handleconfirmdelete()"
     },
     {
       "label": "page.tsx",
@@ -2142,7 +2232,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\sentry-example-page\\page.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_sentry_example_page_page_tsx",
-      "community": 16,
+      "community": 17,
       "norm_label": "page.tsx"
     },
     {
@@ -2151,7 +2241,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\sentry-example-page\\page.tsx",
       "source_location": "L7",
       "id": "page_sentryexamplefrontenderror",
-      "community": 16,
+      "community": 17,
       "norm_label": "sentryexamplefrontenderror"
     },
     {
@@ -2160,7 +2250,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\sentry-example-page\\page.tsx",
       "source_location": "L8",
       "id": "page_sentryexamplefrontenderror_constructor",
-      "community": 16,
+      "community": 17,
       "norm_label": ".constructor()"
     },
     {
@@ -2169,7 +2259,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\sentry-example-page\\page.tsx",
       "source_location": "L19",
       "id": "page_checkconnectivity",
-      "community": 16,
+      "community": 17,
       "norm_label": "checkconnectivity()"
     },
     {
@@ -2178,7 +2268,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\settings\\page.tsx",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_app_settings_page_tsx",
-      "community": 23,
+      "community": 22,
       "norm_label": "page.tsx"
     },
     {
@@ -2187,7 +2277,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\settings\\page.tsx",
       "source_location": "L39",
       "id": "page_handlesavekey",
-      "community": 23,
+      "community": 22,
       "norm_label": "handlesavekey()"
     },
     {
@@ -2196,8 +2286,35 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\settings\\page.tsx",
       "source_location": "L46",
       "id": "page_fetchrepos",
-      "community": 23,
+      "community": 22,
       "norm_label": "fetchrepos()"
+    },
+    {
+      "label": "extension.js",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\codeshield-vscode-bridge\\extension.js",
+      "source_location": "L1",
+      "id": "d_project_ai_based_code_reviewer_codeshield_vscode_bridge_extension_js",
+      "community": 23,
+      "norm_label": "extension.js"
+    },
+    {
+      "label": "activate()",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\codeshield-vscode-bridge\\extension.js",
+      "source_location": "L4",
+      "id": "extension_activate",
+      "community": 23,
+      "norm_label": "activate()"
+    },
+    {
+      "label": "deactivate()",
+      "file_type": "code",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\codeshield-vscode-bridge\\extension.js",
+      "source_location": "L78",
+      "id": "extension_deactivate",
+      "community": 23,
+      "norm_label": "deactivate()"
     },
     {
       "label": "detectFramework.js",
@@ -2230,7 +2347,7 @@
       "label": "manageTunnelForPort()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\terminal-backend\\server.js",
-      "source_location": "L134",
+      "source_location": "L165",
       "id": "server_managetunnelforport",
       "community": 3,
       "norm_label": "managetunnelforport()"
@@ -2331,7 +2448,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\public\\sw.js",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_public_sw_js",
-      "community": 79,
+      "community": 82,
       "norm_label": "sw.js"
     },
     {
@@ -2340,7 +2457,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\public\\workers\\eslint.worker.js",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_public_workers_eslint_worker_js",
-      "community": 80,
+      "community": 83,
       "norm_label": "eslint.worker.js"
     },
     {
@@ -2349,7 +2466,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\scripts\\search_repo.ps1",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_scripts_search_repo_ps1",
-      "community": 81,
+      "community": 84,
       "norm_label": "search_repo.ps1"
     },
     {
@@ -2358,7 +2475,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\scripts\\setup_search.ps1",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_scripts_setup_search_ps1",
-      "community": 82,
+      "community": 85,
       "norm_label": "setup_search.ps1"
     },
     {
@@ -2367,7 +2484,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\scripts\\terminal-proxy.js",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_scripts_terminal_proxy_js",
-      "community": 51,
+      "community": 54,
       "norm_label": "terminal-proxy.js"
     },
     {
@@ -2376,7 +2493,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\scripts\\terminal-proxy.js",
       "source_location": "L26",
       "id": "terminal_proxy_startshell",
-      "community": 51,
+      "community": 54,
       "norm_label": "startshell()"
     },
     {
@@ -2385,7 +2502,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\scripts\\validate-all.ps1",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_scripts_validate_all_ps1",
-      "community": 83,
+      "community": 86,
       "norm_label": "validate-all.ps1"
     },
     {
@@ -2394,7 +2511,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\scripts\\validate-skills.ps1",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_scripts_validate_skills_ps1",
-      "community": 84,
+      "community": 87,
       "norm_label": "validate-skills.ps1"
     },
     {
@@ -2403,7 +2520,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\scripts\\validate-templates.ps1",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_scripts_validate_templates_ps1",
-      "community": 85,
+      "community": 88,
       "norm_label": "validate-templates.ps1"
     },
     {
@@ -2412,7 +2529,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\scripts\\validate-workflows.ps1",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_scripts_validate_workflows_ps1",
-      "community": 86,
+      "community": 89,
       "norm_label": "validate-workflows.ps1"
     },
     {
@@ -2437,7 +2554,7 @@
       "label": "writeBase64File()",
       "file_type": "code",
       "source_file": "D:\\project\\ai_based_code_reviewer\\terminal-backend\\server.js",
-      "source_location": "L213",
+      "source_location": "L244",
       "id": "server_writebase64file",
       "community": 3,
       "norm_label": "writebase64file()"
@@ -2520,7 +2637,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\types\\next-auth.d.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_types_next_auth_d_ts",
-      "community": 87,
+      "community": 90,
       "norm_label": "next-auth.d.ts"
     },
     {
@@ -2529,7 +2646,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\types\\xterm.d.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_types_xterm_d_ts",
-      "community": 88,
+      "community": 91,
       "norm_label": "xterm.d.ts"
     },
     {
@@ -2538,7 +2655,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\__tests__\\payload.test.ts",
       "source_location": "L1",
       "id": "d_project_ai_based_code_reviewer_tests_payload_test_ts",
-      "community": 52,
+      "community": 55,
       "norm_label": "payload.test.ts"
     },
     {
@@ -2547,7 +2664,7 @@
       "source_file": "D:\\project\\ai_based_code_reviewer\\__tests__\\payload.test.ts",
       "source_location": "L4",
       "id": "payload_test_buildjudge0payload",
-      "community": 52,
+      "community": 55,
       "norm_label": "buildjudge0payload()"
     }
   ],
@@ -2676,7 +2793,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\get-activity\\route.ts",
-      "source_location": "L8",
+      "source_location": "L9",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_api_get_activity_route_ts",
       "_tgt": "route_get",
@@ -2814,6 +2931,42 @@
       "_tgt": "route_get",
       "source": "route_get",
       "target": "d_project_ai_based_code_reviewer_app_api_github_search_route_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\vercel\\auth\\route.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_app_api_vercel_auth_route_ts",
+      "_tgt": "route_get",
+      "source": "route_get",
+      "target": "d_project_ai_based_code_reviewer_app_api_vercel_auth_route_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\vercel\\callback\\route.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_app_api_vercel_callback_route_ts",
+      "_tgt": "route_get",
+      "source": "route_get",
+      "target": "d_project_ai_based_code_reviewer_app_api_vercel_callback_route_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\vercel\\deployments\\route.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_app_api_vercel_deployments_route_ts",
+      "_tgt": "route_get",
+      "source": "route_get",
+      "target": "d_project_ai_based_code_reviewer_app_api_vercel_deployments_route_ts",
       "confidence_score": 1.0
     },
     {
@@ -2987,6 +3140,18 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\github\\create-repo\\route.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_app_api_github_create_repo_route_ts",
+      "_tgt": "route_post",
+      "source": "route_post",
+      "target": "d_project_ai_based_code_reviewer_app_api_github_create_repo_route_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\github\\delete-item\\route.ts",
       "source_location": "L6",
       "weight": 1.0,
@@ -3105,6 +3270,30 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\test-runs\\route.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_app_api_test_runs_route_ts",
+      "_tgt": "route_post",
+      "source": "route_post",
+      "target": "d_project_ai_based_code_reviewer_app_api_test_runs_route_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\api\\vercel\\deploy\\route.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_app_api_vercel_deploy_route_ts",
+      "_tgt": "route_post",
+      "source": "route_post",
+      "target": "d_project_ai_based_code_reviewer_app_api_vercel_deploy_route_ts",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
@@ -3156,24 +3345,12 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\CreateProjectModal.tsx",
-      "source_location": "L33",
+      "source_location": "L32",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_components_createprojectmodal_tsx",
-      "_tgt": "createprojectmodal_ondrop",
+      "_tgt": "createprojectmodal_handlecreaterepo",
       "source": "d_project_ai_based_code_reviewer_app_components_createprojectmodal_tsx",
-      "target": "createprojectmodal_ondrop",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\CreateProjectModal.tsx",
-      "source_location": "L54",
-      "weight": 1.0,
-      "_src": "d_project_ai_based_code_reviewer_app_components_createprojectmodal_tsx",
-      "_tgt": "createprojectmodal_handlecreateproject",
-      "source": "d_project_ai_based_code_reviewer_app_components_createprojectmodal_tsx",
-      "target": "createprojectmodal_handlecreateproject",
+      "target": "createprojectmodal_handlecreaterepo",
       "confidence_score": 1.0
     },
     {
@@ -3372,7 +3549,19 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\DeploymentVault.tsx",
-      "source_location": "L50",
+      "source_location": "L45",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_app_components_editor_deploymentvault_tsx",
+      "_tgt": "deploymentvault_checkconnection",
+      "source": "d_project_ai_based_code_reviewer_app_components_editor_deploymentvault_tsx",
+      "target": "deploymentvault_checkconnection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\DeploymentVault.tsx",
+      "source_location": "L67",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_components_editor_deploymentvault_tsx",
       "_tgt": "deploymentvault_handleconnectvercel",
@@ -3384,11 +3573,23 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\DeploymentVault.tsx",
-      "source_location": "L55",
+      "source_location": "L72",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_components_editor_deploymentvault_tsx",
       "_tgt": "deploymentvault_handletriggerdeploy",
       "source": "d_project_ai_based_code_reviewer_app_components_editor_deploymentvault_tsx",
+      "target": "deploymentvault_handletriggerdeploy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\DeploymentVault.tsx",
+      "source_location": "L92",
+      "weight": 1.0,
+      "_src": "deploymentvault_handletriggerdeploy",
+      "_tgt": "deploymentvault_checkconnection",
+      "source": "deploymentvault_checkconnection",
       "target": "deploymentvault_handletriggerdeploy",
       "confidence_score": 1.0
     },
@@ -3516,7 +3717,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\FileExplorer.tsx",
-      "source_location": "L178",
+      "source_location": "L180",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_components_editor_fileexplorer_tsx",
       "_tgt": "fileexplorer_if",
@@ -3684,7 +3885,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\QualityAudit.tsx",
-      "source_location": "L193",
+      "source_location": "L218",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_components_editor_qualityaudit_tsx",
       "_tgt": "qualityaudit_resetmissions",
@@ -3763,6 +3964,18 @@
       "_tgt": "workspace_context_getdeepprojectcontext",
       "source": "qualityaudit_executefullmission",
       "target": "workspace_context_getdeepprojectcontext"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\SettingsPanel.tsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_app_components_editor_settingspanel_tsx",
+      "_tgt": "settingspanel_settingspanel",
+      "source": "d_project_ai_based_code_reviewer_app_components_editor_settingspanel_tsx",
+      "target": "settingspanel_settingspanel",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -3852,7 +4065,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\TabBar.tsx",
-      "source_location": "L172",
+      "source_location": "L159",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_components_editor_tabbar_tsx",
       "_tgt": "tabbar_handleclickoutside",
@@ -3996,7 +4209,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\components\\editor\\WorkspaceContext.tsx",
-      "source_location": "L711",
+      "source_location": "L735",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_components_editor_workspacecontext_tsx",
       "_tgt": "workspacecontext_useworkspace",
@@ -4008,7 +4221,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\dashboard\\page.tsx",
-      "source_location": "L51",
+      "source_location": "L44",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_dashboard_page_tsx",
       "_tgt": "page_timesince",
@@ -4020,7 +4233,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\dashboard\\page.tsx",
-      "source_location": "L86",
+      "source_location": "L78",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_dashboard_page_tsx",
       "_tgt": "page_fetchdata",
@@ -4032,7 +4245,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L55",
+      "source_location": "L57",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_getmonacolanguage",
@@ -4044,7 +4257,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L195",
+      "source_location": "L198",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handleglobalkeydown",
@@ -4056,7 +4269,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L223",
+      "source_location": "L226",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handlerunproject",
@@ -4068,7 +4281,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L255",
+      "source_location": "L258",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handleremoteopen",
@@ -4080,7 +4293,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L275",
+      "source_location": "L278",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handleremoteagent",
@@ -4092,7 +4305,19 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L294",
+      "source_location": "L301",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
+      "_tgt": "page_handlemarkerchange",
+      "source": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
+      "target": "page_handlemarkerchange",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
+      "source_location": "L318",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handleagentfilecreate",
@@ -4104,7 +4329,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L320",
+      "source_location": "L344",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_onfilecreated",
@@ -4116,7 +4341,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L324",
+      "source_location": "L348",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handleitemdeleted",
@@ -4128,7 +4353,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L335",
+      "source_location": "L359",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handlerefreshscm",
@@ -4140,7 +4365,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L371",
+      "source_location": "L395",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handlebranchchange",
@@ -4152,7 +4377,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L392",
+      "source_location": "L416",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handlecreatebranch",
@@ -4164,7 +4389,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L530",
+      "source_location": "L634",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handlekeydown",
@@ -4176,7 +4401,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L578",
+      "source_location": "L682",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_savenewproject",
@@ -4188,7 +4413,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L636",
+      "source_location": "L740",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handlesearchresultclick",
@@ -4200,7 +4425,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L680",
+      "source_location": "L784",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handleeditordidmount",
@@ -4212,7 +4437,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L775",
+      "source_location": "L879",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handlefileclick",
@@ -4224,7 +4449,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L864",
+      "source_location": "L968",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_closetab",
@@ -4236,7 +4461,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L877",
+      "source_location": "L981",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_forceclosetab",
@@ -4248,7 +4473,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L888",
+      "source_location": "L992",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handlecontentchange",
@@ -4260,7 +4485,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L903",
+      "source_location": "L1007",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handlegithubcommit",
@@ -4272,7 +4497,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L926",
+      "source_location": "L1030",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handlesmartfix",
@@ -4284,7 +4509,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L955",
+      "source_location": "L1059",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handlegentests",
@@ -4296,7 +4521,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L995",
+      "source_location": "L1099",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handleacceptdiff",
@@ -4308,7 +4533,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1003",
+      "source_location": "L1107",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handleapplydiagnostic",
@@ -4320,7 +4545,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1060",
+      "source_location": "L1164",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handlegithubpull",
@@ -4332,7 +4557,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1072",
+      "source_location": "L1176",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handlegeneratecommitmessage",
@@ -4344,7 +4569,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1105",
+      "source_location": "L1209",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handleanalyzecode",
@@ -4356,7 +4581,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1135",
+      "source_location": "L1239",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handleruncode",
@@ -4368,7 +4593,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1166",
+      "source_location": "L1270",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_handleneuralfix",
@@ -4380,7 +4605,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1196",
+      "source_location": "L1300",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_renderactiveview",
@@ -4392,7 +4617,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1527",
+      "source_location": "L1652",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_editor_page_tsx",
       "_tgt": "page_async",
@@ -4404,7 +4629,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L262",
+      "source_location": "L265",
       "weight": 1.0,
       "_src": "page_handleremoteopen",
       "_tgt": "page_getmonacolanguage",
@@ -4416,7 +4641,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L300",
+      "source_location": "L324",
       "weight": 1.0,
       "_src": "page_handleagentfilecreate",
       "_tgt": "page_getmonacolanguage",
@@ -4428,7 +4653,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L650",
+      "source_location": "L754",
       "weight": 1.0,
       "_src": "page_handlesearchresultclick",
       "_tgt": "page_getmonacolanguage",
@@ -4440,7 +4665,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1148",
+      "source_location": "L1252",
       "weight": 1.0,
       "_src": "page_handleruncode",
       "_tgt": "page_getmonacolanguage",
@@ -4464,7 +4689,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L874",
+      "source_location": "L978",
       "weight": 1.0,
       "_src": "page_closetab",
       "_tgt": "page_forceclosetab",
@@ -4476,7 +4701,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1535",
+      "source_location": "L1660",
       "weight": 1.0,
       "_src": "page_async",
       "_tgt": "page_forceclosetab",
@@ -4488,7 +4713,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1229",
+      "source_location": "L1333",
       "weight": 1.0,
       "_src": "page_async",
       "_tgt": "page_handlegithubcommit",
@@ -4500,7 +4725,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor\\page.tsx",
-      "source_location": "L1229",
+      "source_location": "L1333",
       "weight": 1.0,
       "_src": "page_async",
       "_tgt": "page_handlegithubpull",
@@ -4543,6 +4768,54 @@
       "_tgt": "opfs_storage_opfsstorage_writefile",
       "source": "page_async",
       "target": "opfs_storage_opfsstorage_writefile"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor-v2\\page.tsx",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_app_editor_v2_page_tsx",
+      "_tgt": "page_handleactivefile",
+      "source": "d_project_ai_based_code_reviewer_app_editor_v2_page_tsx",
+      "target": "page_handleactivefile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor-v2\\page.tsx",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_app_editor_v2_page_tsx",
+      "_tgt": "page_handleactivecontent",
+      "source": "d_project_ai_based_code_reviewer_app_editor_v2_page_tsx",
+      "target": "page_handleactivecontent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor-v2\\page.tsx",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_app_editor_v2_page_tsx",
+      "_tgt": "page_handleapplyfix",
+      "source": "d_project_ai_based_code_reviewer_app_editor_v2_page_tsx",
+      "target": "page_handleapplyfix",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\editor-v2\\page.tsx",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_app_editor_v2_page_tsx",
+      "_tgt": "page_checkhealth",
+      "source": "d_project_ai_based_code_reviewer_app_editor_v2_page_tsx",
+      "target": "page_checkhealth",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -4908,84 +5181,12 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\app\\projects\\page.tsx",
-      "source_location": "L53",
+      "source_location": "L40",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_app_projects_page_tsx",
       "_tgt": "page_fetchalldata",
       "source": "d_project_ai_based_code_reviewer_app_projects_page_tsx",
       "target": "page_fetchalldata",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\projects\\page.tsx",
-      "source_location": "L93",
-      "weight": 1.0,
-      "_src": "d_project_ai_based_code_reviewer_app_projects_page_tsx",
-      "_tgt": "page_handlerename",
-      "source": "d_project_ai_based_code_reviewer_app_projects_page_tsx",
-      "target": "page_handlerename",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\projects\\page.tsx",
-      "source_location": "L98",
-      "weight": 1.0,
-      "_src": "d_project_ai_based_code_reviewer_app_projects_page_tsx",
-      "_tgt": "page_handleconfirmrename",
-      "source": "d_project_ai_based_code_reviewer_app_projects_page_tsx",
-      "target": "page_handleconfirmrename",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\projects\\page.tsx",
-      "source_location": "L121",
-      "weight": 1.0,
-      "_src": "d_project_ai_based_code_reviewer_app_projects_page_tsx",
-      "_tgt": "page_handledelete",
-      "source": "d_project_ai_based_code_reviewer_app_projects_page_tsx",
-      "target": "page_handledelete",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\projects\\page.tsx",
-      "source_location": "L126",
-      "weight": 1.0,
-      "_src": "d_project_ai_based_code_reviewer_app_projects_page_tsx",
-      "_tgt": "page_handleconfirmdelete",
-      "source": "d_project_ai_based_code_reviewer_app_projects_page_tsx",
-      "target": "page_handleconfirmdelete",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\projects\\page.tsx",
-      "source_location": "L107",
-      "weight": 1.0,
-      "_src": "page_handleconfirmrename",
-      "_tgt": "page_fetchalldata",
-      "source": "page_fetchalldata",
-      "target": "page_handleconfirmrename",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "D:\\project\\ai_based_code_reviewer\\app\\projects\\page.tsx",
-      "source_location": "L134",
-      "weight": 1.0,
-      "_src": "page_handleconfirmdelete",
-      "_tgt": "page_fetchalldata",
-      "source": "page_fetchalldata",
-      "target": "page_handleconfirmdelete",
       "confidence_score": 1.0
     },
     {
@@ -5051,6 +5252,30 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\codeshield-vscode-bridge\\extension.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_codeshield_vscode_bridge_extension_js",
+      "_tgt": "extension_activate",
+      "source": "d_project_ai_based_code_reviewer_codeshield_vscode_bridge_extension_js",
+      "target": "extension_activate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:\\project\\ai_based_code_reviewer\\codeshield-vscode-bridge\\extension.js",
+      "source_location": "L78",
+      "weight": 1.0,
+      "_src": "d_project_ai_based_code_reviewer_codeshield_vscode_bridge_extension_js",
+      "_tgt": "extension_deactivate",
+      "source": "d_project_ai_based_code_reviewer_codeshield_vscode_bridge_extension_js",
+      "target": "extension_deactivate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\deploy-tmp\\detectFramework.js",
       "source_location": "L8",
       "weight": 1.0,
@@ -5088,7 +5313,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\terminal-backend\\server.js",
-      "source_location": "L134",
+      "source_location": "L165",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_terminal_backend_server_js",
       "_tgt": "server_managetunnelforport",
@@ -5316,7 +5541,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "D:\\project\\ai_based_code_reviewer\\terminal-backend\\server.js",
-      "source_location": "L213",
+      "source_location": "L244",
       "weight": 1.0,
       "_src": "d_project_ai_based_code_reviewer_terminal_backend_server_js",
       "_tgt": "server_writebase64file",

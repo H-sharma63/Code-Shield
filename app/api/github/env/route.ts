@@ -3,7 +3,7 @@ import { db } from '@/app/lib/db';
 import { repoEnvironments } from '@/app/lib/schema';
 import { eq, and } from 'drizzle-orm';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/app/lib/auth';
 
 export async function GET(req: NextRequest) {
     const session = await getServerSession(authOptions);
